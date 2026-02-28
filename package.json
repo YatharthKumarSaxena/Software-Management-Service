@@ -10,7 +10,30 @@
   "author": "Yatharth Kumar Saxena",
   "license": "ISC",
   "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "module-alias": "^2.3.4"
+    "express-rate-limit": "^8.2.1",
+    "ioredis": "^5.10.0",
+    "module-alias": "^2.3.4",
+    "mongoose": "^9.2.3",
+    "rate-limit-redis": "^4.3.1"
+  },
+  "_moduleAliases": {
+    "@": "src",
+    "@app": "src/app",
+    "@testing": "src/testing",
+    "@bootstrap": "src/bootstrap",
+    "@configs": "src/configs",
+    "@utils": "src/utils",
+    "@middlewares": "src/middlewares",
+    "@services": "src/services",
+    "@rate-limiters": "src/rate-limiters",
+    "@controllers": "src/controllers",
+    "@routes": "src/routers",
+    "@models": "src/models",
+    "@cron-jobs": "src/cron-jobs",
+    "@internals": "src/internals",
+    "@responses": "src/responses"
   }
 }
