@@ -133,7 +133,7 @@ const throwInternalServerError = (res,error) => {
     return res.status(INTERNAL_ERROR).json({
         success: false,
         response: "An internal server error occurred while processing your request.",
-        message: "We apologize for the inconvenience. Please try again later."
+        message: "W    errorMessage,e apologize for the inconvenience. Please try again later."
     });
 }
 
@@ -176,6 +176,24 @@ const throwFeatureDisabledError = (res, featureName, reason = "This feature is c
     });
 };
 
+/*
+  SRP + DRY: 
+  Handles all credentials failure responses.
+*/
+
+const throwUnauthorizedError = (res,resource,reason) => {
+    logWithTime("⚠️ Invalid "+resource);
+    logWithTime("❌ Invalid Credentials! Please try again.");
+    return res.status(UNAUTHORIZED).json({
+        success: false,
+        type: "Unauthorized",
+        resource: resource,
+        reason: reason,
+        warning: "Invalid "+ resource + " Entered",
+        message: "Please enter a Valid "+ resource
+    })
+}
+
 module.exports = {
     throwMissingFieldsError,
     throwInternalServerError,
@@ -189,6 +207,7 @@ module.exports = {
     throwSpecificInternalServerError,
     throwTooManyRequestsError,
     throwFeatureDisabledError,
+    throwUnauthorizedError,
     getLogIdentifiers,
     logMiddlewareError,
     errorMessage
