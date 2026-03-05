@@ -67,9 +67,7 @@ const initializeMicroservice = async () => {
             const { healthCheck } = internal.clients.authClient;
             const healthStatus = await healthCheck();
             
-            if (healthStatus.success) {
-                logWithTime('✅ Custom Auth Service is reachable');
-            } else {
+            if (!healthStatus.success) {
                 logWithTime('⚠️  Custom Auth Service is not reachable - authentication features may not work');
             }
         } catch (healthError) {
@@ -82,9 +80,7 @@ const initializeMicroservice = async () => {
             const { healthCheck } = internal.clients.adminPanelClient;
             const healthStatus = await healthCheck();
             
-            if (healthStatus) {
-                logWithTime('✅ Admin Panel Service is reachable');
-            } else {
+            if (!healthStatus) {
                 logWithTime('⚠️  Admin Panel Service is not reachable - admin coordination features may not work');
             }
         } catch (healthError) {
