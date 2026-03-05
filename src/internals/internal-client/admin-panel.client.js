@@ -61,16 +61,35 @@ const retryRequest = async (requestFn, retries = INTERNAL_API.RETRY_ATTEMPTS) =>
 /**
  * Health check for Admin Panel Service
  * 
- * @returns {Promise<boolean>} true if service is healthy
+ * @returns {Promise<Object>} Health status response
  */
 const healthCheck = async () => {
     try {
-        const client = await createAuthenticatedClient();
-        const response = await client.get('/admin-panel-service/api/v1/internal/software-management/health');
-        return response.status === 200;
+        logWithTime('🏥 Checking Admin Panel Service health...');
+        
+        const response = await retryRequest(async () => {
+            const client = await createAuthenticatedClient();
+            return await client.get('/admin-panel-service/api/v1/internal/software-management/health');
+        });
+
+        const isLive = response.status === 200 && response.data?.success === true;
+        
+        if (isLive) {
+            logWithTime('✅ Admin Panel is live');
+        } else {
+            logWithTime('⚠️  Admin Panel responded but status is not healthy');
+        }
+        
+        return {
+            success: isLive,
+            data: response.data || null
+        };
     } catch (error) {
-        logWithTime(`❌ Admin Panel Service health check failed: ${error.message}`);
-        return false;
+        logWithTime(`❌ Admin Panel Service is not reachable: ${error.message}`);
+        return {
+            success: false,
+            error: error.message
+        };
     }
 };
 
