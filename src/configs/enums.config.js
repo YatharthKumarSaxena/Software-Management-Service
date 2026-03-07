@@ -155,6 +155,24 @@ const ClientTypes = Object.freeze({
     ORGANIZATION: "organization"
 });
 
+
+const AdminRoleTypes = Object.freeze({
+  BUSINESS_ANALYST: "business_analyst",
+  DEVELOPER: "developer",
+  MANAGER: "manager",
+  ANALYST: "analyst",
+  OTHER: "other",
+  CEO: "ceo",
+});
+
+const ClientRoleTypes = Object.freeze({
+  SPONSOR: "sponsor",
+  PARTNER: "partner",
+  VENDOR: "vendor",
+  END_USER: "end_user",
+  OTHER: "other"
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -177,5 +195,7 @@ module.exports = {
   PermissionEffect,
   OverrideType,
   ClientStatus,
-  ClientTypes
+  ClientTypes,
+  AdminRoleTypes,
+  ClientRoleTypes
 };

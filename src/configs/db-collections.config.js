@@ -3,7 +3,7 @@ const DB_COLLECTIONS = {
     COUNTERS: "counters",
     DEVICES: "devices",
     ADMINS: "admins",
-    USERS: "users",
+    CLIENTS: "clients",
     REQUESTS: "requests",
     SERVICE_TRACKER: "service_trackers",
     

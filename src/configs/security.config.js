@@ -34,5 +34,11 @@ module.exports = {
 
     ALLOWED_SERVICE_NAMES: getMyEnvAsArray('ALLOWED_SERVICE_NAMES', []),
     algorithms: ["HS256"]
+  },
+
+  device: {
+    DEVICE_UUID: getMyEnv('DEVICE_UUID', "00000000-0000-4000-8000-000000000000"),
+    DEVICE_TYPE: getMyEnv('DEVICE_TYPE', "LAPTOP"),
+    DEVICE_NAME: getMyEnv('DEVICE_NAME', "System Device")
   }
 };
