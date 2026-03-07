@@ -1,19 +1,19 @@
 const mongoose = require("mongoose");
 const { firstNameLength } = require("@configs/fields-length.config");
-const { FirstNameFieldSetting, AdminRoleTypes } = require("@configs/enums.config");
-const { firstNameRegex, adminIdRegex } = require("@configs/regex.config");
+const { FirstNameFieldSetting, ClientRoleTypes } = require("@configs/enums.config");
+const { firstNameRegex, clientIdRegex } = require("@configs/regex.config");
 const { FIRST_NAME_SETTING } = require("@configs/security.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 
-/* Admin Schema */
-const adminSchema = new mongoose.Schema({
+/* Client Schema */
+const clientSchema = new mongoose.Schema({
 
-    adminId: {
+    clientId: {
         type: String,
         unique: true,
         immutable: true,
         required: true,
-        match: adminIdRegex,
+        match: clientIdRegex,
         index: true
     },
 
@@ -48,14 +48,14 @@ const adminSchema = new mongoose.Schema({
 
     role: {
         type: String,
-        enum: Object.values(AdminRoleTypes),
+        enum: Object.values(ClientRoleTypes),
         required: true
     }
 
 }, { timestamps: true, versionKey: false });
 
 
-adminSchema.pre("validate", function () {
+clientSchema.pre("validate", function () {
 
     if (
         FIRST_NAME_SETTING === FirstNameFieldSetting.DISABLED &&
@@ -79,5 +79,5 @@ adminSchema.pre("validate", function () {
 });
 
 module.exports = {
-    AdminModel: mongoose.model(DB_COLLECTIONS.ADMINS, adminSchema)
+    ClientModel: mongoose.model(DB_COLLECTIONS.CLIENTS, clientSchema)
 };
