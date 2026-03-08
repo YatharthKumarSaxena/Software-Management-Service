@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { notesFieldLength, deviceNameLength } = require("@configs/fields-length.config");
 const { DeviceTypes } = require("@configs/enums.config");
 const { BlockDeviceReasons, UnblockDeviceReasons } = require("@configs/reasons.config");
-const { adminIdRegex, UUID_V4_REGEX } = require("@configs/regex.config");
+const { customIdRegex, UUID_V4_REGEX } = require("@configs/regex.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 
 /* Device Tracker Schema */
@@ -42,7 +42,7 @@ const deviceSchema = new mongoose.Schema({
 
     blockedBy: {
         type: String,
-        match: adminIdRegex,
+        match: customIdRegex,
         default: null
     },
 
@@ -63,7 +63,7 @@ const deviceSchema = new mongoose.Schema({
 
     unblockedBy: {
         type: String,
-        match: adminIdRegex,
+        match: customIdRegex,
         default: null
     },
 

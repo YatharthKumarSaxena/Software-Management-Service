@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { DeviceTypes, AdminTypes, PerformedOnTypes } = require("@configs/enums.config");
-const { adminIdRegex, UUID_V4_REGEX } = require("@configs/regex.config");
+const { customIdRegex, UUID_V4_REGEX } = require("@configs/regex.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 
 const activityTrackerSchema = new mongoose.Schema({
   adminId: {
     type: String,
     required: true,
-    match: adminIdRegex,
+    match: customIdRegex,
     index: true
   },
 

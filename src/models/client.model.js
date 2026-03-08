@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { firstNameLength } = require("@configs/fields-length.config");
 const { FirstNameFieldSetting, ClientRoleTypes } = require("@configs/enums.config");
-const { firstNameRegex, clientIdRegex } = require("@configs/regex.config");
+const { firstNameRegex, customIdRegex } = require("@configs/regex.config");
 const { FIRST_NAME_SETTING } = require("@configs/security.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 
@@ -13,7 +13,7 @@ const clientSchema = new mongoose.Schema({
         unique: true,
         immutable: true,
         required: true,
-        match: clientIdRegex,
+        match: customIdRegex,
         index: true
     },
 
