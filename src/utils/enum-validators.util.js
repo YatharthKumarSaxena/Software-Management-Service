@@ -8,7 +8,9 @@ const {
   DeviceTypes,
   AuditMode,
   FirstNameFieldSetting,
-  ContactModes
+  ContactModes,
+  ProjectCreationReason,
+  ProjectUpdationReason
 } = require("@configs/enums.config");
 
 /**
@@ -44,6 +46,8 @@ const AuthModesHelper = createEnumHelper(AuthModes, "AuthModes");
 const AuditModeHelper = createEnumHelper(AuditMode, "AuditMode");
 const FirstNameFieldSettingHelper = createEnumHelper(FirstNameFieldSetting, "FirstNameFieldSetting");
 const ContactModesHelper = createEnumHelper(ContactModes, "ContactModes");
+const ProjectCreationReasonHelper = createEnumHelper(ProjectCreationReason, "ProjectCreationReason");
+const ProjectUpdationReasonHelper = createEnumHelper(ProjectUpdationReason, "ProjectUpdationReason");
 
 module.exports = {
     DeviceTypeHelper,
@@ -51,5 +55,7 @@ module.exports = {
     AuthModesHelper,
     AuditModeHelper,
     FirstNameFieldSettingHelper,
-    ContactModesHelper
+    ContactModesHelper,
+    ProjectCreationReasonHelper,
+    ProjectUpdationReasonHelper
 };
