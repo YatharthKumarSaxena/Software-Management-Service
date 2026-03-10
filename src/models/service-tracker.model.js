@@ -121,5 +121,5 @@ serviceTrackerSchema.index({ requestId: 1 });
 serviceTrackerSchema.index({ createdAt: -1 });
 
 module.exports = {
-    ServiceTrackerModel: mongoose.model(DB_COLLECTIONS.SERVICE_TRACKER, serviceTrackerSchema)
+    ServiceTrackerModel: mongoose.model(DB_COLLECTIONS.SERVICE_TRACKERS, serviceTrackerSchema)
 }

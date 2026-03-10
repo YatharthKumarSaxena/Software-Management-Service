@@ -3,10 +3,10 @@
 const mongoose = require("mongoose");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { customIdRegex } = require("@configs/regex.config");
-const { ProjectCreationReason, ProjectUpdationReason } = require("@configs/enums.config");
+const { ProjectCreationReason, ProjectUpdationReason, ProjectStatus, ProjectResumeReason, ProjectAbortReason, ProjectDeletionReason, Phases } = require("@configs/enums.config");
 const {
   projectNameLength,
-  projectDescriptionLength,
+  descriptionLength,
   problemStatementLength,
   projectGoalLength,
 } = require("@configs/fields-length.config");
@@ -37,8 +37,8 @@ const projectSchema = new mongoose.Schema(
       type: String,
       required: [true, "Project description is required."],
       trim: true,
-      minlength: [projectDescriptionLength.min, `Description must be at least ${projectDescriptionLength.min} characters.`],
-      maxlength: [projectDescriptionLength.max, `Description must not exceed ${projectDescriptionLength.max} characters.`],
+      minlength: [descriptionLength.min, `Description must be at least ${descriptionLength.min} characters.`],
+      maxlength: [descriptionLength.max, `Description must not exceed ${descriptionLength.max} characters.`],
     },
 
     problemStatement: {
@@ -81,7 +81,7 @@ const projectSchema = new mongoose.Schema(
 
     /* ── Reason trail ───────────────────────────────────────────────── */
 
-    projectCreationReason: {
+    projectCreationReasonType: {
       type: String,
       required: [true, "Project creation reason is required."],
       enum: {
@@ -90,7 +90,15 @@ const projectSchema = new mongoose.Schema(
       },
     },
 
-    projectUpdationReason: {
+    projectCreationReasonDescription: {
+      type: String,
+      default: null,
+      trim: true,
+      minlength: descriptionLength.min,
+      maxlength: descriptionLength.max,
+    },
+
+    projectUpdationReasonType: {
       type: String,
       default: null,
       enum: {
@@ -98,6 +106,132 @@ const projectSchema = new mongoose.Schema(
         message: `projectUpdationReason must be one of: ${Object.values(ProjectUpdationReason).join(", ")}`
       },
     },
+
+    projectUpdationReasonDescription: {
+      type: String,
+      default: null,
+      trim: true,
+      minlength: descriptionLength.min,
+      maxlength: descriptionLength.max,
+    },
+
+    /* ── Status tracking ────────────────────────────────────────────── */
+
+    projectStatus: {
+      type: String,
+      default: ProjectStatus.DRAFT,
+      enum: {
+        values: Object.values(ProjectStatus),
+        message: `projectStatus must be one of: ${Object.values(ProjectStatus).join(", ")}`
+      },
+    },
+
+    abortReasonType: {
+      type: String,
+      default: null,
+      enum: {
+        values: Object.values(ProjectAbortReason),
+        message: `abortReasonType must be one of: ${Object.values(ProjectAbortReason).join(", ")}`
+      }
+    },
+
+    abortReasonDescription: {
+      type: String,
+      default: null,
+      trim: true,
+      minlength: descriptionLength.min,
+      maxlength: descriptionLength.max,
+    },
+
+    resumeReasonType: {
+      type: String,
+      default: null,
+      enum: {
+        values: Object.values(ProjectResumeReason),
+        message: `resumeReasonType must be one of: ${Object.values(ProjectResumeReason).join(", ")}`
+      }
+    },
+
+    resumeReasonDescription: {
+      type: String,
+      default: null,
+      trim: true,
+      minlength: descriptionLength.min,
+      maxlength: descriptionLength.max,
+    },
+
+    completedAt: {
+      type: Date,
+      default: null,
+    },
+
+    abortedAt: {
+      type: Date,
+      default: null,
+    },
+
+    /* ── Phase tracking ───────────────────────────────────────── */
+
+    currentPhase: {
+      type: String,
+      default: Phases.INCEPTION,
+      enum: {
+        values: Object.values(Phases),
+        message: `currentPhase must be one of: ${Object.values(Phases).join(", ")}`
+      },
+    },
+
+    /* ── Archive tracking ────────────────────────────────────── */
+
+    isArchived: {
+      type: Boolean,
+      default: false,
+    },
+
+    archivedAt: {
+      type: Date,
+      default: null,
+    },
+
+    archivedBy: {
+      type: String,
+      default: null,
+      match: [customIdRegex, "archivedBy must be a valid USR ID."],
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+
+
+    deletedAt: {
+      type: Date,
+      default: null
+    },
+
+    deletedBy: {
+      type: String,
+      default: null,
+      match: [customIdRegex, "deletedBy must be a valid USR ID."]
+    },
+
+    deletionReasonType: {
+      type: String,
+      default: null,
+      enum: {
+        values: Object.values(ProjectDeletionReason),
+        message: `deletionReasonType must be one of: ${Object.values(ProjectDeletionReason).join(", ")}`
+      }
+    },
+
+    deletionReasonDescription: {
+      type: String,
+      default: null,
+      trim: true,
+      minlength: descriptionLength.min,
+      maxlength: descriptionLength.max,
+    }
   },
   {
     timestamps: true,   // createdAt + updatedAt
@@ -106,6 +240,18 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-const ProjectModel = mongoose.model("Project", projectSchema);
+projectSchema.pre("save", function (next) {
+  if (this.projectStatus === ProjectStatus.ABORTED && !this.abortedAt) {
+    this.abortedAt = new Date();
+  }
+
+  if (this.projectStatus === ProjectStatus.COMPLETED && !this.completedAt) {
+    this.completedAt = new Date();
+  }
+
+  next();
+});
+
+const ProjectModel = mongoose.model(DB_COLLECTIONS.PROJECTS, projectSchema);
 
 module.exports = { ProjectModel };
