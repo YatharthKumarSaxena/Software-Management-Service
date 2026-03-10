@@ -16,10 +16,20 @@ const { FieldDefinitions } = require("./field-definitions.config");
 
 // AUTO-GENERATED REQUIRED FIELDS
 
-const createProjectField = getRequiredFields(FieldDefinitions.CREATE_PROJECT);
-const updateProjectField = getRequiredFields(FieldDefinitions.UPDATE_PROJECT);
+const createProjectField    = getRequiredFields(FieldDefinitions.CREATE_PROJECT);
+const updateProjectField    = getRequiredFields(FieldDefinitions.UPDATE_PROJECT);
+const abortProjectField     = getRequiredFields(FieldDefinitions.ABORT_PROJECT);
+const completeProjectField  = getRequiredFields(FieldDefinitions.COMPLETE_PROJECT);
+const resumeProjectField    = getRequiredFields(FieldDefinitions.RESUME_PROJECT);
+const deleteProjectField    = getRequiredFields(FieldDefinitions.DELETE_PROJECT);
+const archiveProjectField   = getRequiredFields(FieldDefinitions.ARCHIVE_PROJECT);
 
 module.exports = {
     createProjectField,
-    updateProjectField
+    updateProjectField,
+    abortProjectField,
+    completeProjectField,
+    resumeProjectField,
+    deleteProjectField,
+    archiveProjectField,
 };

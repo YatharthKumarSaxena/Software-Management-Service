@@ -51,7 +51,7 @@ module.exports = {
     min: 3,
     max: 150
   },
-  projectDescriptionLength: {
+  descriptionLength: {
     min: 10,
     max: 2000
   },

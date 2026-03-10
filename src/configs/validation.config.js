@@ -1,6 +1,6 @@
 const {
   projectNameLength,
-  projectDescriptionLength,
+  descriptionLength,
   problemStatementLength,
   projectGoalLength,
 } = require("./fields-length.config");
@@ -8,6 +8,9 @@ const {
 const {
   ProjectCreationReasonHelper,
   ProjectUpdationReasonHelper,
+  ProjectAbortReasonHelper,
+  ProjectResumeReasonHelper,
+  ProjectDeletionReasonHelper,
 } = require("@utils/enum-validators.util");
 
 /**
@@ -25,7 +28,7 @@ const validationRules = {
     length: { min: projectNameLength.min, max: projectNameLength.max },
   },
   projectDescription: {
-    length: { min: projectDescriptionLength.min, max: projectDescriptionLength.max },
+    length: { min: descriptionLength.min, max: descriptionLength.max },
   },
   problemStatement: {
     length: { min: problemStatementLength.min, max: problemStatementLength.max },
@@ -35,11 +38,25 @@ const validationRules = {
   },
 
   // ── Project enum fields ────────────────────────────
-  projectCreationReason: {
+  projectCreationReasonType: {
     enum: ProjectCreationReasonHelper,
   },
-  projectUpdationReason: {
+  projectUpdationReasonType: {
     enum: ProjectUpdationReasonHelper,
+  },
+  abortReasonType: {
+    enum: ProjectAbortReasonHelper,
+  },
+  resumeReasonType: {
+    enum: ProjectResumeReasonHelper,
+  },
+  deletionReasonType: {
+    enum: ProjectDeletionReasonHelper,
+  },
+
+  // ── Reason description (shared length rule) ───────
+  reasonDescription: {
+    length: { min: descriptionLength.min, max: descriptionLength.max },
   },
 
 };

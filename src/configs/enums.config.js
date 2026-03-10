@@ -192,6 +192,94 @@ const ProjectUpdationReason = Object.freeze({
   OTHER: "other"
 });
 
+const ProjectAbortReason = Object.freeze({
+  RESOURCE_CONSTRAINTS: "resource_constraints",
+  PRIORITY_CHANGE: "priority_change",
+  TECHNICAL_CHALLENGES: "technical_challenges",
+  BUDGET_ISSUES: "budget_issues",
+  CLIENT_REQUEST: "client_request",
+  OTHER: "other"
+});
+
+const ProjectResumeReason = Object.freeze({
+  RESOURCE_AVAILABILITY: "resource_availability",
+  PRIORITY_REASSESSMENT: "priority_reassessment",
+  TECHNICAL_BREAKTHROUGH: "technical_breakthrough",
+  BUDGET_APPROVAL: "budget_approval",
+  CLIENT_REQUEST: "client_request",
+  OTHER: "other"
+});
+
+const ProjectStatus = Object.freeze({
+  DRAFT: "DRAFT",
+  ACTIVE: "ACTIVE",
+  ON_HOLD: "ON_HOLD",
+  COMPLETED: "COMPLETED",
+  ABORTED: "ABORTED",
+  ARCHIVED: "ARCHIVED"
+});
+
+const ProjectDeletionReason = Object.freeze({
+  COMPLETED: "completed_project_archived",
+  ABORTED: "aborted_project_removed",
+  DUPLICATE: "duplicate_project_created",
+  TEST_PROJECT: "test_or_demo_project_cleanup",
+  ADMIN_ERROR: "created_by_admin_mistake",
+  OTHER: "other",
+});
+
+const Phases = Object.freeze({
+  INCEPTION: "INCEPTION",
+  ELICITATION: "ELICITATION",
+  ELABORATION: "ELABORATION",
+  NEGOTIATION: "NEGOTIATION",
+  SPECIFICATION: "SPECIFICATION",
+  VALIDATION: "VALIDATION",
+  MANAGEMENT: "MANAGEMENT"
+});
+
+const InceptionDeletionReason = Object.freeze({
+  DUPLICATE: "duplicate_inception",
+  TEST_INCEPTION: "test_or_demo_inception_cleanup",
+  ADMIN_ERROR: "created_by_admin_mistake",
+  OTHER: "other",
+});
+
+const ElicitationDeletionReason = Object.freeze({
+  DUPLICATE: "duplicate_elicitation",
+  TEST_ELICITATION: "test_or_demo_elicitation_cleanup",
+  ADMIN_ERROR: "created_by_admin_mistake",
+  OTHER: "other",
+});
+
+const ElaborationDeletionReason = Object.freeze({
+  DUPLICATE: "duplicate_elaboration",
+  TEST_ELABORATION: "test_or_demo_elaboration_cleanup",
+  ADMIN_ERROR: "created_by_admin_mistake",
+  OTHER: "other",
+});
+
+const NegotiationDeletionReason = Object.freeze({
+  DUPLICATE: "duplicate_negotiation",
+  TEST_NEGOTIATION: "test_or_demo_negotiation_cleanup",
+  ADMIN_ERROR: "created_by_admin_mistake",
+  OTHER: "other",
+});
+
+const SpecificationDeletionReason = Object.freeze({
+  DUPLICATE: "duplicate_specification",
+  TEST_SPECIFICATION: "test_or_demo_specification_cleanup",
+  ADMIN_ERROR: "created_by_admin_mistake",
+  OTHER: "other",
+});
+
+const ValidationDeletionReason = Object.freeze({
+  DUPLICATE: "duplicate_validation",
+  TEST_VALIDATION: "test_or_demo_validation_cleanup",
+  ADMIN_ERROR: "created_by_admin_mistake",
+  OTHER: "other",
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -218,5 +306,16 @@ module.exports = {
   AdminRoleTypes,
   ClientRoleTypes,
   ProjectCreationReason,
-  ProjectUpdationReason
+  ProjectUpdationReason,
+  ProjectStatus,
+  ProjectAbortReason,
+  ProjectResumeReason,
+  ProjectDeletionReason,
+  Phases,
+  InceptionDeletionReason,
+  ElicitationDeletionReason,
+  ElaborationDeletionReason,
+  NegotiationDeletionReason,
+  SpecificationDeletionReason,
+  ValidationDeletionReason
 };

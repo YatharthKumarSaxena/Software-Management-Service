@@ -27,7 +27,14 @@ module.exports = {
     },
     ADMIN_ROUTES: {
         // Projects
-        CREATE_PROJECT: `/create-project`,           // POST   /software-management-service/api/v1/admin/create-project
-        UPDATE_PROJECT: `/update-project/:projectId`, // PATCH  /software-management-service/api/v1/admin/update-project/:projectId
+        CREATE_PROJECT:   `/create-project`,                     // POST    /api/v1/admin/create-project
+        UPDATE_PROJECT:   `/update-project/:projectId`,          // PATCH   /api/v1/admin/update-project/:projectId
+        ABORT_PROJECT:    `/abort-project/:projectId`,           // PATCH   /api/v1/admin/abort-project/:projectId
+        COMPLETE_PROJECT: `/complete-project/:projectId`,        // PATCH   /api/v1/admin/complete-project/:projectId
+        RESUME_PROJECT:   `/resume-project/:projectId`,          // PATCH   /api/v1/admin/resume-project/:projectId
+        DELETE_PROJECT:   `/delete-project/:projectId`,          // DELETE  /api/v1/admin/delete-project/:projectId
+        ARCHIVE_PROJECT: `/archive-project/:projectId`,           // PATCH   /api/v1/admin/archive-project/:projectId
+        GET_PROJECT:     `/get-project/:projectId`,               // GET     /api/v1/admin/get-project/:projectId
+        GET_PROJECTS:    `/get-projects`,                         // GET     /api/v1/admin/get-projects
     }
 };

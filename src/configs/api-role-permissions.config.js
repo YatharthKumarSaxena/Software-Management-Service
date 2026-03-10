@@ -25,13 +25,60 @@ const ApiRolePermissions = Object.freeze({
       AdminRoleTypes.BUSINESS_ANALYST,
       AdminRoleTypes.MANAGER,
     ],
+
+    abortProject: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.MANAGER,
+    ],
+
+    completeProject: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.MANAGER,
+    ],
+
+    resumeProject: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.MANAGER,
+    ],
+
+    deleteProject: [
+      AdminRoleTypes.CEO,
+    ],
+
+    archiveProject: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.MANAGER,
+    ],
+
+    getProject: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.BUSINESS_ANALYST,
+      AdminRoleTypes.MANAGER,
+      AdminRoleTypes.ANALYST,
+      AdminRoleTypes.DEVELOPER,
+      AdminRoleTypes.OTHER,
+    ],
+
+    getProjects: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.BUSINESS_ANALYST,
+      AdminRoleTypes.MANAGER,
+      AdminRoleTypes.ANALYST,
+      AdminRoleTypes.DEVELOPER,
+      AdminRoleTypes.OTHER,
+    ],
   },
 
-  // Client-side role restrictions are reserved for future use.
   client: {
     createProject: [],
     updateProject: [],
-  },
+    abortProject: [],
+    completeProject: [],
+    resumeProject: [],
+    deleteProject: [],
+    getProject: [],
+    getProjects: [],
+  }
 
 });
 
