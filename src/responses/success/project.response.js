@@ -28,8 +28,79 @@ const sendProjectUpdatedSuccess = (res, project) => {
   return res.status(OK).json({
     success: true,
     message: "Project updated successfully.",
+    data: { project },
+  });
+};
+
+const sendProjectAbortedSuccess = (res, project) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Project aborted successfully.",
+    data: { project },
+  });
+};
+
+const sendProjectCompletedSuccess = (res, project) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Project marked as completed successfully.",
+    data: { project },
+  });
+};
+
+const sendProjectResumedSuccess = (res, project) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Project resumed successfully.",
+    data: { project },
+  });
+};
+
+const sendProjectDeletedSuccess = (res) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Project deleted successfully.",
+  });
+};
+
+const sendProjectArchivedSuccess = (res, project) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Project archived successfully.",
+    data: { project },
+  });
+};
+
+/**
+ * Sends a 200 response with a single project's details.
+ *
+ * @param {Object} res     - Express response object
+ * @param {Object} project - Project document
+ */
+const sendProjectFetchedSuccess = (res, project) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Project fetched successfully.",
+    data: { project },
+  });
+};
+
+/**
+ * Sends a 200 response with a paginated list of projects.
+ *
+ * @param {Object} res
+ * @param {Object[]} projects
+ * @param {number}   total
+ * @param {number}   page
+ * @param {number}   totalPages
+ */
+const sendProjectsListFetchedSuccess = (res, projects, total, page, totalPages) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Projects fetched successfully.",
     data: {
-      project,
+      projects,
+      pagination: { total, page, totalPages },
     },
   });
 };
@@ -37,4 +108,11 @@ const sendProjectUpdatedSuccess = (res, project) => {
 module.exports = {
   sendProjectCreatedSuccess,
   sendProjectUpdatedSuccess,
+  sendProjectAbortedSuccess,
+  sendProjectCompletedSuccess,
+  sendProjectResumedSuccess,
+  sendProjectDeletedSuccess,
+  sendProjectArchivedSuccess,
+  sendProjectFetchedSuccess,
+  sendProjectsListFetchedSuccess,
 };
