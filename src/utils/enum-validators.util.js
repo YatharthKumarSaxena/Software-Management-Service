@@ -10,7 +10,11 @@ const {
   FirstNameFieldSetting,
   ContactModes,
   ProjectCreationReason,
-  ProjectUpdationReason
+  ProjectUpdationReason,
+  ProjectAbortReason,
+  ProjectResumeReason,
+  ProjectStatus,
+  ProjectDeletionReason,
 } = require("@configs/enums.config");
 
 /**
@@ -48,6 +52,10 @@ const FirstNameFieldSettingHelper = createEnumHelper(FirstNameFieldSetting, "Fir
 const ContactModesHelper = createEnumHelper(ContactModes, "ContactModes");
 const ProjectCreationReasonHelper = createEnumHelper(ProjectCreationReason, "ProjectCreationReason");
 const ProjectUpdationReasonHelper = createEnumHelper(ProjectUpdationReason, "ProjectUpdationReason");
+const ProjectAbortReasonHelper = createEnumHelper(ProjectAbortReason, "ProjectAbortReason");
+const ProjectResumeReasonHelper = createEnumHelper(ProjectResumeReason, "ProjectResumeReason");
+const ProjectStatusHelper = createEnumHelper(ProjectStatus, "ProjectStatus");
+const ProjectDeletionReasonHelper = createEnumHelper(ProjectDeletionReason, "ProjectDeletionReason");
 
 module.exports = {
     DeviceTypeHelper,
@@ -57,5 +65,9 @@ module.exports = {
     FirstNameFieldSettingHelper,
     ContactModesHelper,
     ProjectCreationReasonHelper,
-    ProjectUpdationReasonHelper
+    ProjectUpdationReasonHelper,
+    ProjectAbortReasonHelper,
+    ProjectResumeReasonHelper,
+    ProjectStatusHelper,
+    ProjectDeletionReasonHelper,
 };
