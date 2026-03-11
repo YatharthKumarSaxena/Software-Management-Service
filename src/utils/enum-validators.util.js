@@ -11,10 +11,15 @@ const {
   ContactModes,
   ProjectCreationReason,
   ProjectUpdationReason,
+  ProjectOnHoldReason,
   ProjectAbortReason,
   ProjectResumeReason,
   ProjectStatus,
   ProjectDeletionReason,
+  AdminRoleTypes,
+  ClientRoleTypes,
+  StakeholderDeletionReason,
+  ProjectRoleTypes
 } = require("@configs/enums.config");
 
 /**
@@ -52,22 +57,33 @@ const FirstNameFieldSettingHelper = createEnumHelper(FirstNameFieldSetting, "Fir
 const ContactModesHelper = createEnumHelper(ContactModes, "ContactModes");
 const ProjectCreationReasonHelper = createEnumHelper(ProjectCreationReason, "ProjectCreationReason");
 const ProjectUpdationReasonHelper = createEnumHelper(ProjectUpdationReason, "ProjectUpdationReason");
-const ProjectAbortReasonHelper = createEnumHelper(ProjectAbortReason, "ProjectAbortReason");
-const ProjectResumeReasonHelper = createEnumHelper(ProjectResumeReason, "ProjectResumeReason");
-const ProjectStatusHelper = createEnumHelper(ProjectStatus, "ProjectStatus");
+const ProjectOnHoldReasonHelper  = createEnumHelper(ProjectOnHoldReason,  "ProjectOnHoldReason");
+const ProjectAbortReasonHelper   = createEnumHelper(ProjectAbortReason,   "ProjectAbortReason");
+const ProjectResumeReasonHelper  = createEnumHelper(ProjectResumeReason,  "ProjectResumeReason");
+const ProjectStatusHelper        = createEnumHelper(ProjectStatus,        "ProjectStatus");
 const ProjectDeletionReasonHelper = createEnumHelper(ProjectDeletionReason, "ProjectDeletionReason");
 
+const AdminRoleTypesHelper = createEnumHelper(AdminRoleTypes, "AdminRoleTypes");
+const ClientRoleTypesHelper = createEnumHelper(ClientRoleTypes, "ClientRoleTypes");
+const StakeholderDeletionReasonHelper = createEnumHelper(StakeholderDeletionReason, "StakeholderDeletionReason");
+const ProjectRoleTypesHelper = createEnumHelper(ProjectRoleTypes, "ProjectRoleTypes");
+
 module.exports = {
-    DeviceTypeHelper,
-    UserTypeHelper,
-    AuthModesHelper,
-    AuditModeHelper,
-    FirstNameFieldSettingHelper,
-    ContactModesHelper,
-    ProjectCreationReasonHelper,
-    ProjectUpdationReasonHelper,
-    ProjectAbortReasonHelper,
-    ProjectResumeReasonHelper,
-    ProjectStatusHelper,
-    ProjectDeletionReasonHelper,
+  DeviceTypeHelper,
+  UserTypeHelper,
+  AuthModesHelper,
+  AuditModeHelper,
+  FirstNameFieldSettingHelper,
+  ContactModesHelper,
+  ProjectCreationReasonHelper,
+  ProjectUpdationReasonHelper,
+  ProjectOnHoldReasonHelper,
+  ProjectAbortReasonHelper,
+  ProjectResumeReasonHelper,
+  ProjectStatusHelper,
+  ProjectDeletionReasonHelper,
+  AdminRoleTypesHelper,
+  ClientRoleTypesHelper,
+  StakeholderDeletionReasonHelper,
+  ProjectRoleTypesHelper
 };

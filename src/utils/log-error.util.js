@@ -9,7 +9,7 @@ const errorMessage = (err) => {
 }
 
 const getLogIdentifiers = (req) => {
-    const userId = req?.founduser?.userId || req?.user?.userId || "UNKNOWN_USER";
+    const userId = req?.admin?.adminId || req?.client?.clientId || req?.founduser?.userId || req?.user?.userId || "UNKNOWN_USER";
     const deviceUUID = req?.device?.deviceUUID || "UNKNOWN_DEVICE";
     return `with user ID: (${userId}). Request is made from device ID: (${deviceUUID})`;
 };
