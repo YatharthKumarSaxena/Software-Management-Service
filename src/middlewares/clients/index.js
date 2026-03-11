@@ -1,3 +1,4 @@
+const { clientApiAuthorizationMiddleware } = require("./client-api-authorization.middleware");
 const { ensureClientExists, ensureClientNew, fetchRequestClient } = require("./fetch-client.middleware");
 const { validationMiddlewares } = require("./field-validation.middleware");
 const { presenceMiddlewares } = require("./validate-request-body.middleware");
@@ -7,7 +8,8 @@ const clientMiddlewares = {
     ensureClientNew,
     fetchRequestClient,
     ...validationMiddlewares,
-    ...presenceMiddlewares
+    ...presenceMiddlewares,
+    clientApiAuthorizationMiddleware
 }
 
 module.exports = { 
