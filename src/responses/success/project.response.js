@@ -32,6 +32,14 @@ const sendProjectUpdatedSuccess = (res, project) => {
   });
 };
 
+const sendProjectOnHoldSuccess = (res, project) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Project put on hold successfully.",
+    data: { project },
+  });
+};
+
 const sendProjectAbortedSuccess = (res, project) => {
   return res.status(OK).json({
     success: true,
@@ -108,6 +116,7 @@ const sendProjectsListFetchedSuccess = (res, projects, total, page, totalPages) 
 module.exports = {
   sendProjectCreatedSuccess,
   sendProjectUpdatedSuccess,
+  sendProjectOnHoldSuccess,
   sendProjectAbortedSuccess,
   sendProjectCompletedSuccess,
   sendProjectResumedSuccess,
