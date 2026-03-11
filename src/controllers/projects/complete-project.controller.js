@@ -3,14 +3,13 @@
 const { completeProjectService } = require("@services/projects/complete-project.service");
 const { sendProjectCompletedSuccess } = require("@/responses/success/project.response");
 const {
-  throwMissingFieldsError,
   throwBadRequestError,
   throwDBResourceNotFoundError,
   throwInternalServerError,
-  logMiddlewareError,
   throwSpecificInternalServerError,
+  getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
-const { isValidMongoID } = require("@/utils/id-validators.util");
+const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
  * Controller: Complete Project
@@ -33,12 +32,8 @@ const { isValidMongoID } = require("@/utils/id-validators.util");
  */
 const completeProjectController = async (req, res) => {
   try {
-    const { projectId } = req.params;
-
-    if (!projectId) return throwMissingFieldsError(res, ["projectId"]);
-    if (!isValidMongoID(projectId)) {
-      return throwBadRequestError(res, "Invalid projectId format", "projectId must be a valid ObjectId string.");
-    }
+    const project = req.project; // fetchProjectMiddleware ne inject kiya hai
+    const projectId = project._id.toString();
 
     const completedBy = req.admin.adminId;
 
@@ -53,6 +48,7 @@ const completeProjectController = async (req, res) => {
 
     if (!result.success) {
       if (result.message === "Project not found") {
+        logWithTime(`❌ [completeProjectController] Project not found | ${getLogIdentifiers(req)}`);
         return throwDBResourceNotFoundError(res, "Project");
       }
       if (
@@ -60,21 +56,24 @@ const completeProjectController = async (req, res) => {
         result.message === "Project is already completed" ||
         result.message === "Only an ACTIVE project can be completed"
       ) {
+        logWithTime(`❌ [completeProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message, result.currentStatus
           ? `Current project status is: ${result.currentStatus}`
           : result.message
         );
       }
       if (result.message === "Validation error") {
+        logWithTime(`❌ [completeProjectController] Validation error: ${JSON.stringify(result.error)} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, "Validation error", result.error);
       }
-      logMiddlewareError("completeProject", result.message, req);
+      logWithTime(`❌ [completeProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
 
+    logWithTime(`✅ [completeProjectController] Project completed successfully | ${getLogIdentifiers(req)}`);
     return sendProjectCompletedSuccess(res, result.project);
   } catch (error) {
-    logMiddlewareError("completeProject", `Unexpected error: ${error.message}`, req);
+    logWithTime(`❌ [completeProjectController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
     return throwInternalServerError(res, error);
   }
 };

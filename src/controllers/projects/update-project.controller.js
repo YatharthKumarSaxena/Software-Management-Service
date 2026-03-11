@@ -3,14 +3,13 @@
 const { updateProjectService } = require("@services/projects/update-project.service");
 const { sendProjectUpdatedSuccess } = require("@/responses/success/project.response");
 const {
-  throwMissingFieldsError,
   throwBadRequestError,
   throwDBResourceNotFoundError,
   throwInternalServerError,
-  logMiddlewareError,
-  throwSpecificInternalServerError
+  throwSpecificInternalServerError,
+  getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
-const { isValidMongoID } = require("@/utils/id-validators.util");
+const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
  * Controller: Update Project
@@ -37,16 +36,8 @@ const { isValidMongoID } = require("@/utils/id-validators.util");
 
 const updateProjectController = async (req, res) => {
   try {
-    const { projectId } = req.params;
-
-    // ── Validate route param ──────────────────────────────────────────
-    if (!projectId) {
-      return throwMissingFieldsError(res, ["projectId"]);
-    }
-
-    if (!isValidMongoID(projectId)) {
-      return throwBadRequestError(res, "Invalid projectId format", "projectId must be a valid ObjectId string.");
-    }
+    const project = req.project; // fetchProjectMiddleware ne inject kiya hai
+    const projectId = project._id.toString();
 
     // ── Ensure at least one updatable field is present ───────────────
     const {
@@ -58,6 +49,7 @@ const updateProjectController = async (req, res) => {
     const hasUpdate = name || description || problemStatement || goal;
 
     if (!hasUpdate) {
+      logWithTime(`❌ [updateProjectController] No updatable fields provided | ${getLogIdentifiers(req)}`);
       return throwBadRequestError(
         res,
         "No updatable fields provided",
@@ -85,32 +77,36 @@ const updateProjectController = async (req, res) => {
 
     if (!result.success) {
       if (result.message === "Project not found") {
+        logWithTime(`❌ [updateProjectController] Project not found | ${getLogIdentifiers(req)}`);
         return throwDBResourceNotFoundError(res, "Project");
       }
-      if (
-        result.message === "Project is deleted" ||
-        result.message === "Project is already completed"
-      ) {
+      if (result.message?.startsWith("Cannot update a")) {
+        logWithTime(`❌ [updateProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message, result.message);
       }
-      if (result.message === "No changes detected") {
-        return throwBadRequestError(
-          res,
-          "No changes detected",
-          "The submitted values are identical to the existing project details. Nothing was updated."
-        );
-      }
       if (result.message === "Validation error") {
+        logWithTime(`❌ [updateProjectController] Validation error: ${JSON.stringify(result.error)} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, "Validation error", result.error);
       }
-      logMiddlewareError("updateProject", result.message, req);
+      logWithTime(`❌ [updateProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
 
+    // ── No-op: service reports success:true but nothing actually changed ─
+    if (result.message === "No changes detected, Project Document remains unchanged") {
+      logWithTime(`❌ [updateProjectController] No changes detected | ${getLogIdentifiers(req)}`);
+      return throwBadRequestError(
+        res,
+        "No changes detected",
+        "The submitted values are identical to the existing project details. Nothing was updated."
+      );
+    }
+
     // ── Success ───────────────────────────────────────────────────────
+    logWithTime(`✅ [updateProjectController] Project updated successfully | ${getLogIdentifiers(req)}`);
     return sendProjectUpdatedSuccess(res, result.project);
   } catch (error) {
-    logMiddlewareError("updateProject", `Unexpected error: ${error.message}`, req);
+    logWithTime(`❌ [updateProjectController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
     return throwInternalServerError(res, error);
   }
 };

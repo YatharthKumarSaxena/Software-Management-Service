@@ -5,7 +5,10 @@ const { sendProjectsListFetchedSuccess } = require("@/responses/success/project.
 const {
   throwBadRequestError,
   throwInternalServerError,
+  throwSpecificInternalServerError,
+  getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
+const { logWithTime } = require("@utils/time-stamps.util");
 const { ProjectStatus, Phases } = require("@configs/enums.config");
 
 /**
@@ -97,12 +100,15 @@ const getProjectsAdminController = async (req, res) => {
     const result = await listProjectsAdminService(filters, { page, limit, selectFields });
 
     if (!result.success) {
-      return throwInternalServerError(res, result.message);
+      logWithTime(`❌ [getProjectsAdminController] ${result.message} | ${getLogIdentifiers(req)}`);
+      return throwSpecificInternalServerError(res, result.message);
     }
 
+    logWithTime(`✅ [getProjectsAdminController] Projects list fetched successfully | ${getLogIdentifiers(req)}`);
     return sendProjectsListFetchedSuccess(res, result.projects, result.total, result.page, result.totalPages);
   } catch (error) {
-    return throwInternalServerError(res, error.message);
+    logWithTime(`❌ [getProjectsAdminController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
+    return throwInternalServerError(res, error);
   }
 };
 

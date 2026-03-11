@@ -3,14 +3,13 @@
 const { deleteProjectService } = require("@services/projects/delete-project.service");
 const { sendProjectDeletedSuccess } = require("@/responses/success/project.response");
 const {
-  throwMissingFieldsError,
   throwBadRequestError,
   throwDBResourceNotFoundError,
   throwInternalServerError,
-  logMiddlewareError,
   throwSpecificInternalServerError,
+  getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
-const { isValidMongoID } = require("@/utils/id-validators.util");
+const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
  * Controller: Delete Project (Soft Delete)
@@ -34,12 +33,9 @@ const { isValidMongoID } = require("@/utils/id-validators.util");
  */
 const deleteProjectController = async (req, res) => {
   try {
-    const { projectId } = req.params;
 
-    if (!projectId) return throwMissingFieldsError(res, ["projectId"]);
-    if (!isValidMongoID(projectId)) {
-      return throwBadRequestError(res, "Invalid projectId format", "projectId must be a valid ObjectId string.");
-    }
+    const project = req.project; // fetchProjectMiddleware ne inject kiya hai
+    const projectId = project._id.toString();
 
     const { deletionReasonType, deletionReasonDescription } = req.body;
     const deletedBy = req.admin.adminId;
@@ -57,24 +53,28 @@ const deleteProjectController = async (req, res) => {
 
     if (!result.success) {
       if (result.message === "Project not found") {
+        logWithTime(`❌ [deleteProjectController] Project not found | ${getLogIdentifiers(req)}`);
         return throwDBResourceNotFoundError(res, "Project");
       }
       if (
-        result.message === "Project is already deleted" ||
-        result.message === "Project is already completed"
+        result.message === "Project is currently active" ||
+        result.message === "Completed projects cannot be deleted"
       ) {
+        logWithTime(`❌ [deleteProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message, result.message);
       }
       if (result.message === "Validation error") {
+        logWithTime(`❌ [deleteProjectController] Validation error: ${JSON.stringify(result.error)} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, "Validation error", result.error);
       }
-      logMiddlewareError("deleteProject", result.message, req);
+      logWithTime(`❌ [deleteProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
 
+    logWithTime(`✅ [deleteProjectController] Project deleted successfully | ${getLogIdentifiers(req)}`);
     return sendProjectDeletedSuccess(res);
   } catch (error) {
-    logMiddlewareError("deleteProject", `Unexpected error: ${error.message}`, req);
+    logWithTime(`❌ [deleteProjectController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
     return throwInternalServerError(res, error);
   }
 };

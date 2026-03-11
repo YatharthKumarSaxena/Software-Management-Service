@@ -5,7 +5,10 @@ const { sendProjectsListFetchedSuccess } = require("@/responses/success/project.
 const {
   throwBadRequestError,
   throwInternalServerError,
+  throwSpecificInternalServerError,
+  getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
+const { logWithTime } = require("@utils/time-stamps.util");
 const { ProjectStatus, Phases } = require("@configs/enums.config");
 
 /**
@@ -42,6 +45,7 @@ const getProjectsClientController = async (req, res) => {
 
     // ── Validate enum filters ─────────────────────────────────────────────────
     if (projectStatus && !VALID_STATUSES.includes(projectStatus)) {
+      logWithTime(`❌ [getProjectsClientController] Invalid projectStatus filter | ${getLogIdentifiers(req)}`);
       return throwBadRequestError(
         res,
         "Invalid projectStatus filter",
@@ -49,6 +53,7 @@ const getProjectsClientController = async (req, res) => {
       );
     }
     if (currentPhase && !VALID_PHASES.includes(currentPhase)) {
+      logWithTime(`❌ [getProjectsClientController] Invalid currentPhase filter | ${getLogIdentifiers(req)}`);
       return throwBadRequestError(
         res,
         "Invalid currentPhase filter",
@@ -86,12 +91,15 @@ const getProjectsClientController = async (req, res) => {
     const result = await listProjectsClientService(filters, { page, limit, selectFields });
 
     if (!result.success) {
-      return throwInternalServerError(res, result.message);
+      logWithTime(`❌ [getProjectsClientController] ${result.message} | ${getLogIdentifiers(req)}`);
+      return throwSpecificInternalServerError(res, result.message);
     }
 
+    logWithTime(`✅ [getProjectsClientController] Projects list fetched successfully | ${getLogIdentifiers(req)}`);
     return sendProjectsListFetchedSuccess(res, result.projects, result.total, result.page, result.totalPages);
   } catch (error) {
-    return throwInternalServerError(res, error.message);
+    logWithTime(`❌ [getProjectsClientController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
+    return throwInternalServerError(res, error);
   }
 };
 

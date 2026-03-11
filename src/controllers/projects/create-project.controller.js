@@ -5,8 +5,10 @@ const { sendProjectCreatedSuccess } = require("@/responses/success/project.respo
 const {
   throwBadRequestError,
   throwInternalServerError,
-  logMiddlewareError,
+  throwSpecificInternalServerError,
+  getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
+const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
  * Controller: Create Project
@@ -52,16 +54,18 @@ const createProjectController = async (req, res) => {
 
     if (!result.success) {
       if (result.message === "Validation error") {
+        logWithTime(`❌ [createProjectController] Validation error: ${JSON.stringify(result.error)} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, "Validation error", result.error);
       }
-      logMiddlewareError("createProject", result.message, req);
-      return throwInternalServerError(res, new Error(result.message));
+      logWithTime(`❌ [createProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
+      return throwSpecificInternalServerError(res, result.message);
     }
 
     // ── Success ───────────────────────────────────────────────────────
+    logWithTime(`✅ [createProjectController] Project created successfully | ${getLogIdentifiers(req)}`);
     return sendProjectCreatedSuccess(res, result.project);
   } catch (error) {
-    logMiddlewareError("createProject", `Unexpected error: ${error.message}`, req);
+    logWithTime(`❌ [createProjectController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
     return throwInternalServerError(res, error);
   }
 };

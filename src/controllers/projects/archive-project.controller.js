@@ -3,14 +3,13 @@
 const { archiveProjectService } = require("@services/projects/archive-project.service");
 const { sendProjectArchivedSuccess } = require("@/responses/success/project.response");
 const {
-  throwMissingFieldsError,
   throwBadRequestError,
   throwDBResourceNotFoundError,
   throwInternalServerError,
-  logMiddlewareError,
   throwSpecificInternalServerError,
+  getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
-const { isValidMongoID } = require("@/utils/id-validators.util");
+const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
  * Controller: Archive Project
@@ -31,12 +30,8 @@ const { isValidMongoID } = require("@/utils/id-validators.util");
  */
 const archiveProjectController = async (req, res) => {
   try {
-    const { projectId } = req.params;
-
-    if (!projectId) return throwMissingFieldsError(res, ["projectId"]);
-    if (!isValidMongoID(projectId)) {
-      return throwBadRequestError(res, "Invalid projectId format", "projectId must be a valid ObjectId string.");
-    }
+    const project = req.project; // fetchProjectMiddleware ne inject kiya hai
+    const projectId = project._id.toString();
 
     const archivedBy = req.admin.adminId;
 
@@ -51,6 +46,7 @@ const archiveProjectController = async (req, res) => {
 
     if (!result.success) {
       if (result.message === "Project not found") {
+        logWithTime(`❌ [archiveProjectController] Project not found | ${getLogIdentifiers(req)}`);
         return throwDBResourceNotFoundError(res, "Project");
       }
       if (
@@ -58,21 +54,24 @@ const archiveProjectController = async (req, res) => {
         result.message === "Project is already archived" ||
         result.message === "Only a COMPLETED project can be archived"
       ) {
+        logWithTime(`❌ [archiveProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message, result.currentStatus
           ? `Current project status is: ${result.currentStatus}`
           : result.message
         );
       }
       if (result.message === "Validation error") {
+        logWithTime(`❌ [archiveProjectController] Validation error: ${JSON.stringify(result.error)} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, "Validation error", result.error);
       }
-      logMiddlewareError("archiveProject", result.message, req);
+      logWithTime(`❌ [archiveProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
 
+    logWithTime(`✅ [archiveProjectController] Project archived successfully | ${getLogIdentifiers(req)}`);
     return sendProjectArchivedSuccess(res, result.project);
   } catch (error) {
-    logMiddlewareError("archiveProject", `Unexpected error: ${error.message}`, req);
+    logWithTime(`❌ [archiveProjectController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
     return throwInternalServerError(res, error);
   }
 };

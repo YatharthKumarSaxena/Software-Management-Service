@@ -3,14 +3,13 @@
 const { abortProjectService } = require("@services/projects/abort-project.service");
 const { sendProjectAbortedSuccess } = require("@/responses/success/project.response");
 const {
-  throwMissingFieldsError,
   throwBadRequestError,
   throwDBResourceNotFoundError,
   throwInternalServerError,
-  logMiddlewareError,
   throwSpecificInternalServerError,
+  getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
-const { isValidMongoID } = require("@/utils/id-validators.util");
+const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
  * Controller: Abort Project
@@ -32,12 +31,8 @@ const { isValidMongoID } = require("@/utils/id-validators.util");
  */
 const abortProjectController = async (req, res) => {
   try {
-    const { projectId } = req.params;
-
-    if (!projectId) return throwMissingFieldsError(res, ["projectId"]);
-    if (!isValidMongoID(projectId)) {
-      return throwBadRequestError(res, "Invalid projectId format", "projectId must be a valid ObjectId string.");
-    }
+    const project = req.project; // fetchProjectMiddleware ne inject kiya hai
+    const projectId = project._id.toString();
 
     const { abortReasonType, abortReasonDescription } = req.body;
     const abortedBy = req.admin.adminId;
@@ -55,6 +50,7 @@ const abortProjectController = async (req, res) => {
 
     if (!result.success) {
       if (result.message === "Project not found") {
+        logWithTime(`❌ [abortProjectController] Project not found | ${getLogIdentifiers(req)}`);
         return throwDBResourceNotFoundError(res, "Project");
       }
       if (
@@ -62,18 +58,21 @@ const abortProjectController = async (req, res) => {
         result.message === "Project is already completed" ||
         result.message === "Project is already aborted"
       ) {
+        logWithTime(`❌ [abortProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message, result.message);
       }
       if (result.message === "Validation error") {
+        logWithTime(`❌ [abortProjectController] Validation error: ${JSON.stringify(result.error)} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, "Validation error", result.error);
       }
-      logMiddlewareError("abortProject", result.message, req);
+      logWithTime(`❌ [abortProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
 
+    logWithTime(`✅ [abortProjectController] Project aborted successfully | ${getLogIdentifiers(req)}`);
     return sendProjectAbortedSuccess(res, result.project);
   } catch (error) {
-    logMiddlewareError("abortProject", `Unexpected error: ${error.message}`, req);
+    logWithTime(`❌ [abortProjectController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
     return throwInternalServerError(res, error);
   }
 };

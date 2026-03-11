@@ -3,14 +3,13 @@
 const { resumeProjectService } = require("@services/projects/resume-project.service");
 const { sendProjectResumedSuccess } = require("@/responses/success/project.response");
 const {
-  throwMissingFieldsError,
   throwBadRequestError,
   throwDBResourceNotFoundError,
   throwInternalServerError,
-  logMiddlewareError,
   throwSpecificInternalServerError,
+  getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
-const { isValidMongoID } = require("@/utils/id-validators.util");
+const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
  * Controller: Resume Project
@@ -32,12 +31,8 @@ const { isValidMongoID } = require("@/utils/id-validators.util");
  */
 const resumeProjectController = async (req, res) => {
   try {
-    const { projectId } = req.params;
-
-    if (!projectId) return throwMissingFieldsError(res, ["projectId"]);
-    if (!isValidMongoID(projectId)) {
-      return throwBadRequestError(res, "Invalid projectId format", "projectId must be a valid ObjectId string.");
-    }
+    const project = req.project; // fetchProjectMiddleware ne inject kiya hai
+    const projectId = project._id.toString();
 
     const { resumeReasonType, resumeReasonDescription } = req.body;
     const resumedBy = req.admin.adminId;
@@ -55,6 +50,7 @@ const resumeProjectController = async (req, res) => {
 
     if (!result.success) {
       if (result.message === "Project not found") {
+        logWithTime(`❌ [resumeProjectController] Project not found | ${getLogIdentifiers(req)}`);
         return throwDBResourceNotFoundError(res, "Project");
       }
       if (
@@ -62,21 +58,24 @@ const resumeProjectController = async (req, res) => {
         result.message === "Project is already completed" ||
         result.message === "Only an ON_HOLD or ABORTED project can be resumed"
       ) {
+        logWithTime(`❌ [resumeProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message, result.currentStatus
           ? `Current project status is: ${result.currentStatus}`
           : result.message
         );
       }
       if (result.message === "Validation error") {
+        logWithTime(`❌ [resumeProjectController] Validation error: ${JSON.stringify(result.error)} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, "Validation error", result.error);
       }
-      logMiddlewareError("resumeProject", result.message, req);
+      logWithTime(`❌ [resumeProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
 
+    logWithTime(`✅ [resumeProjectController] Project resumed successfully | ${getLogIdentifiers(req)}`);
     return sendProjectResumedSuccess(res, result.project);
   } catch (error) {
-    logMiddlewareError("resumeProject", `Unexpected error: ${error.message}`, req);
+    logWithTime(`❌ [resumeProjectController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
     return throwInternalServerError(res, error);
   }
 };
