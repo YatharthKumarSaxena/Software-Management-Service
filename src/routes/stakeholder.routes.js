@@ -18,7 +18,7 @@ const { createStakeholderController }   = require("@controllers/stakeholders/cre
 const { updateStakeholderController }   = require("@controllers/stakeholders/update-stakeholder.controller");
 const { deleteStakeholderController }   = require("@controllers/stakeholders/delete-stakeholder.controller");
 const { getStakeholderController }      = require("@controllers/stakeholders/get-stakeholder.controller");
-const { getStakeholdersController }     = require("@controllers/stakeholders/get-stakeholders.controller");
+const { getStakeholdersController }     = require("@/controllers/stakeholders/list-stakeholders.controller");
 const { stakeholderMiddlewares }        = require("@/middlewares/stakeholders");
 
 const {
@@ -97,31 +97,31 @@ stakeholderRouter.delete(
 );
 
 /**
- * GET /software-management-service/api/v1/admin/get-stakeholder/:stakeholderId
- * Fetch a single stakeholder by MongoDB _id.
- * Allowed roles: all admin roles
+ * GET /software-management-service/api/v1/stakeholders/get/:stakeholderId
+ * Fetch a single stakeholder by stakeholderId.
+ * Allowed roles: All admin roles OR if admin is a stakeholder of any project
  */
 stakeholderRouter.get(
   GET_STAKEHOLDER,
   [
     ...baseAuthAdminMiddlewares,
     getStakeholderRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminGetStakeholder,
+    apiAuthorizationMiddleware.authorizeAdminGetStakeholderOrMember,
   ],
   getStakeholderController
 );
 
 /**
- * GET /software-management-service/api/v1/admin/get-stakeholders
+ * GET /software-management-service/api/v1/stakeholders/list
  * List stakeholders with optional filters and pagination.
- * Allowed roles: all admin roles
+ * Allowed roles: All admin roles OR if admin is a stakeholder of any project
  */
 stakeholderRouter.get(
   GET_STAKEHOLDERS,
   [
     ...baseAuthAdminMiddlewares,
     getStakeholdersRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminGetStakeholders,
+    apiAuthorizationMiddleware.authorizeAdminGetStakeholdersOrMember,
   ],
   getStakeholdersController
 );

@@ -4,7 +4,7 @@ const express = require("express");
 const projectRouter = express.Router();
 
 const { PROJECT_ROUTES } = require("@/configs/uri.config");
-const { baseAuthAdminMiddlewares, baseAuthClientMiddlewares, checkClientIsStakeholder } = require("./middleware.gateway.routes");
+const { baseAuthAdminMiddlewares } = require("./middleware.gateway.routes");
 const { adminApiAuthorizationMiddleware: apiAuthorizationMiddleware } = require("@/middlewares/admins/admin-api-authorization.middleware");
 const {
   createProjectRateLimiter,
@@ -28,9 +28,7 @@ const { resumeProjectController }           = require("@controllers/projects/res
 const { deleteProjectController }           = require("@controllers/projects/delete-project.controller");
 const { archiveProjectController }          = require("@controllers/projects/archive-project.controller");
 const { getProjectAdminController }         = require("@controllers/projects/get-project-admin.controller");
-const { getProjectsAdminController }        = require("@controllers/projects/get-projects-admin.controller");
-const { getProjectClientController }        = require("@controllers/projects/get-project-client.controller");
-const { getProjectsClientController }       = require("@controllers/projects/get-projects-client.controller");
+const { listProjectsAdminController: getProjectsAdminController } = require("@/controllers/projects/list-projects-admin.controller");
 const { fetchProjectMiddleware } = require("@/middlewares/projects/fetch-project.middleware");
 const { projectMiddlewares } = require("@/middlewares/projects");
 
@@ -203,62 +201,34 @@ projectRouter.patch(
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * GET /software-management-service/api/v1/admin/get-project/:projectId
+ * GET /software-management-service/api/v1/projects/get/:projectId
  * Fetch full details of a single project (admin view — all fields).
- * Allowed roles: All admin roles
+ * Allowed roles: All admin roles OR if admin is a stakeholder of this project
  */
 projectRouter.get(
   GET_PROJECT,
   [
     ...baseAuthAdminMiddlewares,
     getProjectRateLimiter,
-    fetchProjectMiddleware
+    fetchProjectMiddleware,
+    apiAuthorizationMiddleware.authorizeAdminGetProjectOrStakeholder,
   ],
   getProjectAdminController
 );
 
 /**
- * GET /software-management-service/api/v1/admin/get-projects
+ * GET /software-management-service/api/v1/projects/list
  * Fetch paginated project list with optional filters (admin view — all fields).
- * Allowed roles: All admin roles
+ * Allowed roles: All admin roles OR if admin is a stakeholder of any project
  */
 projectRouter.get(
   GET_PROJECTS,
   [
     ...baseAuthAdminMiddlewares,
-    getProjectsRateLimiter
+    getProjectsRateLimiter,
+    apiAuthorizationMiddleware.authorizeAdminGetProjectsOrStakeholder,
   ],
   getProjectsAdminController
-);
-
-/**
- * GET /software-management-service/api/v1/admin/get-project-client/:projectId
- * Fetch a single project in client-safe view (restricted fields, no audit data).
- * Allowed roles: All admin roles
- */
-projectRouter.get(
-  `/get-project-client/:projectId`,
-  [
-    ...baseAuthClientMiddlewares,
-    getProjectRateLimiter,
-
-  ],
-  getProjectClientController
-);
-
-/**
- * GET /software-management-service/api/v1/admin/get-projects-client
- * Fetch paginated projects in client-safe view (restricted fields, no deleted).
- * Allowed roles: All admin roles
- */
-projectRouter.get(
-  `/get-projects-client`,
-  [
-    checkClientIsStakeholder,
-    getProjectsRateLimiter,
-
-  ],
-  getProjectsClientController
 );
 
 module.exports = { projectRouter };
