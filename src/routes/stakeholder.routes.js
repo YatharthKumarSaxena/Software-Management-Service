@@ -14,19 +14,15 @@ const {
   getStakeholdersRateLimiter,
 } = require("@rate-limiters/general-api.rate-limiter");
 
-const { createStakeholderController }   = require("@controllers/stakeholders/create-stakeholder.controller");
-const { updateStakeholderController }   = require("@controllers/stakeholders/update-stakeholder.controller");
-const { deleteStakeholderController }   = require("@controllers/stakeholders/delete-stakeholder.controller");
-const { getStakeholderController }      = require("@controllers/stakeholders/get-stakeholder.controller");
-const { getStakeholdersController }     = require("@/controllers/stakeholders/list-stakeholders.controller");
-const { stakeholderMiddlewares }        = require("@/middlewares/stakeholders");
+const { stakeholderControllers } = require("@controllers/stakeholders");
+const { stakeholderMiddlewares } = require("@/middlewares/stakeholders");
 
 const {
   CREATE_STAKEHOLDER,
   UPDATE_STAKEHOLDER,
   DELETE_STAKEHOLDER,
   GET_STAKEHOLDER,
-  LIST_STAKEHOLDERS: GET_STAKEHOLDERS,
+  LIST_STAKEHOLDERS
 } = STAKEHOLDER_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -56,7 +52,7 @@ stakeholderRouter.post(
     stakeholderMiddlewares.createStakeholderValidationMiddleware,
     stakeholderMiddlewares.createStakeholderRoleGuardMiddleware,
   ],
-  createStakeholderController
+  stakeholderControllers.createStakeholderController
 );
 
 /**
@@ -66,16 +62,16 @@ stakeholderRouter.post(
  */
 stakeholderRouter.patch(
   UPDATE_STAKEHOLDER,
-  [
+  [ 
     ...baseAuthAdminMiddlewares,
     updateStakeholderRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminUpdateStakeholder,
-
+    stakeholderMiddlewares.fetchStakeholderMiddleware,
     stakeholderMiddlewares.updateStakeholderPresenceMiddleware,
     stakeholderMiddlewares.updateStakeholderValidationMiddleware,
     stakeholderMiddlewares.updateStakeholderRoleGuardMiddleware,
   ],
-  updateStakeholderController
+  stakeholderControllers.updateStakeholderController
 );
 
 /**
@@ -89,11 +85,11 @@ stakeholderRouter.delete(
     ...baseAuthAdminMiddlewares,
     deleteStakeholderRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminDeleteStakeholder,
-
+    stakeholderMiddlewares.fetchStakeholderMiddleware,
     stakeholderMiddlewares.deleteStakeholderPresenceMiddleware,
     stakeholderMiddlewares.deleteStakeholderValidationMiddleware,
   ],
-  deleteStakeholderController
+  stakeholderControllers.deleteStakeholderController
 );
 
 /**
@@ -107,8 +103,9 @@ stakeholderRouter.get(
     ...baseAuthAdminMiddlewares,
     getStakeholderRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminGetStakeholderOrMember,
+    stakeholderMiddlewares.fetchStakeholderMiddleware
   ],
-  getStakeholderController
+  stakeholderControllers.getStakeholderController
 );
 
 /**
@@ -117,13 +114,13 @@ stakeholderRouter.get(
  * Allowed roles: All admin roles OR if admin is a stakeholder of any project
  */
 stakeholderRouter.get(
-  GET_STAKEHOLDERS,
+  LIST_STAKEHOLDERS,
   [
     ...baseAuthAdminMiddlewares,
     getStakeholdersRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminGetStakeholdersOrMember,
+    apiAuthorizationMiddleware.authorizeAdminGetStakeholdersOrMember
   ],
-  getStakeholdersController
+  stakeholderControllers.listStakeholdersController
 );
 
 module.exports = { stakeholderRouter };

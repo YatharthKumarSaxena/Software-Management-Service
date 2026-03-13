@@ -19,21 +19,12 @@ const {
   getProjectsRateLimiter,
 } = require("@rate-limiters/general-api.rate-limiter");
 
-const { createProjectController }           = require("@controllers/projects/create-project.controller");
-const { updateProjectController }           = require("@controllers/projects/update-project.controller");
-const { onHoldProjectController }           = require("@controllers/projects/on-hold-project.controller");
-const { abortProjectController }            = require("@controllers/projects/abort-project.controller");
-const { completeProjectController }         = require("@controllers/projects/complete-project.controller");
-const { resumeProjectController }           = require("@controllers/projects/resume-project.controller");
-const { deleteProjectController }           = require("@controllers/projects/delete-project.controller");
-const { archiveProjectController }          = require("@controllers/projects/archive-project.controller");
-const { getProjectAdminController }         = require("@controllers/projects/get-project-admin.controller");
-const { listProjectsAdminController: getProjectsAdminController } = require("@/controllers/projects/list-projects-admin.controller");
-const { fetchProjectMiddleware } = require("@/middlewares/projects/fetch-project.middleware");
+const { projectControllers } = require("@controllers/projects");
 const { projectMiddlewares } = require("@/middlewares/projects");
+const { fetchProjectMiddleware } = require("@/middlewares/projects/fetch-project.middleware");
 
 const {
-  CREATE_PROJECT,
+  CREATE_PROJECT, 
   UPDATE_PROJECT,
   ABORT_PROJECT,
   COMPLETE_PROJECT,
@@ -41,7 +32,7 @@ const {
   DELETE_PROJECT,
   ARCHIVE_PROJECT,
   GET_PROJECT,
-  LIST_PROJECTS: GET_PROJECTS,
+  LIST_PROJECTS
 } = PROJECT_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -61,14 +52,14 @@ const {
  */
 projectRouter.post(
   CREATE_PROJECT,
-  [
+  [ 
     ...baseAuthAdminMiddlewares,
     createProjectRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminCreateProject,
     projectMiddlewares.createProjectPresenceMiddleware,
-    projectMiddlewares.createProjectValidationMiddleware,
+    projectMiddlewares.createProjectValidationMiddleware
   ],
-  createProjectController
+  projectControllers.createProjectController
 );
 
 /**
@@ -86,7 +77,7 @@ projectRouter.patch(
     projectMiddlewares.updateProjectPresenceMiddleware,
     projectMiddlewares.updateProjectValidationMiddleware,
   ],
-  updateProjectController
+  projectControllers.updateProjectController
 );
 
 /**
@@ -104,7 +95,7 @@ projectRouter.patch(
     projectMiddlewares.onHoldProjectPresenceMiddleware,
     projectMiddlewares.onHoldProjectValidationMiddleware,
   ],
-  onHoldProjectController
+  projectControllers.onHoldProjectController
 );
 
 /**
@@ -122,7 +113,7 @@ projectRouter.patch(
     projectMiddlewares.abortProjectPresenceMiddleware,
     projectMiddlewares.abortProjectValidationMiddleware,
   ],
-  abortProjectController
+  projectControllers.abortProjectController
 );
 
 /**
@@ -140,7 +131,7 @@ projectRouter.patch(
     projectMiddlewares.completeProjectPresenceMiddleware,
     projectMiddlewares.completeProjectValidationMiddleware,
   ],
-  completeProjectController
+  projectControllers.completeProjectController
 );
 
 /**
@@ -158,7 +149,7 @@ projectRouter.patch(
     projectMiddlewares.resumeProjectPresenceMiddleware,
     projectMiddlewares.resumeProjectValidationMiddleware,
   ],
-  resumeProjectController
+  projectControllers.resumeProjectController
 );
 
 /**
@@ -176,7 +167,7 @@ projectRouter.delete(
     projectMiddlewares.deleteProjectPresenceMiddleware,
     projectMiddlewares.deleteProjectValidationMiddleware,
   ],
-  deleteProjectController
+  projectControllers.deleteProjectController
 );
 
 /**
@@ -192,7 +183,7 @@ projectRouter.patch(
     apiAuthorizationMiddleware.authorizeAdminArchiveProject,
     fetchProjectMiddleware
   ],
-  archiveProjectController
+  projectControllers.archiveProjectController
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -211,9 +202,9 @@ projectRouter.get(
     ...baseAuthAdminMiddlewares,
     getProjectRateLimiter,
     fetchProjectMiddleware,
-    apiAuthorizationMiddleware.authorizeAdminGetProjectOrStakeholder,
+    apiAuthorizationMiddleware.authorizeAdminGetProjectOrStakeholder
   ],
-  getProjectAdminController
+  projectControllers.getProjectController
 );
 
 /**
@@ -222,13 +213,13 @@ projectRouter.get(
  * Allowed roles: All admin roles OR if admin is a stakeholder of any project
  */
 projectRouter.get(
-  GET_PROJECTS,
+  LIST_PROJECTS,
   [
     ...baseAuthAdminMiddlewares,
     getProjectsRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminGetProjectsOrStakeholder,
+    apiAuthorizationMiddleware.authorizeAdminGetProjectsOrStakeholder
   ],
-  getProjectsAdminController
+  projectControllers.listProjectsController
 );
 
 module.exports = { projectRouter };
