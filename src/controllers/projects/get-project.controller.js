@@ -1,9 +1,8 @@
 // controllers/projects/get-project-admin.controller.js
 
-const { getProjectAdminService } = require("@services/projects/get-project.service");
+const { getProjectAdminService, getProjectClientService } = require("@services/projects/get-project.service");
 const { sendProjectFetchedSuccess } = require("@/responses/success/project.response");
 const {
-  throwDBResourceNotFoundError,
   throwInternalServerError,
   throwSpecificInternalServerError,
   getLogIdentifiers,
@@ -24,18 +23,17 @@ const { logWithTime } = require("@utils/time-stamps.util");
  * @returns {404} Project not found
  * @returns {500} Internal server error
  */
-const getProjectAdminController = async (req, res) => {
+const getProjectController = async (req, res) => {
   try {
     const project = req.project; // fetchProjectMiddleware ne inject kiya hai
-    const projectId = project._id.toString();
+    const authorizationContext = req.authorizationContext || {};
 
-    const result = await getProjectAdminService(projectId);
+    const shouldUseRestrictedView = authorizationContext.grantedBy === "stakeholder-membership";
+    const result = shouldUseRestrictedView
+      ? await getProjectClientService(project, req.stakeholder)
+      : await getProjectAdminService(project);
 
     if (!result.success) {
-      if (result.message === "Project not found") {
-        logWithTime(`❌ [getProjectAdminController] Project not found | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Project");
-      }
       logWithTime(`❌ [getProjectAdminController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
@@ -48,4 +46,4 @@ const getProjectAdminController = async (req, res) => {
   }
 };
 
-module.exports = { getProjectAdminController };
+module.exports = { getProjectController };

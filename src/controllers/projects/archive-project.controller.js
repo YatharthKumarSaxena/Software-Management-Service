@@ -31,11 +31,10 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const archiveProjectController = async (req, res) => {
   try {
     const project = req.project; // fetchProjectMiddleware ne inject kiya hai
-    const projectId = project._id.toString();
 
     const archivedBy = req.admin.adminId;
 
-    const result = await archiveProjectService(projectId, {
+    const result = await archiveProjectService(project, {
       archivedBy,
       auditContext: {
         admin: req.admin,
@@ -45,14 +44,9 @@ const archiveProjectController = async (req, res) => {
     });
 
     if (!result.success) {
-      if (result.message === "Project not found") {
-        logWithTime(`❌ [archiveProjectController] Project not found | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Project");
-      }
       if (
-        result.message === "Project is deleted" ||
         result.message === "Project is already archived" ||
-        result.message === "Only a COMPLETED project can be archived"
+        result.message === "Only a COMPLETED or ABORTED project can be archived"
       ) {
         logWithTime(`❌ [archiveProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message, result.currentStatus

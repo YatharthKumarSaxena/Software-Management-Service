@@ -37,34 +37,47 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const updateProjectController = async (req, res) => {
   try {
     const project = req.project; // fetchProjectMiddleware ne inject kiya hai
-    const projectId = project._id.toString();
 
     // ── Ensure at least one updatable field is present ───────────────
     const {
-      name, description, problemStatement, goal,
+      name, description, problemStatement, goal, expectedBudget, expectedTimelineMonths,
       projectUpdationReasonType,
       projectUpdationReasonDescription,
+      addedOrgIds,
+      removedOrgIds,
+
     } = req.body;
 
-    const hasUpdate = name || description || problemStatement || goal;
+    const hasUpdate =
+      name ||
+      description ||
+      problemStatement ||
+      goal ||
+      expectedBudget !== undefined ||
+      expectedTimelineMonths !== undefined ||
+      addedOrgIds?.length ||
+      removedOrgIds?.length;
 
     if (!hasUpdate) {
       logWithTime(`❌ [updateProjectController] No updatable fields provided | ${getLogIdentifiers(req)}`);
       return throwBadRequestError(
         res,
         "No updatable fields provided",
-        "Provide at least one of: name, description, problemStatement, goal."
+        "Provide at least one of: name, description, problemStatement, goal, expectedBudget, expectedTimelineMonths, addedOrgIds, removedOrgIds."
       );
     }
 
     const updatedBy = req.admin.adminId;
 
-    // ── Call service (activity tracking happens inside the service) ──
-    const result = await updateProjectService(projectId, {
+    const result = await updateProjectService(project, {
       name,
       description,
       problemStatement,
       goal,
+      expectedBudget,
+      expectedTimelineMonths,
+      addedOrgIds: addedOrgIds || [],
+      removedOrgIds: removedOrgIds || [],
       updatedBy,
       projectUpdationReasonType,
       projectUpdationReasonDescription,
@@ -76,30 +89,29 @@ const updateProjectController = async (req, res) => {
     });
 
     if (!result.success) {
-      if (result.message === "Project not found") {
-        logWithTime(`❌ [updateProjectController] Project not found | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Project");
-      }
+
       if (result.message?.startsWith("Cannot update a")) {
         logWithTime(`❌ [updateProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message, result.message);
       }
+
+      if (result.message?.includes("Data integrity violation")) {
+        logWithTime(`❌ [updateProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwBadRequestError(res, result.message);
+      }
+
+      if (result.message?.includes("Organization association cannot be modified")) {
+        logWithTime(`❌ [updateProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwBadRequestError(res, result.message);
+      }
+
       if (result.message === "Validation error") {
         logWithTime(`❌ [updateProjectController] Validation error: ${JSON.stringify(result.error)} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, "Validation error", result.error);
       }
+
       logWithTime(`❌ [updateProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
-    }
-
-    // ── No-op: service reports success:true but nothing actually changed ─
-    if (result.message === "No changes detected, Project Document remains unchanged") {
-      logWithTime(`❌ [updateProjectController] No changes detected | ${getLogIdentifiers(req)}`);
-      return throwBadRequestError(
-        res,
-        "No changes detected",
-        "The submitted values are identical to the existing project details. Nothing was updated."
-      );
     }
 
     // ── Success ───────────────────────────────────────────────────────

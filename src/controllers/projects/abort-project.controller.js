@@ -4,7 +4,6 @@ const { abortProjectService } = require("@services/projects/abort-project.servic
 const { sendProjectAbortedSuccess } = require("@/responses/success/project.response");
 const {
   throwBadRequestError,
-  throwDBResourceNotFoundError,
   throwInternalServerError,
   throwSpecificInternalServerError,
   getLogIdentifiers,
@@ -29,15 +28,15 @@ const { logWithTime } = require("@utils/time-stamps.util");
  * @returns {404} Project not found
  * @returns {500} Internal server error
  */
+
 const abortProjectController = async (req, res) => {
   try {
     const project = req.project; // fetchProjectMiddleware ne inject kiya hai
-    const projectId = project._id.toString();
 
     const { abortReasonType, abortReasonDescription } = req.body;
     const abortedBy = req.admin.adminId;
 
-    const result = await abortProjectService(projectId, {
+    const result = await abortProjectService(project, {
       abortReasonType,
       abortReasonDescription,
       abortedBy,
@@ -49,12 +48,7 @@ const abortProjectController = async (req, res) => {
     });
 
     if (!result.success) {
-      if (result.message === "Project not found") {
-        logWithTime(`❌ [abortProjectController] Project not found | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Project");
-      }
       if (
-        result.message === "Project is deleted" ||
         result.message === "Project is already completed" ||
         result.message === "Project is already aborted"
       ) {

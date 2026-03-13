@@ -35,12 +35,11 @@ const deleteProjectController = async (req, res) => {
   try {
 
     const project = req.project; // fetchProjectMiddleware ne inject kiya hai
-    const projectId = project._id.toString();
 
     const { deletionReasonType, deletionReasonDescription } = req.body;
     const deletedBy = req.admin.adminId;
 
-    const result = await deleteProjectService(projectId, {
+    const result = await deleteProjectService(project, {
       deletionReasonType,
       deletionReasonDescription,
       deletedBy,
@@ -52,10 +51,6 @@ const deleteProjectController = async (req, res) => {
     });
 
     if (!result.success) {
-      if (result.message === "Project not found") {
-        logWithTime(`❌ [deleteProjectController] Project not found | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Project");
-      }
       if (
         result.message === "Project is currently active" ||
         result.message === "Completed projects cannot be deleted"

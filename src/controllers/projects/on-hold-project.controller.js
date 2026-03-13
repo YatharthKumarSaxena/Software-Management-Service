@@ -32,12 +32,11 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const onHoldProjectController = async (req, res) => {
   try {
     const project = req.project; // fetchProjectMiddleware ne inject kiya hai
-    const projectId = project._id.toString();
 
     const { onHoldReasonType, onHoldReasonDescription } = req.body;
     const onHoldBy = req.admin.adminId;
 
-    const result = await onHoldProjectService(projectId, {
+    const result = await onHoldProjectService(project, {
       onHoldReasonType,
       onHoldReasonDescription,
       onHoldBy,
@@ -49,10 +48,6 @@ const onHoldProjectController = async (req, res) => {
     });
 
     if (!result.success) {
-      if (result.message === "Project not found") {
-        logWithTime(`❌ [onHoldProjectController] Project not found | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Project");
-      }
       if (result.message === "Only an ACTIVE project can be put on hold") {
         logWithTime(`❌ [onHoldProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(

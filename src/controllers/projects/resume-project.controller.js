@@ -32,12 +32,11 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const resumeProjectController = async (req, res) => {
   try {
     const project = req.project; // fetchProjectMiddleware ne inject kiya hai
-    const projectId = project._id.toString();
 
     const { resumeReasonType, resumeReasonDescription } = req.body;
     const resumedBy = req.admin.adminId;
 
-    const result = await resumeProjectService(projectId, {
+    const result = await resumeProjectService(project, {
       resumeReasonType,
       resumeReasonDescription,
       resumedBy,
@@ -49,12 +48,7 @@ const resumeProjectController = async (req, res) => {
     });
 
     if (!result.success) {
-      if (result.message === "Project not found") {
-        logWithTime(`❌ [resumeProjectController] Project not found | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Project");
-      }
       if (
-        result.message === "Project is deleted" ||
         result.message === "Project is already completed" ||
         result.message === "Only an ON_HOLD or ABORTED project can be resumed"
       ) {

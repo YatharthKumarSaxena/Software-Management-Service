@@ -33,11 +33,10 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const completeProjectController = async (req, res) => {
   try {
     const project = req.project; // fetchProjectMiddleware ne inject kiya hai
-    const projectId = project._id.toString();
 
     const completedBy = req.admin.adminId;
 
-    const result = await completeProjectService(projectId, {
+    const result = await completeProjectService(project, {
       completedBy,
       auditContext: {
         admin: req.admin,
@@ -47,12 +46,7 @@ const completeProjectController = async (req, res) => {
     });
 
     if (!result.success) {
-      if (result.message === "Project not found") {
-        logWithTime(`❌ [completeProjectController] Project not found | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Project");
-      }
       if (
-        result.message === "Project is deleted" ||
         result.message === "Project is already completed" ||
         result.message === "Only an ACTIVE project can be completed"
       ) {

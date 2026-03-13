@@ -1,6 +1,6 @@
 // controllers/projects/get-projects-admin.controller.js
 
-const { listProjectsAdminService } = require("@services/projects/get-project.service");
+const { listProjectsAdminService, listProjectsClientService } = require("@services/projects/list-project.service");
 const { sendProjectsListFetchedSuccess } = require("@/responses/success/project.response");
 const {
   throwBadRequestError,
@@ -39,8 +39,11 @@ const VALID_PHASES   = Object.values(Phases);
  * @returns {400} Invalid filter values
  * @returns {500} Internal server error
  */
-const listProjectsAdminController = async (req, res) => {
+const listProjectsController = async (req, res) => {
   try {
+    const authorizationContext = req.authorizationContext || {};
+    const shouldUseRestrictedView = authorizationContext.grantedBy === "stakeholder-membership";
+
     const {
       projectStatus,
       currentPhase,
@@ -97,7 +100,10 @@ const listProjectsAdminController = async (req, res) => {
       projectIds
     };
 
-    const result = await listProjectsAdminService(filters, { page, limit, selectFields });
+    const requesterUserId = req.stakeholder?.userId || req.admin?.adminId || req.client?.clientId;
+    const result = shouldUseRestrictedView
+      ? await listProjectsClientService(filters, { page, limit, selectFields }, requesterUserId)
+      : await listProjectsAdminService(filters, { page, limit, selectFields });
 
     if (!result.success) {
       logWithTime(`❌ [listProjectsAdminController] ${result.message} | ${getLogIdentifiers(req)}`);
@@ -112,4 +118,4 @@ const listProjectsAdminController = async (req, res) => {
   }
 };
 
-module.exports = { listProjectsAdminController };
+module.exports = { listProjectsController };
