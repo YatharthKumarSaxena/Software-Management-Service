@@ -44,15 +44,15 @@ module.exports = {
     },
     STAKEHOLDER_ROUTES: {
         CREATE_STAKEHOLDER: `/create`,                     // POST    /api/v1/stakeholders/create
-        UPDATE_STAKEHOLDER: `/update/:stakeholderId`,       // PATCH   /api/v1/stakeholders/update/:stakeholderId
-        DELETE_STAKEHOLDER: `/delete/:stakeholderId`,       // DELETE  /api/v1/stakeholders/delete/:stakeholderId
-        GET_STAKEHOLDER:    `/get/:stakeholderId`,          // GET     /api/v1/stakeholders/get/:stakeholderId
+        UPDATE_STAKEHOLDER: `/update/:userId`,       // PATCH   /api/v1/stakeholders/update/:userId
+        DELETE_STAKEHOLDER: `/delete/:userId`,       // DELETE  /api/v1/stakeholders/delete/:userId
+        GET_STAKEHOLDER:    `/get/:userId`,          // GET     /api/v1/stakeholders/get/:userId
         LIST_STAKEHOLDERS:   `/list`                            // GET     /api/v1/stakeholders/list
     },
     CLIENT_ROUTES: {
         GET_PROJECT:       `/view-project/:projectId`,         // GET /software-management-service/api/v1/clients/view-project/:projectId
         LIST_PROJECTS:     `/list-projects`,                   // GET /software-management-service/api/v1/clients/list-projects
-        GET_STAKEHOLDER:   `/get-stakeholder/:stakeholderId`,  // GET /software-management-service/api/v1/clients/get-stakeholder/:stakeholderId
+        GET_STAKEHOLDER:   `/get-stakeholder/:userId`,  // GET /software-management-service/api/v1/clients/get-stakeholder/:userId
         LIST_STAKEHOLDERS: `/list-stakeholders`                // GET /software-management-service/api/v1/clients/list-stakeholders
     }
 };

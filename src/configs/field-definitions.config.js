@@ -71,6 +71,12 @@ const FieldDefinitions = {
       validation: validationRules.timeline,
       description: "Optional expected timeline in months (number)"
     },
+    LINKED_PROJECT_ID: {
+      field: "linkedProjectId",
+      required: false,
+      validation: validationRules.mongoId,
+      description: "Optional MongoDB ObjectId of a related project"
+    }
   },
 
   // ── UPDATE PROJECT ───────────────────────────────────────────────────
