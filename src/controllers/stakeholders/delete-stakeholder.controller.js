@@ -30,9 +30,10 @@ const deleteStakeholderController = async (req, res) => {
   try {
     const { deletionReasonType, deletionReasonDescription } = req.body;
     const deletedBy  = req.admin.adminId;
-    const projectId  = req.stakeholder.projectId?.toString();
+    const project = req.project;
+    const stakeholder = req.foundStakeholder;
 
-    const result = await deleteStakeholderService(req.stakeholder, projectId, {
+    const result = await deleteStakeholderService(stakeholder, project, {
       deletedBy,
       deletionReasonType,
       deletionReasonDescription,
@@ -40,14 +41,10 @@ const deleteStakeholderController = async (req, res) => {
         admin:     req.admin,
         device:    req.device,
         requestId: req.requestId,
-      },
+      }
     });
 
     if (!result.success) {
-      if (result.message === "Stakeholder is already deleted") {
-        logWithTime(`❌ [deleteStakeholderController] Stakeholder is already deleted | ${getLogIdentifiers(req)}`);
-        return throwBadRequestError(res, "Stakeholder is already deleted");
-      }
       if (result.message === "Stakeholders cannot be removed from an individual project") {
         logWithTime(`❌ [deleteStakeholderController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message);

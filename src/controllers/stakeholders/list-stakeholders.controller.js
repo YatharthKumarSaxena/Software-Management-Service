@@ -1,6 +1,9 @@
 // controllers/stakeholders/get-stakeholders.controller.js
 
-const { getStakeholdersService } = require("@services/stakeholders/get-stakeholders.service");
+const {
+  listStakeholdersAdminService,
+  listStakeholdersClientService,
+} = require("@/services/stakeholders/list-stakeholders.service");
 const { enrichStakeholdersWithName } = require("@utils/resolve-stakeholder-name.util");
 const { sendStakeholdersListFetchedSuccess } = require("@/responses/success/stakeholder.response");
 const {
@@ -26,8 +29,11 @@ const { logWithTime } = require("@utils/time-stamps.util");
  * @returns {200} Paginated stakeholder list
  * @returns {500} Internal server error
  */
-const getStakeholdersController = async (req, res) => {
+const listStakeholdersController = async (req, res) => {
   try {
+    const authorizationContext = req.authorizationContext || {};
+    const shouldUseRestrictedView = authorizationContext.grantedBy === "stakeholder-membership";
+
     const {
       projectId,
       role,
@@ -37,28 +43,31 @@ const getStakeholdersController = async (req, res) => {
       limit,
     } = req.query;
 
-    const result = await getStakeholdersService(
-      {
-        projectId,
-        role,
-        stakeholderId,
-        includeDeleted: includeDeleted === "true",
-      },
-      { page, limit }
-    );
+    const filters = {
+      projectId,
+      role,
+      stakeholderId,
+      includeDeleted: includeDeleted === "true",
+    };
+
+    const requesterUserId = req.stakeholder?.userId || req.admin?.adminId || req.client?.clientId;
+    const result = shouldUseRestrictedView
+      ? await listStakeholdersClientService(filters, { page, limit }, requesterUserId)
+      : await listStakeholdersAdminService(filters, { page, limit });
 
     if (!result.success) {
       logWithTime(`❌ [getStakeholdersController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
 
-    // Enrich each stakeholder with resolved name (batch lookup from Admin/Client)
-    const enriched = await enrichStakeholdersWithName(result.stakeholders);
+    const stakeholdersResponse = shouldUseRestrictedView
+      ? result.stakeholders
+      : await enrichStakeholdersWithName(result.stakeholders);
 
     logWithTime(`✅ [getStakeholdersController] Stakeholders list fetched successfully | ${getLogIdentifiers(req)}`);
     return sendStakeholdersListFetchedSuccess(
       res,
-      enriched,
+      stakeholdersResponse,
       result.total,
       result.page,
       result.totalPages
@@ -69,4 +78,4 @@ const getStakeholdersController = async (req, res) => {
   }
 };
 
-module.exports = { getStakeholdersController };
+module.exports = { listStakeholdersController };

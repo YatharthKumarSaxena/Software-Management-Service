@@ -1,11 +1,9 @@
 // controllers/stakeholders/get-stakeholder.controller.js
 
-const { getStakeholderService } = require("@services/stakeholders/get-stakeholder.service");
+const { getStakeholderAdminService, getStakeholderClientService } = require("@services/stakeholders/get-stakeholder.service");
 const { resolveStakeholderName } = require("@utils/resolve-stakeholder-name.util");
 const { sendStakeholderFetchedSuccess } = require("@/responses/success/stakeholder.response");
 const {
-  throwBadRequestError,
-  throwDBResourceNotFoundError,
   throwInternalServerError,
   throwSpecificInternalServerError,
   getLogIdentifiers,
@@ -27,37 +25,28 @@ const { logWithTime } = require("@utils/time-stamps.util");
  */
 const getStakeholderController = async (req, res) => {
   try {
-    const { stakeholderId } = req.params;
+    const stakeholder = req.foundStakeholder;
+    const authorizationContext = req.authorizationContext || {};
+    const shouldUseRestrictedView = authorizationContext.grantedBy === "stakeholder-membership";
 
-    const result = await getStakeholderService(stakeholderId, {
-      admin:     req.admin,
-      device:    req.device,
-      requestId: req.requestId,
-    });
+    const result = shouldUseRestrictedView
+      ? await getStakeholderClientService(stakeholder)
+      : await getStakeholderAdminService(stakeholder);
 
     if (!result.success) {
-      if (result.message === "Stakeholder not found") {
-        logWithTime(`❌ [getStakeholderController] Stakeholder not found | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Stakeholder");
-      }
-      if (result.message === "Stakeholder is deleted") {
-        logWithTime(`❌ [getStakeholderController] Stakeholder is deleted | ${getLogIdentifiers(req)}`);
-        return throwBadRequestError(res, "Stakeholder is deleted", "This stakeholder has been deleted.");
-      }
-      if (result.message === "Invalid stakeholderId format") {
-        logWithTime(`❌ [getStakeholderController] Invalid stakeholderId format | ${getLogIdentifiers(req)}`);
-        return throwBadRequestError(res, "Invalid stakeholderId format", "stakeholderId must be a valid MongoDB ObjectId.");
-      }
       logWithTime(`❌ [getStakeholderController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
 
-    // Resolve name from AdminModel / ClientModel and attach to response
-    const name = await resolveStakeholderName(result.stakeholder.stakeholderId);
-    const enriched = { ...result.stakeholder, name };
+    if (!shouldUseRestrictedView) {
+      const name = await resolveStakeholderName(result.stakeholder.userId);
+      const enriched = { ...result.stakeholder, name };
+      logWithTime(`✅ [getStakeholderController] Stakeholder fetched successfully | ${getLogIdentifiers(req)}`);
+      return sendStakeholderFetchedSuccess(res, enriched);
+    }
 
     logWithTime(`✅ [getStakeholderController] Stakeholder fetched successfully | ${getLogIdentifiers(req)}`);
-    return sendStakeholderFetchedSuccess(res, enriched);
+    return sendStakeholderFetchedSuccess(res, result.stakeholder);
   } catch (error) {
     logWithTime(`❌ [getStakeholderController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
     return throwInternalServerError(res, error);

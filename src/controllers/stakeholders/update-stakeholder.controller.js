@@ -30,10 +30,12 @@ const { logWithTime } = require("@utils/time-stamps.util");
  */
 const updateStakeholderController = async (req, res) => {
   try {
-    const { role, projectId } = req.body;
+    const { role } = req.body;
     const updatedBy  = req.admin.adminId;
+    const stakeholder = req.foundStakeholder;
+    const project = req.project;
 
-    const result = await updateStakeholderService(req.stakeholder, projectId, {
+    const result = await updateStakeholderService(stakeholder, project, {
       role,
       updatedBy,
       auditContext: {
@@ -44,14 +46,6 @@ const updateStakeholderController = async (req, res) => {
     });
 
     if (!result.success) {
-      if (result.message === "Stakeholder is deleted") {
-        logWithTime(`❌ [updateStakeholderController] Stakeholder is deleted | ${getLogIdentifiers(req)}`);
-        return throwBadRequestError(res, "Stakeholder is deleted", "Cannot update a deleted stakeholder.");
-      }
-      if (result.message === "Associated project not found") {
-        logWithTime(`❌ [updateStakeholderController] Associated project not found | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Project");
-      }
       if (result.message?.startsWith("Cannot update a stakeholder on a")) {
         logWithTime(`❌ [updateStakeholderController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message);
