@@ -1,6 +1,6 @@
 const {
   createAdminRoleAuthMiddleware,
-  createAdminRoleOrStakeholderAuthMiddleware,
+  createAdminRoleOrStakeholderAuthMiddleware
 } = require("@middlewares/factory/role-authorization.middleware-factory");
 
 const { ApiRolePermissions } = require("@configs/api-role-permissions.config");
@@ -34,6 +34,8 @@ const authorizeAdminGetStakeholders   = createAdminRoleAuthMiddleware(ApiRolePer
 // Admin gets access if their role is authorized OR if they are a stakeholder
 // of the relevant project (project-specific GET) / any project (list routes).
 // ─────────────────────────────────────────────────────────────────────────────
+
+
 const authorizeAdminGetProjectOrStakeholder    = createAdminRoleOrStakeholderAuthMiddleware(ApiRolePermissions.admin.getProject);
 const authorizeAdminGetProjectsOrStakeholder   = createAdminRoleOrStakeholderAuthMiddleware(ApiRolePermissions.admin.getProjects);
 const authorizeAdminGetStakeholderOrMember     = createAdminRoleOrStakeholderAuthMiddleware(ApiRolePermissions.stakeholder.getStakeholder);
@@ -59,7 +61,7 @@ const adminApiAuthorizationMiddleware = {
   authorizeAdminGetProjectOrStakeholder,
   authorizeAdminGetProjectsOrStakeholder,
   authorizeAdminGetStakeholderOrMember,
-  authorizeAdminGetStakeholdersOrMember,
+  authorizeAdminGetStakeholdersOrMember
 }
 
 module.exports = {
