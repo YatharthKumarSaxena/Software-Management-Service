@@ -25,7 +25,7 @@ const {
  */
 const fetchProjectMiddleware = async (req, res, next) => {
   try {
-    const { projectId } = req.params || req.body;
+    const projectId = req?.params?.projectId || req?.body?.projectId;
 
     // ── 1. Param presence ────────────────────────────────────────────
     if (!projectId) {
