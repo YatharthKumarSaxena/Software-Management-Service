@@ -1,16 +1,3 @@
-/**
- * CENTRALIZED FIELD DEFINITIONS CONFIG
- *
- * Single Source of Truth for:
- * - Required fields per endpoint/action
- * - Validation rules mapping
- * - Field-level metadata
- *
- * NOTE: createdBy / updatedBy are NOT listed here because they are
- * derived from req.admin.adminId inside the controller —
- * callers must never send them in the request body.
- */
-
 const { validationRules } = require("./validation.config");
 
 const FieldDefinitions = {
@@ -71,11 +58,11 @@ const FieldDefinitions = {
       validation: validationRules.timeline,
       description: "Optional expected timeline in months (number)"
     },
-    LINKED_PROJECT_ID: {
-      field: "linkedProjectId",
-      required: false,
-      validation: validationRules.mongoId,
-      description: "Optional MongoDB ObjectId of a related project"
+    PROJECT_TYPE: {
+      field: "projectType",
+      required: true,
+      validation: validationRules.projectType,
+      description: "Optional project type (enum)"
     }
   },
 
@@ -116,12 +103,6 @@ const FieldDefinitions = {
       required: false,
       validation: validationRules.reasonDescription,
       description: "Optional free-text elaboration on updation reason"
-    },
-    ORG_ID: {
-      field: "orgId",
-      required: false,
-      validation: validationRules.mongoId,
-      description: "ORGANIZATION only: replace the single associated org"
     },
     EXPECTED_BUDGET: {
       field: "expectedBudget",
@@ -211,12 +192,6 @@ const FieldDefinitions = {
   // NOTE: role-guard middleware handles admin vs client role-type split;
   //       validation middleware only checks userId format and field presence.
   CREATE_STAKEHOLDER: {
-    PROJECT_ID: {
-      field: "projectId",
-      required: true,
-      validation: validationRules.mongoId,   // MongoID check handled in service / fetch middleware
-      description: "MongoDB ObjectId of the project this stakeholder belongs to"
-    },
     USER_ID: {
       field: "userId",
       required: true,
@@ -245,12 +220,6 @@ const FieldDefinitions = {
       validation: null,   // role-guard middleware enforces admin vs client split
       description: "New role to assign — must match the user's entity type"
     },
-    projectId: {
-      field: "projectId",
-      required: true,
-      validation: validationRules.mongoId,   // MongoID check handled in service / fetch middleware
-      description: "MongoDB ObjectId of the project this stakeholder belongs to (derived from req.stakeholder but can be overridden)"
-    },
     orgId: {
       field: "orgId",
       required: false,
@@ -261,12 +230,6 @@ const FieldDefinitions = {
 
   // ── DELETE STAKEHOLDER ────────────────────────────────────────────────
   DELETE_STAKEHOLDER: {
-    projectId: {
-      field: "projectId",
-      required: true,
-      validation: validationRules.mongoId,   // MongoID check handled in service / fetch middleware
-      description: "MongoDB ObjectId of the project this stakeholder belongs to (derived from req.stakeholder but can be overridden)"
-    },
     orgId: {
       field: "orgId",
       required: false,

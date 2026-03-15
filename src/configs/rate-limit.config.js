@@ -43,7 +43,7 @@ module.exports = {
       message: "Too many requests to create project endpoint. Please try again later."
     },
     updateProject: {
-      maxRequests: 10,
+      maxRequests: 1000,
       windowMs: 60 * 1000,
       prefix: "update_project",
       reason: "Update project endpoint abuse",

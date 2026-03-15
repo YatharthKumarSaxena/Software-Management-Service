@@ -16,7 +16,8 @@ const {
   ClientRoleTypesHelper,
   StakeholderDeletionReasonHelper,
   ProjectRoleTypesHelper,
-  ProjectCategoryTypesHelper
+  ProjectCategoryTypesHelper,
+  ProjectTypesHelper
 } = require("@utils/enum-validators.util");
 
 const { customIdRegex, mongoIdRegex, budgetRegex, timelineRegex } = require("./regex.config");
@@ -98,6 +99,9 @@ const validationRules = {
   projectCategoryType: {
     enum: ProjectCategoryTypesHelper,
   },
+  projectType: {
+    enum: ProjectTypesHelper
+  }
 
 };
 

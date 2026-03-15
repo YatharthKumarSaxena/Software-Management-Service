@@ -280,6 +280,13 @@ const ProjectCategoryTypes = Object.freeze({
   MULTI_ORGANIZATION: "multi_organization"
 });
 
+const ProjectTypes = Object.freeze({
+  DEVELOPMENT: "development",
+  ENHANCEMENT: "enhancement",
+  MAINTENANCE: "maintenance",
+  OTHER: "other"
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -317,5 +324,6 @@ module.exports = {
   PhaseDeletionReason,
   ValidationPhaseStatus,
   ProjectRoleTypes,
-  ProjectCategoryTypes
+  ProjectCategoryTypes,
+  ProjectTypes
 };

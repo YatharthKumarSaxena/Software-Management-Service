@@ -20,7 +20,8 @@ const {
   ClientRoleTypes,
   StakeholderDeletionReason,
   ProjectRoleTypes,
-  ProjectCategoryTypes
+  ProjectCategoryTypes,
+  ProjectTypes
 } = require("@configs/enums.config");
 
 /**
@@ -69,6 +70,7 @@ const ClientRoleTypesHelper = createEnumHelper(ClientRoleTypes, "ClientRoleTypes
 const StakeholderDeletionReasonHelper = createEnumHelper(StakeholderDeletionReason, "StakeholderDeletionReason");
 const ProjectRoleTypesHelper = createEnumHelper(ProjectRoleTypes, "ProjectRoleTypes");
 const ProjectCategoryTypesHelper = createEnumHelper(ProjectCategoryTypes, "ProjectCategoryTypes");
+const ProjectTypesHelper = createEnumHelper(ProjectTypes, "ProjectTypes");
 
 module.exports = {
   DeviceTypeHelper,
@@ -88,5 +90,6 @@ module.exports = {
   ClientRoleTypesHelper,
   StakeholderDeletionReasonHelper,
   ProjectRoleTypesHelper,
-  ProjectCategoryTypesHelper
+  ProjectCategoryTypesHelper,
+  ProjectTypesHelper
 };
