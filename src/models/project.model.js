@@ -3,7 +3,7 @@
 const mongoose = require("mongoose");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { customIdRegex, mongoIdRegex } = require("@configs/regex.config");
-const { ProjectCreationReason, ProjectUpdationReason, ProjectStatus, ProjectOnHoldReason, ProjectResumeReason, ProjectAbortReason, ProjectDeletionReason, Phases, ProjectCategoryTypes } = require("@configs/enums.config");
+const { ProjectCreationReason, ProjectUpdationReason, ProjectStatus, ProjectOnHoldReason, ProjectResumeReason, ProjectAbortReason, ProjectDeletionReason, Phases, ProjectCategoryTypes, ProjectTypes } = require("@configs/enums.config");
 const {
   projectNameLength,
   descriptionLength,
@@ -76,10 +76,38 @@ const projectSchema = new mongoose.Schema(
       min: [0, "Expected timeline cannot be negative."],
     },
 
-    linkedProjectId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: DB_COLLECTIONS.PROJECTS,
-      default: null
+    linkedProjectIds: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: DB_COLLECTIONS.PROJECTS
+        }
+      ],
+      default: [],
+      validate: {
+        validator: function (value) {
+
+          if (!Array.isArray(value)) return false;
+
+          const ids = value.map(id => id.toString());
+
+          // duplicate check
+          const uniqueIds = new Set(ids);
+          if (uniqueIds.size !== ids.length) return false;
+
+          // self-link check
+          if (this._id && ids.includes(this._id.toString())) return false;
+
+          return true;
+        },
+        message: "Invalid linkedProjectIds: duplicates or self-link detected"
+      }
+    },
+
+    projectType: {
+      type: String,
+      enum: Object.values(ProjectTypes),
+      default: ProjectTypes.DEVELOPMENT
     },
 
     projectCategory: {
