@@ -12,6 +12,7 @@ const {
 } = require("@/responses/common/error-handler.response");
 
 const { logWithTime } = require("@/utils/time-stamps.util");
+const { errorMessage } = require("@/utils/log-error.util");
 
 
 const createStakeholderController = async (req, res) => {
@@ -69,9 +70,8 @@ const createStakeholderController = async (req, res) => {
     return sendStakeholderCreatedSuccess(res, result.stakeholder);
 
   } catch (error) {
-
     logWithTime(`❌ [createStakeholderController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
-
+    errorMessage(error);
     return throwInternalServerError(res, error);
   }
 };
