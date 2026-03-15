@@ -2,7 +2,6 @@
 
 const { ProjectModel } = require("@models/project.model");
 const { StakeholderModel } = require("@models/stakeholder.model");
-const { InceptionModel } = require("@models/inception.model");
 const { versionControlService } = require("@services/common/version.service");
 const { convertOnHoldToActiveProjectService } = require("@services/projects/on-hold-project.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
@@ -10,6 +9,7 @@ const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { Phases, ProjectStatus, ProjectCategoryTypes } = require("@configs/enums.config");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { errorMessage } = require("@utils/log-error.util");
 
 /**
  * Creates a new stakeholder and handles the side-effects:
@@ -122,19 +122,8 @@ const createStakeholderService = async ({
     let updatedProject = project;
 
     if (project.currentPhase === Phases.INCEPTION) {
-      // 1. Auto-create InceptionModel doc if not yet present
-      const inceptionExists = await InceptionModel.findOne({ projectId: project._id, isDeleted: false });
-      if (!inceptionExists) {
-        await InceptionModel.create({
-          projectId: project._id,
-          cycleNumber: 0,
-          version: "v1.0",
-          createdBy,
-        });
-        logWithTime(`[createStakeholderService] InceptionModel auto-created for project ${projectId}`);
-      }
 
-      // 2. Promote DRAFT → ACTIVE
+      // 1. Promote DRAFT → ACTIVE
       if (project.projectStatus === ProjectStatus.DRAFT) {
         updatedProject = await ProjectModel.findByIdAndUpdate(
           project._id,
@@ -142,6 +131,8 @@ const createStakeholderService = async ({
           { new: true }
         );
         logWithTime(`[createStakeholderService] Project ${projectId} promoted DRAFT → ACTIVE`);
+      } else {
+        logWithTime(`[createStakeholderService] Project status is ${project.projectStatus}, no status change needed`);
       }
     }
 
@@ -170,9 +161,15 @@ const createStakeholderService = async ({
     return { success: true, stakeholder };
 
   } catch (error) {
+    logWithTime(`❌ [createStakeholderService] Error caught while creating stakeholder`);
+    errorMessage(error);
+    
     if (error.name === "ValidationError") {
+      logWithTime(`[createStakeholderService] Validation Error Details: ${JSON.stringify(error.errors)}`);
       return { success: false, message: "Validation error", error: error.message };
     }
+    
+    logWithTime(`[createStakeholderService] Full error: ${error.toString()}`);
     return { success: false, message: "Internal error while creating stakeholder", error: error.message };
   }
 };
