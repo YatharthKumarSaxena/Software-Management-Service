@@ -21,10 +21,9 @@ const {
 
 const { projectControllers } = require("@controllers/projects");
 const { projectMiddlewares } = require("@/middlewares/projects");
-const { fetchProjectMiddleware } = require("@/middlewares/projects/fetch-project.middleware");
 
 const {
-  CREATE_PROJECT, 
+  CREATE_PROJECT,
   UPDATE_PROJECT,
   ABORT_PROJECT,
   COMPLETE_PROJECT,
@@ -52,7 +51,7 @@ const {
  */
 projectRouter.post(
   CREATE_PROJECT,
-  [ 
+  [
     ...baseAuthAdminMiddlewares,
     createProjectRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminCreateProject,
@@ -73,7 +72,8 @@ projectRouter.patch(
     ...baseAuthAdminMiddlewares,
     updateProjectRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminUpdateProject,
-    fetchProjectMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
     projectMiddlewares.updateProjectPresenceMiddleware,
     projectMiddlewares.updateProjectValidationMiddleware,
   ],
@@ -91,7 +91,7 @@ projectRouter.patch(
     ...baseAuthAdminMiddlewares,
     onHoldProjectRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminOnHoldProject,
-    fetchProjectMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
     projectMiddlewares.onHoldProjectPresenceMiddleware,
     projectMiddlewares.onHoldProjectValidationMiddleware,
   ],
@@ -109,7 +109,7 @@ projectRouter.patch(
     ...baseAuthAdminMiddlewares,
     abortProjectRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminAbortProject,
-    fetchProjectMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
     projectMiddlewares.abortProjectPresenceMiddleware,
     projectMiddlewares.abortProjectValidationMiddleware,
   ],
@@ -127,7 +127,7 @@ projectRouter.patch(
     ...baseAuthAdminMiddlewares,
     completeProjectRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminCompleteProject,
-    fetchProjectMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
     projectMiddlewares.completeProjectPresenceMiddleware,
     projectMiddlewares.completeProjectValidationMiddleware,
   ],
@@ -145,7 +145,7 @@ projectRouter.patch(
     ...baseAuthAdminMiddlewares,
     resumeProjectRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminResumeProject,
-    fetchProjectMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
     projectMiddlewares.resumeProjectPresenceMiddleware,
     projectMiddlewares.resumeProjectValidationMiddleware,
   ],
@@ -163,7 +163,7 @@ projectRouter.delete(
     ...baseAuthAdminMiddlewares,
     deleteProjectRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminDeleteProject,
-    fetchProjectMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
     projectMiddlewares.deleteProjectPresenceMiddleware,
     projectMiddlewares.deleteProjectValidationMiddleware,
   ],
@@ -181,7 +181,7 @@ projectRouter.patch(
     ...baseAuthAdminMiddlewares,
     archiveProjectRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminArchiveProject,
-    fetchProjectMiddleware
+    projectMiddlewares.fetchProjectMiddleware,
   ],
   projectControllers.archiveProjectController
 );
@@ -201,7 +201,7 @@ projectRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getProjectRateLimiter,
-    fetchProjectMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
     apiAuthorizationMiddleware.authorizeAdminGetProjectOrStakeholder
   ],
   projectControllers.getProjectController

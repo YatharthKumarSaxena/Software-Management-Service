@@ -16,7 +16,7 @@ const {
 
 const { stakeholderControllers } = require("@controllers/stakeholders");
 const { stakeholderMiddlewares } = require("@/middlewares/stakeholders");
-const { fetchProjectMiddleware } = require("@/middlewares/projects/fetch-project.middleware");
+const { projectMiddlewares } = require("@/middlewares/projects");
 
 const {
   CREATE_STAKEHOLDER,
@@ -50,7 +50,8 @@ stakeholderRouter.post(
     ...baseAuthAdminMiddlewares,
     createStakeholderRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminCreateStakeholder,
-    fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderMiddlewares.createStakeholderPresenceMiddleware,
     stakeholderMiddlewares.createStakeholderValidationMiddleware,
     stakeholderMiddlewares.createStakeholderRoleGuardMiddleware,
@@ -70,6 +71,8 @@ stakeholderRouter.patch(
     updateStakeholderRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminUpdateStakeholder,
     stakeholderMiddlewares.fetchStakeholderMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderMiddlewares.updateStakeholderPresenceMiddleware,
     stakeholderMiddlewares.updateStakeholderValidationMiddleware,
     stakeholderMiddlewares.updateStakeholderRoleGuardMiddleware,
@@ -89,6 +92,8 @@ stakeholderRouter.delete(
     deleteStakeholderRateLimiter,
     apiAuthorizationMiddleware.authorizeAdminDeleteStakeholder,
     stakeholderMiddlewares.fetchStakeholderMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderMiddlewares.deleteStakeholderPresenceMiddleware,
     stakeholderMiddlewares.deleteStakeholderValidationMiddleware,
   ],
