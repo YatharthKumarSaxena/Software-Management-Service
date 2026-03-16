@@ -44,9 +44,9 @@ module.exports = {
     },
     STAKEHOLDER_ROUTES: {
         CREATE_STAKEHOLDER: `/create`,                     // POST    /api/v1/stakeholders/create
-        UPDATE_STAKEHOLDER: `/update/:userId`,       // PATCH   /api/v1/stakeholders/update/:userId
-        DELETE_STAKEHOLDER: `/delete/:userId`,       // DELETE  /api/v1/stakeholders/delete/:userId
-        GET_STAKEHOLDER:    `/get/:userId`,          // GET     /api/v1/stakeholders/get/:userId
+        UPDATE_STAKEHOLDER: `/update/:stakeholderId`,       // PATCH   /api/v1/stakeholders/update/:stakeholderId
+        DELETE_STAKEHOLDER: `/delete/:stakeholderId`,       // DELETE  /api/v1/stakeholders/delete/:stakeholderId
+        GET_STAKEHOLDER:    `/get/:stakeholderId`,          // GET     /api/v1/stakeholders/get/:stakeholderId
         LIST_STAKEHOLDERS:   `/list`                            // GET     /api/v1/stakeholders/list
     },
     CLIENT_ROUTES: {
