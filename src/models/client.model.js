@@ -32,6 +32,11 @@ const clientSchema = new mongoose.Schema({
         default: true
     },
 
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+
     isSuspended: {
         type: Boolean,
         default: false
