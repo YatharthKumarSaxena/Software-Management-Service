@@ -23,7 +23,12 @@ module.exports = {
         CREATE_SUPER_ADMIN: `/create-super-admin`, // /software-management-service/api/v1/internal/create-super-admin
         CREATE_USER: `/create-user`, // /software-management-service/api/v1/internal/admin-panel/create-user
         PROVIDE_HEALTH_CHECK_TO_AUTH_SERVICE: `/auth/health`, // /software-management-service/api/v1/internal/auth/health
-        PROVIDE_HEALTH_CHECK_TO_ADMIN_PANEL_SERVICE: `/admin-panel/health` // /software-management-service/api/v1/internal/admin-panel/health
+        PROVIDE_HEALTH_CHECK_TO_ADMIN_PANEL_SERVICE: `/admin-panel/health`, // /software-management-service/api/v1/internal/admin-panel/health
+        UPDATE_USER_DETAILS: `/update-user/:userId`, // /software-management-service/api/v1/internal/update-user/:userId
+        DELETE_USER: `/delete-user/:userId`, // /software-management-service/api/v1/internal/delete-user/:userId
+        TOGGLE_ACTIVE_STATUS: `/toggle-active/:userId`, // /software-management-service/api/v1/internal/toggle-active/:userId
+        TOGGLE_BLOCK_USER_STATUS: `/toggle-block-user/:userId`, // /software-management-service/api/v1/internal/toggle-block-user/:userId
+        TOGGLE_BLOCK_DEVICE_STATUS: `/toggle-block-device/:deviceUUID`, // /software-management-service/api/v1/internal/toggle-block-device/:userId
     },
     TEST_ROUTES: {
         WELCOME_ADMIN: `/welcome-admin`, // /software-management-service/api/v1/test/welcome-admin

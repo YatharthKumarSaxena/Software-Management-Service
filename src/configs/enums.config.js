@@ -152,7 +152,8 @@ const RequestLocation = Object.freeze({
 
 const ClientTypes = Object.freeze({
     INDIVIDUAL: "individual",
-    ORGANIZATION: "organization"
+    ORGANIZATION: "organization",
+    MULTI_ORGANIZATION: "multi_organization"
 });
 
 
@@ -287,6 +288,12 @@ const ProjectTypes = Object.freeze({
   OTHER: "other"
 });
 
+const TotalTypes = Object.freeze({
+  ADMIN: "ADMIN",
+  USER: "USER",
+  CLIENT: "CLIENT"
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -325,5 +332,6 @@ module.exports = {
   ValidationPhaseStatus,
   ProjectRoleTypes,
   ProjectCategoryTypes,
-  ProjectTypes
+  ProjectTypes,
+  TotalTypes
 };
