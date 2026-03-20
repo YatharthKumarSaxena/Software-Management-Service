@@ -28,7 +28,8 @@ module.exports = {
         DELETE_USER: `/delete-user/:userId`, // /software-management-service/api/v1/internal/delete-user/:userId
         TOGGLE_ACTIVE_STATUS: `/toggle-active/:userId`, // /software-management-service/api/v1/internal/toggle-active/:userId
         TOGGLE_BLOCK_USER_STATUS: `/toggle-block-user/:userId`, // /software-management-service/api/v1/internal/toggle-block-user/:userId
-        TOGGLE_BLOCK_DEVICE_STATUS: `/toggle-block-device/:deviceUUID`, // /software-management-service/api/v1/internal/toggle-block-device/:userId
+        TOGGLE_BLOCK_DEVICE_STATUS: `/toggle-block-device/:deviceUUID`, // /software-management-service/api/v1/internal/toggle-block-device/:deviceUUID
+        UPDATE_ORGANIZATION_IN_CLIENT: `/update-client-organizations/:clientId` // /software-management-service/api/v1/internal/update-client-organizations/:clientId
     },
     TEST_ROUTES: {
         WELCOME_ADMIN: `/welcome-admin`, // /software-management-service/api/v1/test/welcome-admin

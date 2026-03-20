@@ -34,7 +34,7 @@ const {
 const createUserController = async (req, res) => {
     try {
         // Extract data from request body
-        const { type, id, firstName, role } = req.body;
+        const { type, id, firstName, role, organizationIds } = req.body;
 
         // Extract requesting service info if available
         const requestedBy = req.serviceAuth?.serviceName || "ADMIN_PANEL";
@@ -45,6 +45,7 @@ const createUserController = async (req, res) => {
             id, 
             firstName, 
             role, 
+            organizationIds,
             requestedBy 
         });
 

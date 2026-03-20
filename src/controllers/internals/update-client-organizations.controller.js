@@ -9,12 +9,15 @@ const { logWithTime } = require("@/utils/time-stamps.util");
 
 /**
  * Update Client Organizations Controller
- * Updates client's organization memberships and blocked status
+ * Updates client's organization memberships
+ * Soft-deletes associated stakeholder roles when organization is removed
  * Called by Admin Panel service
  * 
  * @param {Object} req - Express request object
  * @param {string} req.params.clientId - The custom client ID
  * @param {string} req.body.removedOrgId - Organization ID to remove (optional)
+ *   → Triggers automatic soft-deletion of client's stakeholder roles in that organization
+ *   → Reason: ORGANIZATION_REMOVED_FROM_CLIENT (audit trail maintained)
  * @param {string} req.body.addedOrgId - Organization ID to add (optional)
  * @param {string} req.body.adminId - The adminId who triggered the update
  * @param {string} req.body.requestId - Request ID for tracking

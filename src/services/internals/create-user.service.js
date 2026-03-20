@@ -12,6 +12,7 @@ const { ClientTypes } = require("@/configs/enums.config");
 const createUser = async ({ type, id, firstName = null, role, organizationIds = [], requestedBy }) => {
   try {
 
+    console.log(organizationIds);
     // 1️⃣ Validate input
     if (!type || !id || !role) {
       logFailure(

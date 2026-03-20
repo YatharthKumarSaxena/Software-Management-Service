@@ -251,6 +251,7 @@ const StakeholderDeletionReason = Object.freeze({
   DUPLICATE: "duplicate_stakeholder",
   TEST_STAKEHOLDER: "test_or_demo_stakeholder_cleanup",
   ADMIN_ERROR: "created_by_admin_mistake",
+  ORGANIZATION_REMOVED_FROM_CLIENT: "organization_removed_from_client",
   OTHER: "other",
 });
 
