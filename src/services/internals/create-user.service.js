@@ -2,13 +2,14 @@ const { AdminModel, ClientModel } = require("@/models/index");
 const { SYSTEM_LOG_EVENTS, SERVICE_NAMES } = require("@/configs/system-log-events.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { logSuccess, logFailure, logError } = require("@services/audit/service-tracker.service");
+const { ClientTypes } = require("@/configs/enums.config");
 
 /**
  * Create User Service (Admin Panel Integration)
  * Creates either Client or Admin based on type
  */
 
-const createUser = async ({ type, id, firstName = null, role, requestedBy }) => {
+const createUser = async ({ type, id, firstName = null, role, organizationIds = [], requestedBy }) => {
   try {
 
     // 1️⃣ Validate input
@@ -73,10 +74,19 @@ const createUser = async ({ type, id, firstName = null, role, requestedBy }) => 
         };
       }
 
+      let clientType = ClientTypes.INDIVIDUAL;
+      if (organizationIds.length === 1) {
+        clientType = ClientTypes.ORGANIZATION;
+      } else if (organizationIds.length > 1) {
+        clientType = ClientTypes.MULTI_ORGANIZATION;
+      }
+
       const client = await ClientModel.create({
         clientId: id,
         firstName,
         role,
+        clientType,
+        organizationIds,
         isActive: true
       });
 
