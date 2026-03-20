@@ -15,7 +15,12 @@ const {
 const { INTERNAL_ROUTES } = require("@configs/uri.config");
 const { authInternalMiddlewares, adminPanelInternalMiddlewares } = require("./middleware.gateway.routes");
 const { microserviceConfig } = require("@configs/microservice.config");
-const { CREATE_SUPER_ADMIN, CREATE_USER, PROVIDE_HEALTH_CHECK_TO_AUTH_SERVICE, PROVIDE_HEALTH_CHECK_TO_ADMIN_PANEL_SERVICE } = INTERNAL_ROUTES;
+const { deleteUser } = require("@/controllers/internals/delete-user.controller");
+const { toggleActiveStatus } = require("@/controllers/internals/toggle-active-status.controller");
+const { updateUserDetails } = require("@/controllers/internals/update-user-details.controller");
+const { toggleBlockDeviceStatus } = require("@/controllers/internals/toggle-block-status-device.controller");
+const { toggleBlockUserStatus } = require("@/controllers/internals/toggle-block-status-user.controller");
+const { CREATE_SUPER_ADMIN, CREATE_USER, PROVIDE_HEALTH_CHECK_TO_AUTH_SERVICE, PROVIDE_HEALTH_CHECK_TO_ADMIN_PANEL_SERVICE, DELETE_USER, TOGGLE_ACTIVE_STATUS, UPDATE_USER_DETAILS, TOGGLE_BLOCK_DEVICE_STATUS, TOGGLE_BLOCK_USER_STATUS } = INTERNAL_ROUTES;
 const internalRouter = express.Router();
 
 // Check if microservice mode is enabled
@@ -75,6 +80,16 @@ if (!microserviceConfig.enabled) {
     internalRouter.get(PROVIDE_HEALTH_CHECK_TO_ADMIN_PANEL_SERVICE, adminPanelInternalMiddlewares, (req, res) => {
       return sendAdminPanelServiceHealthSuccess(res, req.serviceAuth);
     });
+
+    internalRouter.delete(DELETE_USER, authInternalMiddlewares, deleteUser);
+
+    internalRouter.patch(TOGGLE_ACTIVE_STATUS, authInternalMiddlewares, toggleActiveStatus);
+
+    internalRouter.patch(UPDATE_USER_DETAILS, authInternalMiddlewares, updateUserDetails);
+
+    internalRouter.patch(TOGGLE_BLOCK_DEVICE_STATUS, adminPanelInternalMiddlewares, toggleBlockDeviceStatus);
+
+    internalRouter.patch(TOGGLE_BLOCK_USER_STATUS, adminPanelInternalMiddlewares, toggleBlockUserStatus);
 
     module.exports = {
       internalRouter
