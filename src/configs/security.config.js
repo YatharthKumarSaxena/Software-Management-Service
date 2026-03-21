@@ -16,6 +16,7 @@ module.exports = {
   },
   WHITELISTED_DEVICE_UUIDS: getMyEnvAsArray('WHITELISTED_DEVICE_UUIDS'),
   FIRST_NAME_SETTING: getMyEnv('FIRST_NAME_SETTING', 'mandatory'),
+  ADVANCED_LOGGING_ENABLED: getMyEnvAsBool('ADVANCED_LOGGING_ENABLED', false),
   link: {
     length: 32,
     algorithm: "sha256",

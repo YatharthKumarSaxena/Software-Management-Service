@@ -1,6 +1,6 @@
 // configs/api-role-permissions.config.js
 
-const { AdminRoleTypes, ClientRoleTypes } = require("./enums.config");
+const { AdminRoleTypes } = require("./enums.config");
 
 /**
  * Maps each API operation to the roles permitted to perform it.
@@ -71,6 +71,23 @@ const ApiRolePermissions = Object.freeze({
       AdminRoleTypes.ANALYST,
       AdminRoleTypes.DEVELOPER,
       AdminRoleTypes.OTHER,
+    ],
+
+    approveProductRequest: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.MANAGER,
+      AdminRoleTypes.BUSINESS_ANALYST
+    ],
+
+    rejectProductRequest: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.MANAGER,
+      AdminRoleTypes.BUSINESS_ANALYST
+    ],
+
+    deleteProductRequest: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.MANAGER,
     ],
   },
 

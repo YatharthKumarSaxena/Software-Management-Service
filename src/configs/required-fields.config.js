@@ -30,6 +30,13 @@ const createStakeholderField = getRequiredFields(FieldDefinitions.CREATE_STAKEHO
 const updateStakeholderField = getRequiredFields(FieldDefinitions.UPDATE_STAKEHOLDER);
 const deleteStakeholderField = getRequiredFields(FieldDefinitions.DELETE_STAKEHOLDER);
 
+// ── Product Request ───────────────────────────────────────────────────────────
+const createProductRequestField = getRequiredFields(FieldDefinitions.CREATE_PRODUCT_REQUEST);
+const updateProductRequestField = getRequiredFields(FieldDefinitions.UPDATE_PRODUCT_REQUEST);
+const deleteProductRequestField = getRequiredFields(FieldDefinitions.DELETE_PRODUCT_REQUEST);
+const approveProductRequestField = getRequiredFields(FieldDefinitions.APPROVE_PRODUCT_REQUEST);
+const rejectProductRequestField = getRequiredFields(FieldDefinitions.REJECT_PRODUCT_REQUEST);
+
 module.exports = {
     createProjectField,
     updateProjectField,
@@ -42,4 +49,9 @@ module.exports = {
     createStakeholderField,
     updateStakeholderField,
     deleteStakeholderField,
+    createProductRequestField,
+    updateProductRequestField,
+    deleteProductRequestField,
+    approveProductRequestField,
+    rejectProductRequestField
 };

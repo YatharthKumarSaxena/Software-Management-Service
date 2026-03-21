@@ -169,6 +169,62 @@ module.exports = {
       prefix: "client_list_stakeholders",
       reason: "Client list stakeholders endpoint abuse",
       message: "Too many requests to list stakeholders. Please try again later."
+    },
+    createProductRequest: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "create_product_request",
+      reason: "Create product request endpoint abuse",
+      message: "Too many requests to create product request endpoint. Please try again later."
+    },
+    updateProductRequest: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "update_product_request",
+      reason: "Update product request endpoint abuse",
+      message: "Too many requests to update product request endpoint. Please try again later."
+    },
+    deleteProductRequest: {
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      prefix: "delete_product_request",
+      reason: "Delete product request endpoint abuse",
+      message: "Too many requests to delete product request endpoint. Please try again later."
+    },
+    getProductRequest: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_product_request",
+      reason: "Get product request endpoint abuse",
+      message: "Too many requests to get product request endpoint. Please try again later."
+    },
+    listProductRequests: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_product_requests",
+      reason: "List product requests endpoint abuse",
+      message: "Too many requests to list product requests endpoint. Please try again later."
+    },
+    cancelProductRequest: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "cancel_product_request",
+      reason: "Cancel product request endpoint abuse",
+      message: "Too many requests to cancel product request endpoint. Please try again later."
+    },
+    approveProductRequest: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "approve_product_request",
+      reason: "Approve product request endpoint abuse",
+      message: "Too many requests to approve product request endpoint. Please try again later."
+    },
+    rejectProductRequest: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "reject_product_request",
+      reason: "Reject product request endpoint abuse",
+      message: "Too many requests to reject product request endpoint. Please try again later."
     }
   }
 };

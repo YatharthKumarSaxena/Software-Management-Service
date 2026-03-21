@@ -12,6 +12,7 @@ const TEST_BASE = `${API_PREFIX}/test`; // /software-management-service/api/v1/t
 const PROJECT_BASE = `${API_PREFIX}/projects`; // /software-management-service/api/v1/projects
 const STAKEHOLDER_BASE = `${API_PREFIX}/stakeholders`; // /software-management-service/api/v1/stakeholders
 const CLIENT_BASE = `${API_PREFIX}/clients`; // /software-management-service/api/v1/clients
+const PRODUCT_REQUEST_BASE = `${API_PREFIX}/product-requests`; // /software-management-service/api/v1/product-requests
 
 module.exports = {
     INTERNAL_BASE,
@@ -19,6 +20,7 @@ module.exports = {
     PROJECT_BASE,
     STAKEHOLDER_BASE,
     CLIENT_BASE,
+    PRODUCT_REQUEST_BASE,
     INTERNAL_ROUTES: {
         CREATE_SUPER_ADMIN: `/create-super-admin`, // /software-management-service/api/v1/internal/create-super-admin
         CREATE_USER: `/create-user`, // /software-management-service/api/v1/internal/admin-panel/create-user
@@ -60,5 +62,15 @@ module.exports = {
         LIST_PROJECTS:     `/list-projects`,                   // GET /software-management-service/api/v1/clients/list-projects
         GET_STAKEHOLDER:   `/get-stakeholder/:userId`,  // GET /software-management-service/api/v1/clients/get-stakeholder/:userId
         LIST_STAKEHOLDERS: `/list-stakeholders`                // GET /software-management-service/api/v1/clients/list-stakeholders
+    },
+    PRODUCT_REQUEST_ROUTES: {
+        CREATE_PRODUCT_REQUEST: `/create`,                     // POST    /api/v1/product-requests/create
+        UPDATE_PRODUCT_REQUEST: `/update/:requestId`,          // PATCH   /api/v1/product-requests/update/:requestId
+        DELETE_PRODUCT_REQUEST: `/delete/:requestId`,          // DELETE  /api/v1/product-requests/delete/:requestId
+        GET_PRODUCT_REQUEST:    `/get/:requestId`,             // GET     /api/v1/product-requests/get/:requestId
+        LIST_PRODUCT_REQUESTS:   `/list`,                            // GET     /api/v1/product-requests/list
+        APPROVE_PRODUCT_REQUEST: `/approve/:requestId`,        // PATCH   /api/v1/product-requests/approve/:requestId
+        REJECT_PRODUCT_REQUEST: `/reject/:requestId`,           // PATCH   /api/v1/product-requests/reject/:requestId
+        CANCEL_PRODUCT_REQUEST: `/cancel/:requestId`            // PATCH   /api/v1/product-requests/cancel/:requestId
     }
 };

@@ -53,7 +53,7 @@ const FieldDefinitions = {
       description: "Optional expected budget (number)"
     },
     EXPECTED_TIMELINE: {
-      field: "expectedTimelineMonths",
+      field: "expectedTimelineInDays",
       required: false,
       validation: validationRules.timeline,
       description: "Optional expected timeline in months (number)"
@@ -63,6 +63,24 @@ const FieldDefinitions = {
       required: true,
       validation: validationRules.projectType,
       description: "Optional project type (enum)"
+    },
+    PROJECT_COMPLEXITY: {
+      field: "projectComplexity",
+      required: false,
+      validation: validationRules.projectComplexity,
+      description: "Optional project complexity level (enum)"
+    },
+    PROJECT_CRITICALITY: {
+      field: "projectCriticality",
+      required: false,
+      validation: validationRules.projectCriticality,
+      description: "Optional project criticality level (enum)"
+    },
+    PROJECT_PRIORITY: {
+      field: "projectPriority",
+      required: false,
+      validation: validationRules.priorityLevel,
+      description: "Optional project priority level (enum)"
     }
   },
 
@@ -111,11 +129,29 @@ const FieldDefinitions = {
       description: "Optional expected budget (number)"
     },
     EXPECTED_TIMELINE: {
-      field: "expectedTimelineMonths",
+      field: "expectedTimelineInDays",
       required: false,
       validation: null,
       description: "Optional expected timeline in months (number)"
     },
+    PROJECT_COMPLEXITY: {
+      field: "projectComplexity",
+      required: false,
+      validation: validationRules.projectComplexity,
+      description: "Optional project complexity level (enum)"
+    },
+    PROJECT_CRITICALITY: {
+      field: "projectCriticality",
+      required: false,
+      validation: validationRules.projectCriticality,
+      description: "Optional project criticality level (enum)"
+    },
+    PROJECT_PRIORITY: {
+      field: "projectPriority",
+      required: false,
+      validation: validationRules.priorityLevel,
+      description: "Optional project priority level (enum)"
+    }
   },
 
   // ── ON_HOLD PROJECT ──────────────────────────────────────
@@ -236,6 +272,140 @@ const FieldDefinitions = {
       validation: validationRules.reasonDescription,
       description: "Optional free-text elaboration on deletion reason"
     },
+  },
+
+  // ── CREATE PRODUCT REQUEST ────────────────────────────────────────────
+  CREATE_PRODUCT_REQUEST: {
+    TITLE: {
+      field: "title",
+      required: true,
+      validation: validationRules.projectName,
+      description: "Product request title"
+    },
+    DESCRIPTION: {
+      field: "description",
+      required: true,
+      validation: validationRules.projectDescription,
+      description: "Detailed description of the product request"
+    },
+    PROJECT_TYPE: {
+      field: "projectType",
+      required: true,
+      validation: validationRules.projectType,
+      description: "Type of project"
+    },
+    PROJECT_CATEGORY: {
+      field: "projectCategory",
+      required: true,
+      validation: validationRules.projectCategoryType,
+      description: "Category of project"
+    },
+    PRIORITY: {
+      field: "priority",
+      required: false,
+      validation: validationRules.priorityLevel,
+      description: "Priority level of the request"
+    },
+    EXPECTED_TIMELINE_DAYS: {
+      field: "expectedTimelineInDays",
+      required: false,
+      validation: null,
+      description: "Expected timeline in days (must be at least 1)"
+    },
+    BUDGET: {
+      field: "budget",
+      required: false,
+      validation: null,
+      description: "Optional budget"
+    }
+  },
+
+  // ── UPDATE PRODUCT REQUEST ────────────────────────────────────────────
+  UPDATE_PRODUCT_REQUEST: {
+    TITLE: {
+      field: "title",
+      required: false,
+      validation: validationRules.projectName,
+      description: "Updated product request title"
+    },
+    DESCRIPTION: {
+      field: "description",
+      required: false,
+      validation: validationRules.projectDescription,
+      description: "Updated product request description"
+    },
+    PROJECT_TYPE: {
+      field: "projectType",
+      required: false,
+      validation: validationRules.projectType,
+      description: "Updated project type"
+    },
+    PROJECT_CATEGORY: {
+      field: "projectCategory",
+      required: false,
+      validation: validationRules.projectCategoryType,
+      description: "Updated project category"
+    },
+    PRIORITY: {
+      field: "priority",
+      required: false,
+      validation: validationRules.priorityLevel,
+      description: "Updated priority level"
+    },
+    EXPECTED_TIMELINE_DAYS: {
+      field: "expectedTimelineInDays",
+      required: false,
+      validation: null,
+      description: "Updated expected timeline in days"
+    },
+    BUDGET: {
+      field: "budget",
+      required: false,
+      validation: null,
+      description: "Updated budget"
+    }
+  },
+
+  // ── DELETE PRODUCT REQUEST ────────────────────────────────────────────
+  DELETE_PRODUCT_REQUEST: {
+    DELETION_REASON: {
+      field: "deletionReason",
+      required: true,
+      validation: validationRules.reasonDescription,
+      description: "For admin deletion: reason description (compulsory); for client: optional"
+    }
+  },
+
+  // ── APPROVE PRODUCT REQUEST ──────────────────────────────────────────
+  APPROVE_PRODUCT_REQUEST: {
+    REASON_TYPE: {
+      field: "reasonType",
+      required: true,
+      validation: validationRules.approveProjectRequestReasonType,
+      description: "Type of approval reason (compulsory)"
+    },
+    REASON_DESCRIPTION: {
+      field: "reasonDescription",
+      required: false,
+      validation: validationRules.reasonDescription,
+      description: "Optional approval description"
+    }
+  },
+
+  // ── REJECT PRODUCT REQUEST ───────────────────────────────────────────
+  REJECT_PRODUCT_REQUEST: {
+    REASON_TYPE: {
+      field: "reasonType",
+      required: true,
+      validation: validationRules.rejectProjectRequestReasonType,
+      description: "Type of rejection reason (compulsory)"
+    },
+    REASON_DESCRIPTION: {
+      field: "reasonDescription",
+      required: true,
+      validation: validationRules.reasonDescription,
+      description: "Rejection description (compulsory)"
+    }
   },
 
 };

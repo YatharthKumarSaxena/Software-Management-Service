@@ -13,7 +13,8 @@ const DB_COLLECTIONS = {
     ELABORATIONS: "elaborations",
     NEGOTIATIONS: "negotiations",
     SPECIFICATIONS: "specifications",
-    VALIDATIONS: "validations"
+    VALIDATIONS: "validations",
+    PRODUCT_REQUESTS: "product_requests",
 }
 
 module.exports = { DB_COLLECTIONS };

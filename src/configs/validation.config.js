@@ -17,7 +17,10 @@ const {
   StakeholderDeletionReasonHelper,
   ProjectRoleTypesHelper,
   ProjectCategoryTypesHelper,
-  ProjectTypesHelper
+  ProjectTypesHelper,
+  PriorityLevelsHelper,
+  ApproveProductRequestReasonTypeHelper,
+  RejectProductRequestReasonTypeHelper
 } = require("@utils/enum-validators.util");
 
 const { customIdRegex, mongoIdRegex, budgetRegex, timelineRegex } = require("./regex.config");
@@ -101,8 +104,16 @@ const validationRules = {
   },
   projectType: {
     enum: ProjectTypesHelper
+  },
+  priorityLevel: {
+    enum: PriorityLevelsHelper
+  },
+  approveProjectRequestReasonType: {
+    enum: ApproveProductRequestReasonTypeHelper
+  },
+  rejectProjectRequestReasonType: {
+    enum: RejectProductRequestReasonTypeHelper
   }
-
 };
 
 module.exports = {

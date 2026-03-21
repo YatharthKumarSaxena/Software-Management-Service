@@ -295,6 +295,37 @@ const TotalTypes = Object.freeze({
   CLIENT: "CLIENT"
 });
 
+const PriorityLevels = Object.freeze({
+  LOW: "LOW",
+  MEDIUM: "MEDIUM",
+  HIGH: "HIGH",
+  CRITICAL: "CRITICAL"
+});
+
+const RequestStatus = Object.freeze({
+  PENDING: "PENDING",
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+  WITHDRAWN: "WITHDRAWN",
+});
+
+const RejectProductRequestReasonType = Object.freeze({
+  INSUFFICIENT_INFORMATION: "INSUFFICIENT_INFORMATION",
+  NOT_ALIGNED_WITH_STRATEGY: "NOT_ALIGNED_WITH_STRATEGY",
+  BUDGET_CONSTRAINTS: "BUDGET_CONSTRAINTS",
+  RESOURCE_LIMITATIONS: "RESOURCE_LIMITATIONS",
+  DUPLICATE_REQUEST: "DUPLICATE_REQUEST",
+  OTHER: "OTHER"
+});
+
+const ApproveProductRequestReasonType = Object.freeze({
+  ALIGNED_WITH_STRATEGY: "ALIGNED_WITH_STRATEGY",
+  HIGH_VALUE: "HIGH_VALUE",
+  URGENT_NEEDS: "URGENT_NEEDS",
+  RESOURCE_AVAILABILITY: "RESOURCE_AVAILABILITY",
+  OTHER: "OTHER"
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -334,5 +365,9 @@ module.exports = {
   ProjectRoleTypes,
   ProjectCategoryTypes,
   ProjectTypes,
-  TotalTypes
+  TotalTypes,
+  PriorityLevels,
+  RequestStatus,
+  ApproveProductRequestReasonType,
+  RejectProductRequestReasonType
 };
