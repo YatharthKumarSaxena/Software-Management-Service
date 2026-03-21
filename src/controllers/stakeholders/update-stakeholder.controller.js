@@ -48,7 +48,7 @@ const updateStakeholderController = async (req, res) => {
       role,
       updatedBy,
       auditContext: {
-        admin:     req.admin,
+        user:     req.admin,
         device:    req.device,
         requestId: req.requestId,
       },

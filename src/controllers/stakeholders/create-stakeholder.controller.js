@@ -32,7 +32,7 @@ const createStakeholderController = async (req, res) => {
       organizationId: orgId || null,
       createdBy,
       auditContext: {
-        admin: req.admin,
+        user: req.admin,
         device: req.device,
         requestId: req.requestId,
       },

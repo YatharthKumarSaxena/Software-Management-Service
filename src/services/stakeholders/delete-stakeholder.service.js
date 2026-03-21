@@ -72,10 +72,10 @@ const deleteStakeholderService = async (
     }
 
     // ── Activity tracker ──────────────────────────────────────────────────────
-    const { admin, device, requestId } = auditContext || {};
+    const { user, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldStakeholder, updatedStakeholder);
     logActivityTrackerEvent(
-      admin,
+      user,
       device,
       requestId,
       ACTIVITY_TRACKER_EVENTS.DELETE_STAKEHOLDER,

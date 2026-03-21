@@ -47,7 +47,7 @@ const createStakeholderService = async ({
 
     const projectId = project._id.toString();
 
-    const userId = user.adminId || user.clientId;
+    const userId = user.clientId;
 
     // ── Guard: prevent duplicate stakeholder ──────────────────────────────────
     const existing = await StakeholderModel.findOne({
@@ -216,9 +216,9 @@ const createStakeholderService = async ({
     );
 
     // ── Activity tracker ──────────────────────────────────────────────────────
-    const { admin, device, requestId } = auditContext || {};
+    const { user: auditUser, device, requestId } = auditContext || {};
     logActivityTrackerEvent(
-      admin,
+      auditUser,
       device,
       requestId,
       ACTIVITY_TRACKER_EVENTS.CREATE_STAKEHOLDER,

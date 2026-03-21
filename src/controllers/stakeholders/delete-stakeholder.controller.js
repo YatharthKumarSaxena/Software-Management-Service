@@ -38,7 +38,7 @@ const deleteStakeholderController = async (req, res) => {
       deletionReasonType,
       deletionReasonDescription,
       auditContext: {
-        admin:     req.admin,
+        user:     req.admin,
         device:    req.device,
         requestId: req.requestId,
       }
