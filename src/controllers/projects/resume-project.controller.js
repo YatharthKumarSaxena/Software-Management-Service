@@ -41,7 +41,7 @@ const resumeProjectController = async (req, res) => {
       resumeReasonDescription,
       resumedBy,
       auditContext: {
-        admin: req.admin,
+        user: req.admin,
         device: req.device,
         requestId: req.requestId,
       },

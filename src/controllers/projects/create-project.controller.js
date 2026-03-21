@@ -33,9 +33,12 @@ const createProjectController = async (req, res) => {
       projectCreationReasonDescription,
       projectCategory,
       expectedBudget,
-      expectedTimelineMonths,
+      expectedTimelineInDays,
       orgIds,
       linkedProjectIds,
+      projectComplexity,
+      projectCriticality,
+      projectPriority
     } = req.body;
 
     // ── Derive createdBy from authenticated admin ────────────────────
@@ -51,12 +54,15 @@ const createProjectController = async (req, res) => {
       orgIds,
       linkedProjectIds,
       expectedBudget,
-      expectedTimelineMonths,
+      expectedTimelineInDays,
       createdBy,
       projectCreationReasonType,
       projectCreationReasonDescription,
+      projectComplexity,
+      projectCriticality,
+      projectPriority,
       auditContext: {
-        admin: req.admin,
+        user: req.admin,
         device: req.device,
         requestId: req.requestId,
       },

@@ -39,7 +39,7 @@ const completeProjectController = async (req, res) => {
     const result = await completeProjectService(project, {
       completedBy,
       auditContext: {
-        admin: req.admin,
+        user: req.admin,
         device: req.device,
         requestId: req.requestId,
       },

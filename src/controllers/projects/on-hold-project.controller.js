@@ -41,7 +41,7 @@ const onHoldProjectController = async (req, res) => {
       onHoldReasonDescription,
       onHoldBy,
       auditContext: {
-        admin:     req.admin,
+        user:     req.admin,
         device:    req.device,
         requestId: req.requestId,
       },

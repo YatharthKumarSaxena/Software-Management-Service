@@ -40,13 +40,16 @@ const updateProjectController = async (req, res) => {
 
     // ── Ensure at least one updatable field is present ───────────────
     const {
-      name, description, problemStatement, goal, expectedBudget, expectedTimelineMonths,
+      name, description, problemStatement, goal, expectedBudget, expectedTimelineInDays,
       projectUpdationReasonType,
       projectUpdationReasonDescription,
       addedOrgIds,
       removedOrgIds,
       addedLinkedProjectIds,
-      removedLinkedProjectIds
+      removedLinkedProjectIds,
+      projectComplexity,
+      projectCriticality,
+      projectPriority
     } = req.body;
 
     const hasUpdate =
@@ -55,18 +58,21 @@ const updateProjectController = async (req, res) => {
       problemStatement ||
       goal ||
       expectedBudget !== undefined ||
-      expectedTimelineMonths !== undefined ||
+      expectedTimelineInDays !== undefined ||
       (Array.isArray(addedOrgIds) && addedOrgIds.length) ||
       (Array.isArray(removedOrgIds) && removedOrgIds.length) ||
       (Array.isArray(addedLinkedProjectIds) && addedLinkedProjectIds.length) ||
-      (Array.isArray(removedLinkedProjectIds) && removedLinkedProjectIds.length);
+      (Array.isArray(removedLinkedProjectIds) && removedLinkedProjectIds.length) ||
+      projectComplexity !== undefined ||
+      projectCriticality !== undefined ||
+      projectPriority !== undefined;
 
     if (!hasUpdate) {
       logWithTime(`❌ [updateProjectController] No updatable fields provided | ${getLogIdentifiers(req)}`);
       return throwBadRequestError(
         res,
         "No updatable fields provided",
-        "Provide at least one of: name, description, problemStatement, goal, expectedBudget, expectedTimelineMonths, addedOrgIds, removedOrgIds, addedLinkedProjectIds, removedLinkedProjectIds."
+        "Provide at least one of: name, description, problemStatement, goal, expectedBudget, expectedTimelineInDays, addedOrgIds, removedOrgIds, addedLinkedProjectIds, removedLinkedProjectIds, projectComplexity, projectCriticality, projectPriority."
       );
     }
 
@@ -78,7 +84,7 @@ const updateProjectController = async (req, res) => {
       problemStatement,
       goal,
       expectedBudget,
-      expectedTimelineMonths,
+      expectedTimelineInDays,
       addedOrgIds: addedOrgIds || [],
       removedOrgIds: removedOrgIds || [],
       addedLinkedProjectIds: addedLinkedProjectIds || [],
@@ -86,8 +92,11 @@ const updateProjectController = async (req, res) => {
       updatedBy,
       projectUpdationReasonType,
       projectUpdationReasonDescription,
+      projectComplexity,
+      projectCriticality,
+      projectPriority,
       auditContext: {
-        admin: req.admin,
+        user: req.admin,
         device: req.device,
         requestId: req.requestId,
       },

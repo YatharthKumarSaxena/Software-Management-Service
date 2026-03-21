@@ -41,7 +41,7 @@ const abortProjectController = async (req, res) => {
       abortReasonDescription,
       abortedBy,
       auditContext: {
-        admin: req.admin,
+        user: req.admin,
         device: req.device,
         requestId: req.requestId,
       },

@@ -37,7 +37,7 @@ const archiveProjectController = async (req, res) => {
     const result = await archiveProjectService(project, {
       archivedBy,
       auditContext: {
-        admin: req.admin,
+        user: req.admin,
         device: req.device,
         requestId: req.requestId,
       },

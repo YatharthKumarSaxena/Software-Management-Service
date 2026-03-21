@@ -20,7 +20,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
  * @param {string} params.projectCategory          - Required. One of: individual | organization | multi_organization
  * @param {string[]} [params.orgIds]               - organization: array of exactly 1 MongoID | multi_organization: array min 1
  * @param {number} [params.expectedBudget]       - Optional
- * @param {number} [params.expectedTimelineMonths] - Optional
+ * @param {number} [params.expectedTimelineInDays] - Optional
  * @param {string} params.createdBy
  * @param {string} params.projectCreationReasonType
  * @param {string} [params.projectCreationReasonDescription]
@@ -37,10 +37,13 @@ const createProjectService = async ({
   orgIds,
   linkedProjectIds,
   expectedBudget,
-  expectedTimelineMonths,
+  expectedTimelineInDays,
   createdBy,
   projectCreationReasonType,
   projectCreationReasonDescription,
+  projectComplexity,
+  projectCriticality,
+  projectPriority,
   auditContext
 }) => {
   try {
@@ -101,16 +104,19 @@ const createProjectService = async ({
       orgIds: resolvedOrgIds,
       linkedProjectIds: linkedProjectsValidation.addedLinkedProjectIds,
       ...(expectedBudget !== undefined && { expectedBudget }),
-      ...(expectedTimelineMonths !== undefined && { expectedTimelineMonths }),
+      ...(expectedTimelineInDays !== undefined && { expectedTimelineInDays }),
       createdBy,
       projectCreationReasonType,
       projectCreationReasonDescription: projectCreationReasonDescription || null,
+      ...(projectComplexity !== undefined && { projectComplexity }),
+      ...(projectCriticality !== undefined && { projectCriticality }),
+      ...(projectPriority !== undefined && { projectPriority }),
     });
 
     // ── Fire-and-forget: activity tracking ──────────────────────────
-    const { admin, device, requestId } = auditContext || {};
+    const { user, device, requestId } = auditContext || {};
     logActivityTrackerEvent(
-      admin,
+      user,
       device,
       requestId,
       ACTIVITY_TRACKER_EVENTS.CREATE_PROJECT,
@@ -132,7 +138,7 @@ const createProjectService = async ({
       logWithTime(`[createStakeholderService] InceptionModel auto-created for project ${projectId}`);
 
       logActivityTrackerEvent(
-        admin,
+        user,
         device,
         requestId,
         ACTIVITY_TRACKER_EVENTS.CREATE_INCEPTION,

@@ -32,7 +32,10 @@ const updateProjectService = async (existingProject, updates) => {
       "problemStatement",
       "goal",
       "expectedBudget",
-      "expectedTimelineMonths"
+      "expectedTimelineInDays",
+      "projectComplexity",
+      "projectCriticality",
+      "projectPriority"
     ];
 
     const updatePayload = {};
@@ -193,7 +196,7 @@ const updateProjectService = async (existingProject, updates) => {
         logWithTime(`[updateProjectService] Inception document for project ${existingProject._id} version updated to ${version}`);
 
         logActivityTrackerEvent(
-          updates.auditContext?.admin,
+          updates.auditContext?.user,
           updates.auditContext?.device,
           updates.auditContext?.requestId,
           ACTIVITY_TRACKER_EVENTS.UPDATE_INCEPTION,
@@ -223,13 +226,13 @@ const updateProjectService = async (existingProject, updates) => {
 
     /* ───────── Activity Tracker ───────── */
 
-    const { admin, device, requestId } = updates.auditContext || {};
+    const { user, device, requestId } = updates.auditContext || {};
 
     const { oldData, newData } =
       prepareAuditData(existingProject, updatedProject);
 
     logActivityTrackerEvent(
-      admin,
+      user,
       device,
       requestId,
       ACTIVITY_TRACKER_EVENTS.UPDATE_PROJECT,

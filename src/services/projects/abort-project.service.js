@@ -57,11 +57,11 @@ const abortProjectService = async (project, params) => {
     );
 
     // ── Fire-and-forget: activity tracking ──────────────────────────
-    const { admin, device, requestId } = params.auditContext || {};
+    const { user, device, requestId } = params.auditContext || {};
     const { oldData, newData } = prepareAuditData(project, updatedProject);
 
     logActivityTrackerEvent(
-      admin,
+      user,
       device,
       requestId,
       ACTIVITY_TRACKER_EVENTS.ABORT_PROJECT,
