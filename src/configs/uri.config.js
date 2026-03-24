@@ -17,6 +17,7 @@ const SCOPE_BASE = `${API_PREFIX}/scope`; // /software-management-service/api/v1
 const HLF_BASE = `${API_PREFIX}/high-level-features`; // /software-management-service/api/v1/high-level-features
 const PRODUCT_VISION_BASE = `${API_PREFIX}/product-vision`; // /software-management-service/api/v1/product-vision
 const COMMENT_BASE = `${API_PREFIX}/comments`; // /software-management-service/api/v1/comments
+const ACTIVITY_TRACKER_BASE = `${API_PREFIX}/activity-trackers`; // /software-management-service/api/v1/activity-trackers
 
 module.exports = {
     INTERNAL_BASE,
@@ -29,6 +30,7 @@ module.exports = {
     HLF_BASE,
     PRODUCT_VISION_BASE,
     COMMENT_BASE,
+    ACTIVITY_TRACKER_BASE,
     INTERNAL_ROUTES: {
         CREATE_SUPER_ADMIN: `/create-super-admin`, // /software-management-service/api/v1/internal/create-super-admin
         CREATE_USER: `/create-user`, // /software-management-service/api/v1/internal/admin-panel/create-user
@@ -109,5 +111,10 @@ module.exports = {
         LIST_HIERARCHICAL_COMMENTS:  `/list-hierarchical/:entityType/:entityId`, // GET /api/v1/comments/list-hierarchical/:entityType/:entityId
         UPDATE_COMMENT:              `/update/:commentId`,                // PATCH  /api/v1/comments/update/:commentId
         DELETE_COMMENT:              `/delete/:commentId`                 // DELETE /api/v1/comments/delete/:commentId
+    },
+    ACTIVITY_TRACKER_ROUTES: {
+        GET_MY_ACTIVITY:  `/my-activity`,      // GET /api/v1/activity-trackers/my-activity
+        LIST_ACTIVITY:    `/list`,              // GET /api/v1/activity-trackers/list (admin only)
+        GET_ACTIVITY:     `/get/:activityId`    // GET /api/v1/activity-trackers/get/:activityId (admin only)
     }
 };
