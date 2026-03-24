@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 
 const RequirementSchema = new mongoose.Schema({
     elicitationId: { type: mongoose.Schema.Types.ObjectId, ref: DB_COLLECTIONS.ELICITATIONS, required: true },
+    projectId: { type: mongoose.Schema.Types.ObjectId, ref: DB_COLLECTIONS.PROJECTS, required: true },
     title: { type: String, trim: true, minlength: titleLength.min, maxlength: titleLength.max, required: true },
     description: { type: String, trim: true, default: null, minlength: descriptionLength.min, maxlength: descriptionLength.max },
     type: { type: String, enum: Object.values(RequirementTypes), default: RequirementTypes.FUNCTIONAL },
