@@ -394,6 +394,68 @@ module.exports = {
       reason: "Get product vision endpoint abuse",
       message: "Too many requests to get product vision endpoint. Please try again later."
     },
-
+    createElicitation: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "create_elicitation",
+      reason: "Create elicitation endpoint abuse",
+      message: "Too many requests to create elicitation endpoint. Please try again later."
+    },
+    updateElicitation: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "update_elicitation",
+      reason: "Update elicitation endpoint abuse",
+      message: "Too many requests to update elicitation endpoint. Please try again later."
+    },
+    deleteElicitation: {
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      prefix: "delete_elicitation",
+      reason: "Delete elicitation endpoint abuse",
+      message: "Too many requests to delete elicitation endpoint. Please try again later."
+    },
+    getElicitation: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_elicitation",
+      reason: "Get elicitation endpoint abuse",
+      message: "Too many requests to get elicitation endpoint. Please try again later."
+    },
+    listElicitations: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_elicitations",
+      reason: "List elicitations endpoint abuse",
+      message: "Too many requests to list elicitations endpoint. Please try again later."
+    },
+    getInception: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_inception",
+      reason: "Get inception endpoint abuse",
+      message: "Too many requests to get inception endpoint. Please try again later."
+    },
+    listInceptions: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_inceptions",
+      reason: "List inceptions endpoint abuse",
+      message: "Too many requests to list inceptions endpoint. Please try again later."
+    },
+    deleteInception: {
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      prefix: "delete_inception",
+      reason: "Delete inception endpoint abuse",
+      message: "Too many requests to delete inception endpoint. Please try again later."
+    },
+    getLatestInception: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_latest_inception",
+      reason: "Get latest inception endpoint abuse",
+      message: "Too many requests to get latest inception endpoint. Please try again later."
+    }
   }
-};
+}

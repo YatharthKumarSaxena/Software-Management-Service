@@ -58,7 +58,10 @@ const requiredFields = {
     createCommentField:getRequiredFields(FieldDefinitions.CREATE_COMMENT),
     updateCommentField:getRequiredFields(FieldDefinitions.UPDATE_COMMENT),
     deleteCommentField:getRequiredFields(FieldDefinitions.DELETE_COMMENT),
-    commentEntityField:getRequiredFields(FieldDefinitions.COMMENT_ENTITY)
+    commentEntityField:getRequiredFields(FieldDefinitions.COMMENT_ENTITY),
+
+    // ── Inception ────────────────────────────────────────────────────────────────
+    deleteInceptionField:getRequiredFields(FieldDefinitions.DELETE_INCEPTION)
 }
 
 module.exports = {

@@ -272,6 +272,15 @@ const PhaseDeletionReason = Object.freeze({
   OTHER: "other",
 });
 
+const InceptionDeletionReason = Object.freeze({
+  DUPLICATE: "duplicate_inception",
+  TEST_INCEPTION: "test_or_demo_inception_cleanup",
+  ADMIN_ERROR: "created_by_admin_mistake",
+  RESTART_CYCLE: "restart_project_cycle",
+  LOW_CRITICALITY: "project_criticality_low",
+  OTHER: "other"
+});
+
 const ValidationPhaseStatus = Object.freeze({
   DRAFT: "DRAFT",
   IN_PROGRESS: "IN_PROGRESS",
@@ -414,6 +423,7 @@ module.exports = {
   Phases,
   StakeholderDeletionReason,
   PhaseDeletionReason,
+  InceptionDeletionReason,
   ValidationPhaseStatus,
   ProjectRoleTypes,
   ProjectCategoryTypes,

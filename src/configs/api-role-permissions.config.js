@@ -139,6 +139,36 @@ const ApiRolePermissions = Object.freeze({
     ]
   },
 
+  inception: {
+    getInception: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.BUSINESS_ANALYST,
+      AdminRoleTypes.MANAGER,
+      AdminRoleTypes.ANALYST,
+      AdminRoleTypes.DEVELOPER,
+      AdminRoleTypes.OTHER,
+    ],
+    listInceptions: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.BUSINESS_ANALYST,
+      AdminRoleTypes.MANAGER,
+      AdminRoleTypes.ANALYST,
+      AdminRoleTypes.DEVELOPER,
+      AdminRoleTypes.OTHER,
+    ],
+    deleteInception: [
+      AdminRoleTypes.CEO,
+    ],
+    getLatestInception: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.BUSINESS_ANALYST,
+      AdminRoleTypes.MANAGER,
+      AdminRoleTypes.ANALYST,
+      AdminRoleTypes.DEVELOPER,
+      AdminRoleTypes.OTHER,
+    ],
+  },
+
   client: {
     createProject: [],
     updateProject: [],

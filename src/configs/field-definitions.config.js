@@ -601,6 +601,21 @@ const FieldDefinitions = {
     }
   },
 
+  DELETE_INCEPTION: {
+    DELETION_REASON_TYPE: {
+      field: "deletionReasonType",
+      required: true,
+      validation: validationRules.inceptionDeletionReasonType,
+      description: "Reason category for deleting inception (enum)"
+    },
+    DELETION_REASON_DESCRIPTION: {
+      field: "deletionReasonDescription",
+      required: false,
+      validation: validationRules.reasonDescription,
+      description: "Optional free-text elaboration on deletion reason"
+    },
+  },
+
 };
 
 module.exports = { FieldDefinitions };

@@ -33,7 +33,8 @@ const validationSets = {
     commentEntityValidationSet: getValidationSet(FieldDefinitions.COMMENT_ENTITY),
     createCommentValidationSet: getValidationSet(FieldDefinitions.CREATE_COMMENT),
     updateCommentValidationSet: getValidationSet(FieldDefinitions.UPDATE_COMMENT),
-    deleteCommentValidationSet: getValidationSet(FieldDefinitions.DELETE_COMMENT)
+    deleteCommentValidationSet: getValidationSet(FieldDefinitions.DELETE_COMMENT),
+    deleteInceptionValidationSet: getValidationSet(FieldDefinitions.DELETE_INCEPTION)
 
 };
 

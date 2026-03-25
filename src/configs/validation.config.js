@@ -14,6 +14,7 @@ const {
   ProjectAbortReasonHelper,
   ProjectResumeReasonHelper,
   ProjectDeletionReasonHelper,
+  InceptionDeletionReasonHelper,
   AdminRoleTypesHelper,
   ClientRoleTypesHelper,
   StakeholderDeletionReasonHelper,
@@ -81,6 +82,10 @@ const validationRules = {
   },
   deletionReasonType: {
     enum: ProjectDeletionReasonHelper,
+  },
+
+  inceptionDeletionReasonType: {
+    enum: InceptionDeletionReasonHelper,
   },
 
   // ── Reason description (shared length rule) ───────
