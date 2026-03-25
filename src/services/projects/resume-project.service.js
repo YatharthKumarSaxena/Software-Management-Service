@@ -36,7 +36,7 @@ const resumeProjectService = async (project, params) => {
       return { success: false, message: "Project is already completed" };
     }
 
-    // ── Guard: must be ON_HOLD or ABORTED ────────────────────────────
+    // ── Guard: must be ON_HOLD  ────────────────────────────
     const resumableStatuses = [ProjectStatus.ON_HOLD];
     if (!resumableStatuses.includes(project.projectStatus)) {
       return {
