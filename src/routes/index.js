@@ -1,4 +1,4 @@
-const { INTERNAL_BASE, TEST_BASE, PROJECT_BASE, STAKEHOLDER_BASE, PRODUCT_REQUEST_BASE, SCOPE_BASE, HLF_BASE, PRODUCT_VISION_BASE, COMMENT_BASE, ACTIVITY_TRACKER_BASE } = require("@/configs/uri.config");
+const { INTERNAL_BASE, TEST_BASE, PROJECT_BASE, STAKEHOLDER_BASE, PRODUCT_REQUEST_BASE, SCOPE_BASE, HLF_BASE, PRODUCT_VISION_BASE, COMMENT_BASE, ACTIVITY_TRACKER_BASE, INCEPTION_BASE } = require("@/configs/uri.config");
 const { internalRouter }    = require("./internal.routes");
 const { testRouter }        = require("./test.routes");
 const { projectRouter }     = require("./project.routes");
@@ -9,6 +9,7 @@ const { hlfRouter } = require("./high-level-features.routes");
 const { productVisionRouter } = require("./product-vision.routes");
 const { commentRouter } = require("./comment.routes");
 const { activityTrackerRouter } = require("./activity-tracker.routes");
+const { inceptionRouter } = require("./inception.routes");
 
 module.exports = (app) => {
   // Internal service-to-service routes (protected by service token)
@@ -39,5 +40,8 @@ module.exports = (app) => {
 
   // Admin/Client-facing API routes — activity trackers
   app.use(ACTIVITY_TRACKER_BASE, activityTrackerRouter);
+
+  // Admin-facing API routes — inceptions
+  app.use(INCEPTION_BASE, inceptionRouter);
 
 };
