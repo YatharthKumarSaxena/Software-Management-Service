@@ -16,6 +16,7 @@ const {
   ProjectResumeReason,
   ProjectStatus,
   ProjectDeletionReason,
+  InceptionDeletionReason,
   AdminRoleTypes,
   ClientRoleTypes,
   StakeholderDeletionReason,
@@ -70,6 +71,7 @@ const ProjectAbortReasonHelper   = createEnumHelper(ProjectAbortReason,   "Proje
 const ProjectResumeReasonHelper  = createEnumHelper(ProjectResumeReason,  "ProjectResumeReason");
 const ProjectStatusHelper        = createEnumHelper(ProjectStatus,        "ProjectStatus");
 const ProjectDeletionReasonHelper = createEnumHelper(ProjectDeletionReason, "ProjectDeletionReason");
+const InceptionDeletionReasonHelper = createEnumHelper(InceptionDeletionReason, "InceptionDeletionReason");
 
 const AdminRoleTypesHelper = createEnumHelper(AdminRoleTypes, "AdminRoleTypes");
 const ClientRoleTypesHelper = createEnumHelper(ClientRoleTypes, "ClientRoleTypes");
@@ -98,6 +100,7 @@ module.exports = {
   ProjectResumeReasonHelper,
   ProjectStatusHelper,
   ProjectDeletionReasonHelper,
+  InceptionDeletionReasonHelper,
   AdminRoleTypesHelper,
   ClientRoleTypesHelper,
   StakeholderDeletionReasonHelper,
