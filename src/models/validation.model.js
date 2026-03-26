@@ -13,15 +13,15 @@ const validationSchema = new mongoose.Schema({
     index: true
   },
 
-  cycleNumber: {
-    type: Number,
-    required: true,
-    default: 0
-  },
-
   version: {
-    type: String,
-    default: "v1.0"
+    major: {
+      type: Number, // equivalent to cycleNumber
+      default: 1
+    },
+    minor: {
+      type: Number, // updates inside cycle
+      default: 0
+    }
   },
 
   createdBy: {

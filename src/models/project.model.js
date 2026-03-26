@@ -60,8 +60,14 @@ const projectSchema = new mongoose.Schema(
     /* ── Version (auto-managed) ─────────────────────────────────────── */
 
     version: {
-      type: String,
-      default: "v1.0",
+      major: {
+        type: Number, // equivalent to cycleNumber
+        default: 1
+      },
+      minor: {
+        type: Number, // updates inside cycle
+        default: 0
+      }
     },
 
     expectedBudget: {

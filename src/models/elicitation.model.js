@@ -1,9 +1,57 @@
-
 const { customIdRegex } = require("@/configs/regex.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
-const { PhaseDeletionReason } = require("@/configs/enums.config");
+const { PhaseDeletionReason, ParticipantTypes, ElicitationModes, MeetingPlatformTypes } = require("@/configs/enums.config");
 const { descriptionLength, titleLength } = require("@/configs/fields-length.config");
 const mongoose = require("mongoose");
+
+const participantSchema = new mongoose.Schema({
+
+  userId: {
+    type: String,
+    match: customIdRegex,
+    required: true
+  },
+
+  role: {
+    type: String,
+    enum: Object.values(ParticipantTypes),
+    default: ParticipantTypes.PARTICIPANT
+  },
+
+  roleDescription: {
+    type: String,
+    default: null // optional (SCRIBE, OBSERVER etc. for UI only)
+  },
+
+  addedBy: {
+    type: String,
+    match: customIdRegex,
+    immutable: true,
+    required: true
+  },
+
+  addedAt: {
+    type: Date,
+    default: Date.now
+  },
+
+  isDeleted: {
+    type: Boolean,
+    default: false
+  },
+
+  removedBy: {
+    type: String,
+    match: customIdRegex,
+    default: null
+  },
+
+  removedAt: {
+    type: Date,
+    default: null
+  }
+
+}, { _id: true });
 
 const elicitationSchema = new mongoose.Schema({
 
@@ -40,15 +88,37 @@ const elicitationSchema = new mongoose.Schema({
     default: null
   },
 
-  cycleNumber: {
-    type: Number,
-    required: true,
-    default: 0
+  version: {
+    major: {
+      type: Number, // equivalent to cycleNumber
+      default: 1
+    },
+    minor: {
+      type: Number, // updates inside cycle
+      default: 0
+    }
   },
 
-  version: {
+  meetingLink: {
     type: String,
-    default: "v1.0"
+    default: null
+  },
+
+  meetingPassword: {
+    type: String,
+    default: null
+  },
+
+  participants: {
+    type: [participantSchema],
+    default: [],
+    validate: {
+      validator: function (participants) {
+        const ids = participants.map(p => p.userId);
+        return ids.length === new Set(ids).size;
+      },
+      message: 'Duplicate participants not allowed'
+    }
   },
 
   createdBy: {
@@ -79,6 +149,12 @@ const elicitationSchema = new mongoose.Schema({
     default: null
   },
 
+  elicitationMode: {
+    type: String,
+    enum: Object.values(ElicitationModes),
+    default: ElicitationModes.OPEN
+  },
+
   deletionReasonType: {
     type: String,
     enum: Object.values(PhaseDeletionReason),
@@ -95,7 +171,7 @@ const elicitationSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 elicitationSchema.index({ projectId: 1, isDeleted: 1 });
-elicitationSchema.index({ projectId: 1, cycleNumber: -1, isDeleted: 1 });
+elicitationSchema.index({ projectId: 1, "version.major": -1, isDeleted: 1 });
 
 const ElicitationModel = mongoose.model(DB_COLLECTIONS.ELICITATIONS, elicitationSchema);
 

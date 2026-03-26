@@ -13,12 +13,6 @@ const inceptionSchema = new mongoose.Schema({
     index: true
   },
 
-  cycleNumber: {
-    type: Number,
-    required: true,
-    default: 0
-  },
-
   productVision: {
     type: String,
     trim: true,
@@ -28,8 +22,14 @@ const inceptionSchema = new mongoose.Schema({
   },
 
   version: {
-    type: String,
-    default: "v1.0"
+    major: {
+      type: Number, // equivalent to cycleNumber
+      default: 1
+    },
+    minor: {
+      type: Number, // updates inside cycle
+      default: 0
+    }
   },
 
   createdBy: {
@@ -77,11 +77,10 @@ const inceptionSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 inceptionSchema.index(
-  { projectId: 1, cycleNumber: 1 },
+  { projectId: 1, "version.major": 1 },
   { unique: true, partialFilterExpression: { isDeleted: false } }
 );
 inceptionSchema.index({ projectId: 1, isDeleted: 1 });
-inceptionSchema.index({ projectId: 1, cycleNumber: -1, isDeleted: 1 });
 
 const InceptionModel = mongoose.model(DB_COLLECTIONS.INCEPTIONS, inceptionSchema);
 

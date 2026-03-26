@@ -89,8 +89,8 @@ const stakeholderSchema = new mongoose.Schema({
 });
 
 stakeholderSchema.index(
-  { userId: 1, projectId: 1 },
-  { unique: true }
+  { userId: 1, projectId: 1, isDeleted: 1 },
+  { unique: true, partialFilterExpression: { isDeleted: false } }
 );
 
 const StakeholderModel = mongoose.model(DB_COLLECTIONS.STAKEHOLDERS, stakeholderSchema);

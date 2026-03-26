@@ -1,6 +1,6 @@
 
 const { DB_COLLECTIONS } = require('@/configs/db-collections.config');
-const { RequirementTypes, RequirementSources, RequirementStatuses } = require('@/configs/enums.config');
+const { RequirementTypes, RequirementSources, RequirementStatuses, PriorityLevels } = require('@/configs/enums.config');
 const { descriptionLength, titleLength } = require('@/configs/fields-length.config');
 const { customIdRegex } = require('@/configs/regex.config');
 const mongoose = require('mongoose');
@@ -19,9 +19,29 @@ const RequirementSchema = new mongoose.Schema({
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
     deletedBy: { type: String, match: customIdRegex, default: null },
-    lastDroppedAt: { type: Date, default: null },
-    lastDroppedBy: { type: String, match: customIdRegex, default: null },
-    lastDropReason: { type: String, trim: true, minlength: descriptionLength.min, maxlength: descriptionLength.max, default: null }
+    priority: {
+        type: String,
+        enum: Object.values(PriorityLevels),
+        default: PriorityLevels.MEDIUM
+    },
+    issueNote: { type: String, trim: true, default: null, minlength: descriptionLength.min, maxlength: descriptionLength.max },
+    linkedRequirementIds: {
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: DB_COLLECTIONS.REQUIREMENTS
+        }],
+        default: []
+    },
+    timeline: {
+        proposedDate: {
+            type: Date,
+            default: null
+        },
+        expectedDeliveryDate: {
+            type: Date,
+            default: null
+        }
+    }
 }, {
     timestamps: true
 });
