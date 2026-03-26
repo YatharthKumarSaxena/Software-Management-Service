@@ -5,7 +5,6 @@ const inceptionRouter = express.Router();
 
 const { INCEPTION_ROUTES } = require("@/configs/uri.config");
 const { baseAuthAdminMiddlewares } = require("./middleware.gateway.routes");
-const { adminApiAuthorizationMiddleware: apiAuthorizationMiddleware } = require("@/middlewares/admins/admin-api-authorization.middleware");
 const {
   getInceptionRateLimiter,
   listInceptionsRateLimiter,
@@ -16,6 +15,7 @@ const {
 const { inceptionControllers } = require("@controllers/inceptions");
 const { inceptionMiddlewares } = require("@/middlewares/inceptions");
 const { projectMiddlewares } = require("@/middlewares/projects");
+const { checkUserIsStakeholder } = require("@/middlewares/stakeholders/check-user-is-stakeholder.middleware");
 
 const {
   GET_INCEPTION,
@@ -42,8 +42,9 @@ inceptionRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getInceptionRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminGetInception,
-    inceptionMiddlewares.fetchInceptionMiddleware // Validates inceptionId, fetches inception document for controller
+    inceptionMiddlewares.fetchInceptionMiddleware, // Validates inceptionId, fetches inception document for controller
+    projectMiddlewares.fetchProjectMiddleware, // Validates projectId, fetches project document for controller
+    checkUserIsStakeholder
   ],
   inceptionControllers.getInceptionController
 );
@@ -53,8 +54,8 @@ inceptionRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getLatestInceptionRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminGetLatestInception,
-    projectMiddlewares.fetchProjectMiddleware // Validates projectId, fetches project document for controller
+    projectMiddlewares.fetchProjectMiddleware, // Validates projectId, fetches project document for controller
+    checkUserIsStakeholder
   ],
   inceptionControllers.getLatestInceptionController
 );
@@ -74,8 +75,8 @@ inceptionRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     listInceptionsRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminListInceptions,
-    projectMiddlewares.fetchProjectMiddleware // Validates projectId, fetches project document for controller
+    projectMiddlewares.fetchProjectMiddleware, // Validates projectId, fetches project document for controller
+    checkUserIsStakeholder
   ],
   inceptionControllers.listInceptionsController
 );
@@ -100,9 +101,9 @@ inceptionRouter.delete(
   [
     ...baseAuthAdminMiddlewares,
     deleteInceptionRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminDeleteInception,
     inceptionMiddlewares.fetchInceptionMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
     inceptionMiddlewares.deleteInceptionPresenceMiddleware,
     inceptionMiddlewares.deleteInceptionValidationMiddleware
