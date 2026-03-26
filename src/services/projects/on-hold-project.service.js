@@ -5,7 +5,6 @@ const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.se
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { ProjectStatus } = require("@configs/enums.config");
-const { generateVersion } = require("@/utils/version.util");
 
 /**
  * Puts an ACTIVE project on hold.
@@ -53,7 +52,7 @@ const onHoldProjectService = async (project, params) => {
         const updatedProject = await ProjectModel.findByIdAndUpdate(
             project._id,
             { $set: updatePayload },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
 
         // ── Fire-and-forget: activity tracking ──────────────────────────
@@ -107,9 +106,11 @@ const convertOnHoldToActiveProjectService = async (project, params) => {
             };
         }
 
+        // ✅ Update version (minor++)
+        const currentVersion = project.version || { major: 1, minor: 0 };
+
         const updatePayload = {
             projectStatus: ProjectStatus.ACTIVE,
-            version: generateVersion(1, project.version),
             updatedBy: params.convertedBy,
             // clear any stale on-hold-related stamps
             isArchived: false,
@@ -120,19 +121,21 @@ const convertOnHoldToActiveProjectService = async (project, params) => {
         const updatedProject = await ProjectModel.findByIdAndUpdate(
             project._id,
             { $set: updatePayload },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
 
         // ── Fire-and-forget: activity tracking ──────────────────────────
         const { user, device, requestId } = params.auditContext || {};
         const { oldData, newData } = prepareAuditData(project, updatedProject);
 
+        const versionString = `v${updatedProject.version.major}.${updatedProject.version.minor}`;
+
         logActivityTrackerEvent(
             user,
             device,
             requestId,
             ACTIVITY_TRACKER_EVENTS.CONVERT_ON_HOLD_TO_ACTIVE,
-            `Project '${updatedProject.name}' (${project._id}) auto-converted from ON_HOLD to ACTIVE (${project.version} → ${updatedProject.version}) by ${params.convertedBy}`,
+            `Project '${updatedProject.name}' (${project._id}) auto-converted from ON_HOLD to ACTIVE of ${versionString} by ${params.convertedBy}`,
             { oldData, newData, adminActions: { targetId: project._id } }
         );
 

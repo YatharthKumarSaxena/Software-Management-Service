@@ -12,7 +12,7 @@ const { ProjectStatus } = require("@configs/enums.config");
  * Allowed source statuses : DRAFT
  * Blocked if              : isDeleted === true  |  projectStatus === COMPLETED
  *
- * Sets projectStatus → ACTIVE, records activateReasonType / activateReasonDescription,
+ * Sets projectStatus → ACTIVE, records activationReasonType / activationReasonDescription,
  *
  * Version is NOT incremented – activating is a lifecycle event.
  *
@@ -20,8 +20,8 @@ const { ProjectStatus } = require("@configs/enums.config");
  * @param {string} project._id
  * @param {string} project.projectStatus
  * @param {Object} params
- * @param {string} params.activateReasonType
- * @param {string} params.activateReasonDescription
+ * @param {string} params.activationReasonType
+ * @param {string} params.activationReasonDescription
  * @param {string} params.activatedBy         - Admin USR ID
  * @param {Object} params.auditContext
  *

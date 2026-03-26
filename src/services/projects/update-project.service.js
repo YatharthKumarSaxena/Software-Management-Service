@@ -1,14 +1,13 @@
-const { ProjectModel, InceptionModel } = require("@models/index");
+const { ProjectModel } = require("@models/index");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { generateVersion } = require("@/utils/version.util");
-const { ProjectStatus, ProjectCategoryTypes } = require("@/configs/enums.config");
+const { manualVersionControlService } = require("@services/common/version.service");
+const { ProjectStatus, ProjectCategoryTypes, Phases } = require("@/configs/enums.config");
 const { isValidMongoID } = require("@/utils/id-validators.util");
 const {
   validateLinkedProjectIds
 } = require("@/services/projects/linked-projects.service");
-const { logWithTime } = require("@/utils/time-stamps.util");
 
 const updateProjectService = async (existingProject, updates) => {
   try {
@@ -173,39 +172,30 @@ const updateProjectService = async (existingProject, updates) => {
 
     /* ───────── Version Increment ───────── */
 
-    const shouldIncrementVersion =
-      hasOrgChanges ||
-      hasLinkedProjectChanges ||
-      allowedFields.some(field =>
-        updatePayload[field] !== undefined &&
-        updatePayload[field] !== existingProject[field]
-      );
+    const shouldImpactInception =
+      updates.problemStatement !== undefined ||
+      updates.goal !== undefined ||
+      updates.expectedTimelineInDays !== undefined;
 
-    if (shouldIncrementVersion) {
-      updatePayload.version = generateVersion(1, existingProject.version);
-      // Fetch Inception Document
-      const inceptionDoc = await InceptionModel.findOne({ projectId: existingProject._id });
-      if (inceptionDoc) {
-        // Update Inception Document with new version
-        const version = generateVersion(inceptionDoc.cycleNumber, inceptionDoc.version);
-        await InceptionModel.findByIdAndUpdate(
-          inceptionDoc._id,
-          { $set: { version, updatedBy: updates.updatedBy } },
-          { new: true }
-        );
-        logWithTime(`[updateProjectService] Inception document for project ${existingProject._id} version updated to ${version}`);
+    if (hasActualChanges) {
 
-        logActivityTrackerEvent(
-          updates.auditContext?.user,
-          updates.auditContext?.device,
-          updates.auditContext?.requestId,
-          ACTIVITY_TRACKER_EVENTS.UPDATE_INCEPTION,
-          `Inception document version updated to ${version} due to project update for project ${existingProject._id}`,
-          {
-            newData: { version },
-            adminActions: { targetId: inceptionDoc._id.toString() },
-          }
-        );
+      // ✅ Project version update (minor++)
+      const currentVersion = existingProject.version || { major: 1, minor: 0 };
+
+      updatePayload.version = {
+        major: currentVersion.major,
+        minor: currentVersion.minor + 1
+      };
+
+      // ✅ Phase version update (reuse service)
+      if (shouldImpactInception) {
+        await manualVersionControlService({
+          projectId: existingProject._id,
+          currentPhase: Phases.INCEPTION,
+          action: "Project update impacting requirement phases",
+          performedBy: updates.updatedBy,
+          auditContext: updates.auditContext
+        });
       }
     }
 
@@ -221,7 +211,7 @@ const updateProjectService = async (existingProject, updates) => {
     const updatedProject = await ProjectModel.findByIdAndUpdate(
       existingProject._id,
       { $set: updatePayload },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     /* ───────── Activity Tracker ───────── */
@@ -231,12 +221,14 @@ const updateProjectService = async (existingProject, updates) => {
     const { oldData, newData } =
       prepareAuditData(existingProject, updatedProject);
 
+    const versionString = `v${updatedProject.version.major}.${updatedProject.version.minor}`;
+
     logActivityTrackerEvent(
       user,
       device,
       requestId,
       ACTIVITY_TRACKER_EVENTS.UPDATE_PROJECT,
-      `Project '${updatedProject.name}' (${existingProject._id}) updated to ${updatedProject.version} by ${updates.updatedBy}`,
+      `Project '${updatedProject.name}' (${existingProject._id}) updated to ${versionString} by ${updates.updatedBy}`,
       {
         oldData,
         newData,

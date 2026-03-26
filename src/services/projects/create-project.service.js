@@ -131,8 +131,6 @@ const createProjectService = async ({
       logWithTime(`[createStakeholderService] Creating InceptionModel for project ${projectId}`);
       const inception = await InceptionModel.create({
         projectId: project._id,
-        cycleNumber: 0,
-        version: "v1.0",
         createdBy,
       });
       logWithTime(`[createStakeholderService] InceptionModel auto-created for project ${projectId}`);
