@@ -15,7 +15,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
  * @route  GET /software-management-service/api/v1/inceptions/list/:projectId
  * @access Private – All admin roles
  *
- * Fetches all inception cycles for a given project, sorted by cycleNumber in descending order.
+ * Fetches all inception cycles for a given project, sorted by version.major in descending order.
  *
  * @returns {200} Array of inceptions with count
  * @returns {400} Invalid projectId
