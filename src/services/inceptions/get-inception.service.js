@@ -1,7 +1,7 @@
 // services/inceptions/get-inception.service.js
 
 /**
- * Fetches the latest (highest cycleNumber) inception for a given project.
+ * Fetches the latest (highest version.major) inception for a given project.
  *
  * @param {string} projectId - Project MongoDB ObjectId
  *

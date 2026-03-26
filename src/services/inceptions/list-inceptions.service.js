@@ -3,7 +3,7 @@
 const { InceptionModel } = require("@models/inception.model");
 
 /**
- * Fetches all non-deleted inceptions for a given project, sorted by cycleNumber descending.
+ * Fetches all non-deleted inceptions for a given project, sorted by version.major descending.
  *
  * @param {string} projectId - Project MongoDB ObjectId
  *
@@ -16,7 +16,7 @@ const listInceptionsService = async (projectId) => {
         projectId,
         isDeleted: false
       })
-      .sort({ cycleNumber: -1 })
+      .sort({ "version.major": -1 })
       .lean();
 
     return {

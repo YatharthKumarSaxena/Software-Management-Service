@@ -5,7 +5,6 @@ const { ProjectTypes, ProjectStatus, PriorityLevels } = require("@configs/enums.
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { ProjectModel } = require("@models/project.model")
 
 /**
  * Soft-deletes an inception (sets isDeleted = true).

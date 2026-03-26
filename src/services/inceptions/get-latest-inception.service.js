@@ -3,7 +3,7 @@
 const { InceptionModel } = require("@models/inception.model");
 
 /**
- * Fetches the latest (highest cycleNumber) inception for a given project.
+ * Fetches the latest (highest version.major) inception for a given project.
  *
  * @param {string} projectId - Project MongoDB ObjectId
  *
@@ -16,7 +16,7 @@ const getLatestInceptionService = async (projectId) => {
         projectId,
         isDeleted: false
       })
-      .sort({ cycleNumber: -1 })
+      .sort({ "version.major": -1 })
       .lean();
 
     if (!latestInception) {
