@@ -14,7 +14,8 @@ const presenceMiddlewares = {
   resumeProjectPresenceMiddleware:   checkBodyPresence("resumeProjectPresence",   requiredFields.resumeProjectField),
   deleteProjectPresenceMiddleware:   checkBodyPresence("deleteProjectPresence",   requiredFields.deleteProjectField),
   archiveProjectPresenceMiddleware:  checkBodyPresence("archiveProjectPresence",  requiredFields.archiveProjectField),
-  activateProjectPresenceMiddleware:  checkBodyPresence("activateProjectPresence",  requiredFields.activateProjectField)
+  activateProjectPresenceMiddleware:  checkBodyPresence("activateProjectPresence",  requiredFields.activateProjectField),
+  changeProjectOwnerPresenceMiddleware: checkBodyPresence("changeProjectOwnerPresence", requiredFields.changeProjectOwnerField)
 };
 
 module.exports = { presenceMiddlewares };

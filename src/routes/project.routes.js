@@ -17,7 +17,8 @@ const {
   archiveProjectRateLimiter,
   getProjectRateLimiter,
   getProjectsRateLimiter,
-  activateProjectRateLimiter
+  activateProjectRateLimiter,
+  changeProjectOwnerRateLimiter
 } = require("@rate-limiters/general-api.rate-limiter");
 
 const { projectControllers } = require("@controllers/projects");
@@ -34,7 +35,8 @@ const {
   GET_PROJECT,
   LIST_PROJECTS,
   ON_HOLD_PROJECT,
-  ACTIVATE_PROJECT
+  ACTIVATE_PROJECT,
+  CHANGE_PROJECT_OWNER
 } = PROJECT_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -166,6 +168,25 @@ projectRouter.patch(
     projectMiddlewares.activateProjectValidationMiddleware,
   ],
   projectControllers.activateProjectController
+);
+
+/**
+ * PATCH /software-management-service/api/v1/admin/change-owner/:projectId
+ * Change the owner of a project.
+ * Allowed roles: CEO, Manager
+ */
+projectRouter.patch(
+  CHANGE_PROJECT_OWNER,
+  [
+    ...baseAuthAdminMiddlewares,
+    changeProjectOwnerRateLimiter,
+    apiAuthorizationMiddleware.authorizeAdminChangeProjectOwner,
+    projectMiddlewares.fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    projectMiddlewares.changeProjectOwnerPresenceMiddleware,
+    projectMiddlewares.changeProjectOwnerValidationMiddleware,
+  ],
+  projectControllers.changeProjectOwnerController
 );
 
 /**

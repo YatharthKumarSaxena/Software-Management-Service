@@ -10,7 +10,8 @@ const validationMiddlewares = {
   resumeProjectValidationMiddleware:  validateBody("resumeProject",  validationSets.resumeProjectValidationSet),
   deleteProjectValidationMiddleware:  validateBody("deleteProject",  validationSets.deleteProjectValidationSet),
   archiveProjectValidationMiddleware: validateBody("archiveProject", validationSets.archiveProjectValidationSet),
-  activateProjectValidationMiddleware: validateBody("activateProject", validationSets.activateProjectValidationSet)
+  activateProjectValidationMiddleware: validateBody("activateProject", validationSets.activateProjectValidationSet),
+  changeProjectOwnerValidationMiddleware: validateBody("changeProjectOwner", validationSets.changeProjectOwnerValidationSet)
 };
 
 module.exports = { validationMiddlewares };

@@ -1,12 +1,13 @@
 
 const mongoose = require("mongoose");
 const { ProjectModel } = require("@models/project.model");
-const { InceptionModel } = require("@models/inception.model");
+const { createStakeholderService } = require("@services/stakeholders/create-stakeholder.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { ProjectCategoryTypes } = require("@configs/enums.config");
+const { ProjectCategoryTypes, ProjectRoleTypes, Phases } = require("@configs/enums.config");
 const { isValidMongoID } = require("@/utils/id-validators.util");
 const { validateLinkedProjectIds } = require("@/services/projects/linked-projects.service");
+const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
@@ -94,6 +95,8 @@ const createProjectService = async ({
     }
 
     // ── Persist ───────────────────────────────────────────────────────
+    const { user, device, requestId } = auditContext || {};
+
     const project = await ProjectModel.create({
       _id: projectId,
       name,
@@ -106,6 +109,7 @@ const createProjectService = async ({
       ...(expectedBudget !== undefined && { expectedBudget }),
       ...(expectedTimelineInDays !== undefined && { expectedTimelineInDays }),
       createdBy,
+      ownerId: createdBy, // Set creator as initial owner
       projectCreationReasonType,
       projectCreationReasonDescription: projectCreationReasonDescription || null,
       ...(projectComplexity !== undefined && { projectComplexity }),
@@ -113,8 +117,6 @@ const createProjectService = async ({
       ...(projectPriority !== undefined && { projectPriority }),
     });
 
-    // ── Fire-and-forget: activity tracking ──────────────────────────
-    const { user, device, requestId } = auditContext || {};
     logActivityTrackerEvent(
       user,
       device,
@@ -123,28 +125,41 @@ const createProjectService = async ({
       `Project '${project.name}' (${project._id}) created by ${createdBy}`,
       { newData: project }
     );
-    logWithTime(`[createStakeholderService] Project is in INCEPTION phase, checking for side-effects`);
+    
+    // Auto-create Inception Phase using phase management service
+    logWithTime(`[createProjectService] Creating Inception phase for project ${projectId}`);
+    const phaseResult = await createPhaseWithVersionManagement({
+      project: {
+        _id: project._id,
+        currentPhase: Phases.INCEPTION
+      },
+      createdBy,
+      auditContext: { user, device, requestId }
+    });
 
-    // 1. Auto-create InceptionModel doc if not yet present
-    const inceptionExists = await InceptionModel.findOne({ projectId: project._id, isDeleted: false });
-    if (!inceptionExists) {
-      logWithTime(`[createStakeholderService] Creating InceptionModel for project ${projectId}`);
-      const inception = await InceptionModel.create({
-        projectId: project._id,
-        createdBy,
-      });
-      logWithTime(`[createStakeholderService] InceptionModel auto-created for project ${projectId}`);
-
-      logActivityTrackerEvent(
-        user,
-        device,
-        requestId,
-        ACTIVITY_TRACKER_EVENTS.CREATE_INCEPTION,
-        `InceptionModel for project '${project.name}' (${project._id}) auto-created during project creation by ${createdBy}`,
-        { oldData: null, newData: inception }
-      );
+    if (!phaseResult.success) {
+      logWithTime(`⚠️ [createProjectService] Failed to create Inception phase: ${phaseResult.message}`);
+      // Log warning but don't fail - project was created successfully
     } else {
-      logWithTime(`[createStakeholderService] InceptionModel already exists for project ${projectId}`);
+      logWithTime(`✅ [createProjectService] Inception phase created successfully for project ${projectId}`);
+    }
+
+    // Add creator as stakeholder with OWNER role
+    logWithTime(`[createProjectService] Adding creator ${createdBy} as stakeholder with OWNER role`);
+    const stakeholderResult = await createStakeholderService({
+      project,
+      user: { adminId: createdBy, clientId: null },
+      role: ProjectRoleTypes.OWNER,
+      organizationId: null,
+      createdBy,
+      auditContext: { user, device, requestId }
+    });
+
+    if (!stakeholderResult.success) {
+      logWithTime(`⚠️ [createProjectService] Failed to add creator as stakeholder: ${stakeholderResult.message}`);
+      // Log warning but don't fail - project was created successfully
+    } else {
+      logWithTime(`[createProjectService] Creator added as stakeholder successfully`);
     }
 
     return { success: true, project };
