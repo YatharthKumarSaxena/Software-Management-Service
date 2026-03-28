@@ -1,13 +1,15 @@
 // middlewares/elicitations/index.js
 
 const { fetchElicitationMiddleware } = require("./fetch-elicitation.middleware");
-const { validationMiddlewares } = require("./validate-request-body.middleware");
-const { checkUserIsStakeholder } = require("../stakeholders/check-user-is-stakeholder.middleware");
+const { fetchLatestElicitationMiddleware } = require("./fetch-latest-elicitation.middleware");
+const { validationMiddlewares } = require("./field-validation.middleware");
+const { presenceMiddlewares } = require("./validate-request-body.middleware");
 
 const elicitationMiddlewares = {
   fetchElicitationMiddleware,
+  fetchLatestElicitationMiddleware,
   ...validationMiddlewares,
-  checkUserIsStakeholder // Reuse existing stakeholder check
+  ...presenceMiddlewares
 };
 
 module.exports = { elicitationMiddlewares };

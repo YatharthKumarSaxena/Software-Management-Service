@@ -1,62 +1,56 @@
 // controllers/elicitations/create-elicitation.controller.js
 
-const { createElicitationService } = require("@services/elicitations/create-elicitation.service");
+const { elicitationServices } = require("@services/elicitations");
 const {
-  throwBadRequestError,
+  throwConflictError,
   throwInternalServerError,
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
+const { sendElicitationCreatedSuccess } = require("@/responses/success/elicitation.response");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { CONFLICT } = require("@configs/http-status.config");
 
 /**
- * Controller: Create Elicitation
- *
- * @route  POST /software-management-service/api/v1/admin/projects/:projectId/elicitations
- * @access Private – Admin (must be stakeholder of the project)
- *
- * @param projectId - Project ID from URL params
- * 
- * @description Creates an empty elicitation record to start requirement engineering.
- * No title or description is provided initially.
- *
- * @returns {201} Elicitation created successfully
- * @returns {400} Invalid project or missing fields
- * @returns {403} User is not a stakeholder of the project
- * @returns {500} Internal server error
+ * POST /projects/:projectId/elicitations
+ * Create a new elicitation for a project.
  */
 const createElicitationController = async (req, res) => {
   try {
-    const projectId = req.project._id;
-    const createdBy = req.admin.adminId;
+    const { projectId } = req.params;
+    const { elicitationMode, allowParallelMeetings } = req.body;
 
-    // ── Call service (activity tracking happens inside the service) ──
-    const result = await createElicitationService({
+    logWithTime(
+      `📍 [createElicitationController] Creating elicitation for project: ${projectId} | ${getLogIdentifiers(req)}`
+    );
+
+    // ── Call service ──────────────────────────────────────────────────
+    const result = await elicitationServices.createElicitationService({
       projectId,
-      createdBy,
+      mode: elicitationMode,
+      allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
+      createdBy: req.admin.adminId,
       auditContext: {
         user: req.admin,
         device: req.device,
-        requestId: req.requestId,
-      },
+        requestId: req.requestId
+      }
     });
 
+    // ── Handle error response ─────────────────────────────────────────
     if (!result.success) {
-      if (result.message === "Validation error") {
-        logWithTime(`❌ [createElicitationController] Validation error: ${JSON.stringify(result.error)} | ${getLogIdentifiers(req)}`);
-        return throwBadRequestError(res, "Validation error", result.error);
+      if (result.errorCode === CONFLICT) {
+        logWithTime(
+          `❌ [createElicitationController] ${result.message} | ${getLogIdentifiers(req)}`
+        );
+        return throwConflictError(res, result.message, "An active elicitation already exists for this project.");
       }
-
       logWithTime(`❌ [createElicitationController] ${result.message} | ${getLogIdentifiers(req)}`);
-      return throwBadRequestError(res, result.message);
+      return throwInternalServerError(res, new Error(result.message));
     }
 
-    // ── Success response ──────────────────────────────────────────────
+    // ── Return success response ───────────────────────────────────────
     logWithTime(`✅ [createElicitationController] Elicitation created successfully | ${getLogIdentifiers(req)}`);
-    return res.status(result.errorCode).json({
-      success: true,
-      message: "Elicitation created successfully",
-      data: result.data,
-    });
+    return sendElicitationCreatedSuccess(res, result.elicitation);
 
   } catch (error) {
     logWithTime(`❌ [createElicitationController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);

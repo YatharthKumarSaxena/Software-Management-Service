@@ -1,52 +1,37 @@
 // controllers/elicitations/get-elicitation.controller.js
 
-const { getElicitationService } = require("@services/elicitations/get-elicitation.service");
+const { elicitationServices } = require("@services/elicitations");
 const {
-  throwBadRequestError,
   throwInternalServerError,
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
+const { sendElicitationFetchedSuccess } = require("@/responses/success/elicitation.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
- * Controller: Get Elicitation
- *
- * @route  GET /software-management-service/api/v1/admin/projects/:projectId/elicitations/:elicitationId
- * @access Private – Admin (must be stakeholder of the project)
- *
- * @param projectId - Project ID from URL params
- * @param elicitationId - Elicitation ID from URL params
- *
- * @description Retrieves full elicitation details.
- *
- * @returns {200} Elicitation data retrieved successfully
- * @returns {403} User is not a stakeholder of the project
- * @returns {404} Elicitation not found
- * @returns {500} Internal server error
+ * GET /projects/:projectId/elicitations/:elicitationId
+ * Retrieve a single elicitation by ID.
  */
 const getElicitationController = async (req, res) => {
   try {
-    const elicitationId = req.elicitation._id;
-    const projectId = req.project._id;
+    const { elicitation } = req;
+
+    logWithTime(
+      `📍 [getElicitationController] Retrieving elicitation: ${elicitation._id} | ${getLogIdentifiers(req)}`
+    );
 
     // ── Call service ──────────────────────────────────────────────────
-    const result = await getElicitationService({
-      elicitationId,
-      projectId,
-    });
+    const result = await elicitationServices.getElicitationService(elicitation);
 
+    // ── Handle error response ─────────────────────────────────────────
     if (!result.success) {
       logWithTime(`❌ [getElicitationController] ${result.message} | ${getLogIdentifiers(req)}`);
-      return throwBadRequestError(res, result.message);
+      return throwInternalServerError(res, new Error(result.message));
     }
 
-    // ── Success response ──────────────────────────────────────────────
+    // ── Return success response ───────────────────────────────────────
     logWithTime(`✅ [getElicitationController] Elicitation retrieved successfully | ${getLogIdentifiers(req)}`);
-    return res.status(result.errorCode).json({
-      success: true,
-      message: "Elicitation retrieved successfully",
-      data: result.data,
-    });
+    return sendElicitationFetchedSuccess(res, result.elicitation);
 
   } catch (error) {
     logWithTime(`❌ [getElicitationController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);

@@ -3,65 +3,70 @@
 const { ElicitationModel } = require("@models/elicitation.model");
 const { isValidMongoID } = require("@utils/id-validators.util");
 const {
-  throwMissingFieldsError,
   throwBadRequestError,
   throwDBResourceNotFoundError,
   throwInternalServerError,
   logMiddlewareError,
 } = require("@/responses/common/error-handler.response");
-const { logWithTime } = require("@/utils/time-stamps.util");
+const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
  * fetchElicitationMiddleware
  *
  * Validates the `:elicitationId` route param, fetches the elicitation from DB,
- * and attaches it to `req.elicitation` for downstream middlewares and controllers.
+ * and attaches it to `req.elicitation` and ensures `req.projectId` is set.
  *
  * Returns 400 if elicitationId is missing or malformed.
  * Returns 404 if no elicitation exists with that id.
  * Returns 400 if the elicitation is soft-deleted (isDeleted === true).
+ *
+ * Usage in route chain:
+ *   router.patch(ROUTE, [...authMiddlewares, fetchElicitationMiddleware, fetchProjectMiddleware, ...otherMiddlewares], controller)
  */
 const fetchElicitationMiddleware = async (req, res, next) => {
   try {
-    const elicitationId = req?.params?.elicitationId || req?.body?.elicitationId;
+    const elicitationId = req?.params?.elicitationId;
 
-    // ── 1. Param presence ────────────────────────────────────────────
+    // ── Guard: elicitationId must be present ────────────────────────────────────
     if (!elicitationId) {
-      return throwMissingFieldsError(res, ["elicitationId"]);
+      logMiddlewareError("fetchElicitationMiddleware", "elicitationId is missing", req);
+      return throwBadRequestError(res, "elicitationId is required");
     }
 
-    // ── 2. Format validation ─────────────────────────────────────────
+    // ── Guard: elicitationId must be a valid MongoDB ID ─────────────────────────
     if (!isValidMongoID(elicitationId)) {
-      return throwBadRequestError(
-        res,
-        "Invalid elicitationId format",
-        "elicitationId must be a valid MongoDB ObjectId string."
-      );
+      logMiddlewareError("fetchElicitationMiddleware", `Invalid MongoDB ID format: ${elicitationId}`, req);
+      return throwBadRequestError(res, "Invalid elicitationId format");
     }
 
-    // ── 3. DB lookup ─────────────────────────────────────────────────
-    const elicitation = await ElicitationModel.findById(elicitationId);
+    // ── Fetch elicitation from DB using lean() ─────────────────────────────────
+    const elicitation = await ElicitationModel.findById(elicitationId).lean();
 
+    // ── Guard: elicitation must exist ───────────────────────────────────────────
     if (!elicitation) {
-      return throwDBResourceNotFoundError(res, "Elicitation");
+      logMiddlewareError("fetchElicitationMiddleware", `Elicitation not found: ${elicitationId}`, req);
+      return throwDBResourceNotFoundError(res, "Elicitation", elicitationId);
     }
 
-    // ── 4. Soft-delete guard ─────────────────────────────────────────
-    if (elicitation.isDeleted) {
-      return throwBadRequestError(
-        res,
-        "Elicitation is deleted",
-        "This elicitation has been deleted and cannot be accessed."
+    // ── Guard: elicitation must not be soft-deleted ──────────────────────────────
+    if (elicitation.isDeleted === true) {
+      logMiddlewareError(
+        "fetchElicitationMiddleware",
+        `Elicitation is deleted: ${elicitationId}`,
+        req
       );
+      return throwBadRequestError(res, "Elicitation has been deleted");
     }
 
-    // ── 5. Attach and continue ───────────────────────────────────────
-    logWithTime(`✅ Elicitation fetched successfully: ${elicitation._id}`);
+    // ── Attach elicitation and projectId to request ──────────────────────────────
     req.elicitation = elicitation;
+    req.projectId = elicitation.projectId.toString();
+
+    logWithTime(`✅ [fetchElicitationMiddleware] Elicitation fetched: ${elicitationId}`);
     return next();
 
   } catch (error) {
-    logMiddlewareError("fetchElicitationMiddleware", `Internal error: ${error.message}`, req);
+    logMiddlewareError("fetchElicitationMiddleware", `Unexpected error: ${error.message}`, req);
     return throwInternalServerError(res, error);
   }
 };

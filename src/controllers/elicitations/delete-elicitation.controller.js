@@ -1,67 +1,68 @@
 // controllers/elicitations/delete-elicitation.controller.js
 
-const { deleteElicitationService } = require("@services/elicitations/delete-elicitation.service");
+const { elicitationServices } = require("@services/elicitations");
 const {
   throwBadRequestError,
   throwInternalServerError,
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
+const { sendElicitationDeletedSuccess } = require("@/responses/success/elicitation.response");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { PriorityLevels } = require("@configs/enums.config");
 
 /**
- * Controller: Delete Elicitation
- *
- * @route  DELETE /software-management-service/api/v1/admin/projects/:projectId/elicitations/:elicitationId
- * @access Private – Admin (must be stakeholder of the project)
- *
- * @param projectId - Project ID from URL params
- * @param elicitationId - Elicitation ID from URL params
- * @body {string} deletionReasonType - Reason for deletion (required)
- * @body {string} [deletionReasonDescription] - Description of deletion reason (required if project criticality = HIGH)
- *
- * @description Soft deletes an elicitation record.
- * If project criticality is HIGH, deletionReasonDescription is mandatory.
- *
- * @returns {200} Elicitation deleted successfully
- * @returns {400} Missing required fields or invalid data
- * @returns {403} User is not a stakeholder of the project
- * @returns {500} Internal server error
+ * DELETE /projects/:projectId/elicitations/:elicitationId
+ * Delete (soft delete) an elicitation.
+ * 
+ * If project criticality is HIGH, description is mandatory.
  */
 const deleteElicitationController = async (req, res) => {
   try {
-    const elicitationId = req.elicitation._id;
-    const projectId = req.project._id;
-    const projectCriticality = req.project.projectCriticality;
     const { deletionReasonType, deletionReasonDescription } = req.body;
-    const deletedBy = req.admin.adminId;
+    const { elicitation, project, stakeholder, auditContext } = req;
 
-    // ── Call service (activity tracking happens inside the service) ──
-    const result = await deleteElicitationService({
-      elicitationId,
-      projectId,
-      projectCriticality,
-      deletionReasonType,
-      deletionReasonDescription,
-      deletedBy,
-      auditContext: {
-        user: req.admin,
-        device: req.device,
-        requestId: req.requestId,
-      },
-    });
+    logWithTime(
+      `📍 [deleteElicitationController] Deleting elicitation: ${elicitation._id} | ${getLogIdentifiers(req)}`
+    );
 
+    // ── Conditional validation: description mandatory for HIGH criticality ─
+    if (project.projectCriticality === PriorityLevels.HIGH) {
+      if (!deletionReasonDescription || deletionReasonDescription.trim().length === 0) {
+        logWithTime(
+          `❌ [deleteElicitationController] Description required for HIGH criticality project | ${getLogIdentifiers(req)}`
+        );
+        return throwBadRequestError(
+          res,
+          "Description is mandatory for HIGH criticality projects",
+          "When project criticality is HIGH, description field is required"
+        );
+      }
+    }
+
+    // ── Call service ──────────────────────────────────────────────────
+    const result = await elicitationServices.deleteElicitationService(
+      elicitation,
+      {
+        deletionReasonType,
+        deletionReasonDescription: deletionReasonDescription || null,
+        deletedBy: req.admin.adminId,
+        auditContext: {
+          user: req.admin,
+          device: req.device,
+          requestId: req.requestId
+        }
+      }
+    );
+
+    // ── Handle error response ─────────────────────────────────────────
     if (!result.success) {
       logWithTime(`❌ [deleteElicitationController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwBadRequestError(res, result.message);
     }
 
-    // ── Success response ──────────────────────────────────────────────
+    // ── Return success response ───────────────────────────────────────
     logWithTime(`✅ [deleteElicitationController] Elicitation deleted successfully | ${getLogIdentifiers(req)}`);
-    return res.status(result.errorCode).json({
-      success: true,
-      message: "Elicitation deleted successfully",
-      data: result.data,
-    });
+    return sendElicitationDeletedSuccess(res, result.elicitation);
 
   } catch (error) {
     logWithTime(`❌ [deleteElicitationController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);

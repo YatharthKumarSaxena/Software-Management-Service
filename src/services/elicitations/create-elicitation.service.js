@@ -1,101 +1,123 @@
 // services/elicitations/create-elicitation.service.js
 
 const mongoose = require("mongoose");
+const { ProjectModel } = require("@models/project.model");
 const { ElicitationModel } = require("@models/elicitation.model");
+const { Phases } = require("@configs/enums.config");
+const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { ElicitationModes } = require("@configs/enums.config");
+const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CREATED, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 /**
- * Creates a new empty elicitation document in the database.
- * 
- * Only Admins who are stakeholders of the project can create elicitations.
+ * Creates a new elicitation document in the database.
  *
  * @param {Object} params
- * @param {string} params.projectId        - Project ID (MongoDB ObjectId)
- * @param {string} params.createdBy        - Admin ID who created the elicitation
- * @param {Object} params.auditContext     - Audit context {user, device, requestId}
+ * @param {string} params.projectId              - Project MongoDB ObjectId
+ * @param {string} params.mode                   - Elicitation mode (OPEN or FAST)
+ * @param {boolean} [params.allowParallelMeetings] - Allow parallel meetings (default: false)
+ * @param {string} params.createdBy              - Admin USR ID
+ * @param {Object} params.auditContext           - { user, device, requestId }
  *
- * @returns {Object} { errorCode, success: true, data } | { errorCode, success: false, message }
+ * @returns {{ success: true, elicitation } | { success: false, message, errorCode }}
  */
 const createElicitationService = async ({
   projectId,
+  mode,
+  allowParallelMeetings,
   createdBy,
   auditContext
 }) => {
   try {
-
-    // ── 1. Validate projectId ────────────────────────────────────────
-    if (!projectId || !mongoose.Types.ObjectId.isValid(projectId)) {
-      logWithTime(`❌ [createElicitationService] Invalid projectId: ${projectId}`);
-      return {
-        errorCode: BAD_REQUEST,
-        success: false,
-        message: "Invalid projectId format"
-      };
+    // ── Step 1: Verify project exists ──────────────────────────────────
+    const project = await ProjectModel.findById(projectId);
+    if (!project) {
+      logWithTime(`❌ [createElicitationService] Project not found: ${projectId}`);
+      return { success: false, message: "Project not found", errorCode: NOT_FOUND };
     }
 
-    // ── 2. Validate createdBy ────────────────────────────────────────
-    if (!createdBy) {
-      logWithTime(`❌ [createElicitationService] Missing createdBy`);
-      return {
-        errorCode: BAD_REQUEST,
-        success: false,
-        message: "createdBy is required"
-      };
-    }
-
-    // ── 3. Generate elicitationId ────────────────────────────────────
-    const elicitationId = new mongoose.Types.ObjectId();
-
-    // ── 4. Create the elicitation (empty - no title, no description) ──
-    const elicitation = await ElicitationModel.create({
-      _id: elicitationId,
-      projectId: new mongoose.Types.ObjectId(projectId),
-      createdBy,
-      title: null,
-      description: null,
-      isFrozen: false,
-      elicitationMode: ElicitationModes.OPEN,
+    // ── Step 2: Check if elicitation already exists ───────────────────
+    const existingElicitation = await ElicitationModel.findOne({
+      projectId,
       isDeleted: false,
-      participants: []
+      isFrozen: false
     });
 
-    // ── 5. Fire-and-forget: activity tracking ────────────────────────
-    const { user, device, requestId } = auditContext || {};
+    if (existingElicitation) {
+      logWithTime(`❌ [createElicitationService] Elicitation already exists for project ${projectId}`);
+      return { success: false, message: "An active elicitation already exists for this project", errorCode: CONFLICT };
+    }
+
+    // ── Step 3: Update project's currentPhase to ELICITATION ─────────
+    logWithTime(`[createElicitationService] Updating project phase to ELICITATION for ${projectId}`);
     
-    logActivityTrackerEvent(
-      user,
-      device,
-      requestId,
-      ACTIVITY_TRACKER_EVENTS.CREATE_ELICITATION,
-      `Elicitation (${elicitation._id}) created for Project ${projectId}`,
-      { oldData: null, newData: elicitation }
+    const oldProjectData = { ...project.toObject ? project.toObject() : project };
+    
+    const updatedProject = await ProjectModel.findByIdAndUpdate(
+      projectId,
+      {
+        currentPhase: Phases.ELICITATION
+        // Agar project level minorVersion increment karni hai, toh yahan: $inc: { minorVersion: 1 } add karo
+      },
+      { new: true }
     );
 
-    logWithTime(`✅ [createElicitationService] Elicitation created successfully: ${elicitation._id}`);
-    return {
-      errorCode: CREATED,
-      success: true,
-      data: { elicitation }
-    };
+    if (!updatedProject) {
+      logWithTime(`❌ [createElicitationService] Failed to update project phase`);
+      return { success: false, message: "Failed to update project phase", errorCode: INTERNAL_ERROR };
+    }
+
+    // Log project update activity
+    const { user, device, requestId } = auditContext || {};
+    const { oldData, newData } = prepareAuditData(oldProjectData, updatedProject);
+    logActivityTrackerEvent(
+      user, device, requestId, ACTIVITY_TRACKER_EVENTS.UPDATE_PROJECT,
+      `Project phase transitioned to ELICITATION`, // Removed the fake minorVersion log
+      { oldData, newData, adminActions: { targetId: projectId } }
+    );
+
+    // ── Step 4: Create phase WITH version management AND additional data ─
+    logWithTime(`[createElicitationService] Creating ELICITATION phase document`);
+    
+    // Pass both mode and allowParallelMeetings to the phase management service
+    const phaseResult = await createPhaseWithVersionManagement({
+      project: updatedProject,
+      createdBy,
+      auditContext,
+      additionalData: { 
+        elicitationMode: mode,
+        allowParallelMeetings: allowParallelMeetings || false
+      }
+    });
+
+    if (!phaseResult.success) {
+      logWithTime(`❌ [createElicitationService] Failed to create phase: ${phaseResult.message}`);
+      
+      // OPTIONAL BUT RECOMMENDED: Agar phase banne mein error aaye, 
+      // toh Project ka phase wapas Inception par revert karne ka logic yahan likh sakte ho (Manual Rollback).
+      
+      return {
+        success: false,
+        message: phaseResult.message,
+        errorCode: phaseResult.errorCode || INTERNAL_ERROR
+      };
+    }
+
+    // ── Step 5: DELETED! (Because phaseResult.phase ALREADY contains the new document) ──
+
+    logWithTime(`✅ [createElicitationService] Elicitation created with ID: ${phaseResult.phase._id} and mode: ${mode}`);
+    
+    // Return the phase generated by our common service
+    return { success: true, elicitation: phaseResult.phase };
 
   } catch (error) {
     logWithTime(`❌ [createElicitationService] Error: ${error.message}`);
     if (error.name === "ValidationError") {
-      return {
-        errorCode: BAD_REQUEST,
-        success: false,
-        message: "Validation error: " + error.message
-      };
+      return { success: false, message: "Validation error", error: error.message };
     }
-    return {
-      errorCode: INTERNAL_ERROR,
-      success: false,
-      message: "Internal error while creating elicitation"
-    };
+    return { success: false, message: "Internal error while creating elicitation", error: error.message };
   }
 };
 

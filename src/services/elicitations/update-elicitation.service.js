@@ -3,108 +3,132 @@
 const { ElicitationModel } = require("@models/elicitation.model");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
+const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { OK, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 /**
- * Updates an elicitation record with provided data.
+ * Updates an elicitation's mode and/or allowParallelMeetings.
  * 
- * Protected fields (cannot be updated): _id, projectId, isDeleted, deletedAt, deletedBy, createdBy
+ * For allowParallelMeetings toggle validation:
+ *   - If meetingIds.length === 0: always allow toggle
+ *   - If meetingIds.length > 0 AND toggling from true to false:
+ *     - Fetch all meetings and check if any status is not COMPLETED/CANCELLED
+ *     - If found, block the toggle
+ *   - If toggling from false to true: always allow (no meeting check)
  *
+ * @param {Object} elicitation - Elicitation document (already validated by middleware)
  * @param {Object} params
- * @param {string} params.elicitationId - Elicitation ID
- * @param {string} params.projectId     - Project ID
- * @param {Object} params.updateData    - Fields to update
- * @param {string} params.updatedBy     - Admin ID who updated
- * @param {Object} params.auditContext  - Audit context {user, device, requestId}
+ * @param {string} [params.mode] - New elicitation mode
+ * @param {boolean} [params.allowParallelMeetings] - Toggle parallel meetings
+ * @param {string} params.updatedBy - User ID who updated
+ * @param {Object} params.auditContext - Audit context {user, device, requestId}
  *
- * @returns {Object} { errorCode, success: true, data } | { errorCode, success: false, message }
+ * @returns {Object} { success: true, elicitation } | { success: false, message }
  */
-const updateElicitationService = async ({
-  elicitationId,
-  projectId,
-  updateData,
-  updatedBy,
-  auditContext
-}) => {
+const updateElicitationService = async (
+  elicitation,
+  { mode, allowParallelMeetings, updatedBy, auditContext }
+) => {
   try {
+    const { MeetingModel } = require("@models/meeting.model");
+    const { MeetingStatuses } = require("@configs/enums.config");
 
-    // ── 1. Fetch the current elicitation ─────────────────────────────
-    const oldElicitation = await ElicitationModel.findById(elicitationId);
+    // ── 1. Check if any changes are being made ────────────────────────
+    const modeChanged = mode !== undefined && elicitation.elicitationMode !== mode;
+    const allowParallelChanged = allowParallelMeetings !== undefined && elicitation.allowParallelMeetings !== allowParallelMeetings;
 
-    if (!oldElicitation) {
-      logWithTime(`❌ [updateElicitationService] Elicitation not found: ${elicitationId}`);
+    if (!modeChanged && !allowParallelChanged) {
+      logWithTime(
+        `⚠️ [updateElicitationService] No changes detected.`
+      );
       return {
-        errorCode: BAD_REQUEST,
-        success: false,
-        message: "Elicitation not found"
+        success: true,
+        message: "No changes detected"
       };
     }
 
-    // ── 2. Verify it belongs to the project ──────────────────────────
-    if (oldElicitation.projectId.toString() !== projectId.toString()) {
-      logWithTime(`❌ [updateElicitationService] Elicitation does not belong to project ${projectId}`);
-      return {
-        errorCode: BAD_REQUEST,
-        success: false,
-        message: "Elicitation does not belong to the specified project"
-      };
-    }
+    // ── 2. If toggling allowParallelMeetings from true to false, validate meetings ────────
+    if (allowParallelChanged && elicitation.allowParallelMeetings === true && allowParallelMeetings === false) {
+      logWithTime(
+        `🔍 [updateElicitationService] Validating meeting statuses before disabling parallel meetings`
+      );
+      
+      // Check if there are any meetings
+      if (elicitation.meetingIds && elicitation.meetingIds.length > 0) {
+        // Fetch all meetings to check their status
+        const meetings = await MeetingModel.find(
+          { _id: { $in: elicitation.meetingIds }, isDeleted: false },
+          { status: 1 }
+        ).lean();
 
-    // ── 3. Protect sensitive fields from updates ─────────────────────
-    const protectedFields = ['_id', 'projectId', 'isDeleted', 'deletedAt', 'deletedBy', 'createdBy', 'createdAt'];
-    const sanitizedUpdateData = { ...updateData };
-    
-    protectedFields.forEach(field => {
-      if (field in sanitizedUpdateData) {
-        logWithTime(`⚠️ [updateElicitationService] Attempted to update protected field: ${field}`);
-        delete sanitizedUpdateData[field];
+        // Check if any meeting is not COMPLETED or CANCELLED
+        const ongoingMeetings = meetings.filter(m => 
+          m.status !== MeetingStatuses.COMPLETED && m.status !== MeetingStatuses.CANCELLED
+        );
+
+        if (ongoingMeetings.length > 0) {
+          logWithTime(
+            `⛔ [updateElicitationService] Cannot disable parallel meetings: ${ongoingMeetings.length} ongoing/scheduled meetings found`
+          );
+          return {
+            success: false,
+            message: "Mode change not possible due to ongoing meetings"
+          };
+        }
       }
-    });
+    }
 
-    // ── 4. Set updatedBy and updatedAt ───────────────────────────────
-    sanitizedUpdateData.updatedBy = updatedBy;
-    sanitizedUpdateData.updatedAt = new Date();
-
-    // ── 5. Update the elicitation ────────────────────────────────────
-    const updatedElicitation = await ElicitationModel.findByIdAndUpdate(
-      elicitationId,
-      sanitizedUpdateData,
-      { new: true, runValidators: true }
-    );
-
-    // ── 6. Fire-and-forget: activity tracking ────────────────────────
-    const { user, device, requestId } = auditContext || {};
+    // ── 3. Build update payload ────────────────────────────────────────
+    const updatePayload = { updatedBy, updatedAt: new Date() };
     
-    logActivityTrackerEvent(
-      user,
-      device,
-      requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_ELICITATION,
-      `Elicitation (${elicitationId}) updated in Project ${projectId}`,
-      { oldData: oldElicitation, newData: updatedElicitation }
+    if (modeChanged) {
+      updatePayload.elicitationMode = mode;
+    }
+    
+    if (allowParallelChanged) {
+      updatePayload.allowParallelMeetings = allowParallelMeetings;
+    }
+
+    // ── 4. Update via atomic findByIdAndUpdate ────────────────────
+    const updatedElicitation = await ElicitationModel.findByIdAndUpdate(
+      elicitation._id,
+      { $set: updatePayload },
+      { new: true }
     );
 
-    logWithTime(`✅ [updateElicitationService] Elicitation updated successfully: ${elicitationId}`);
+    // ── 5. Log activity tracker event (only if changed) ────────────
+    if (updatedElicitation) {
+      const { user, device, requestId } = auditContext || {};
+      const { oldData, newData } = prepareAuditData(elicitation, updatedElicitation);
+
+      let changeDesc = [];
+      if (modeChanged) changeDesc.push(`mode: '${elicitation.elicitationMode}' → '${mode}'`);
+      if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${elicitation.allowParallelMeetings} → ${allowParallelMeetings}`);
+
+      logActivityTrackerEvent(
+        user,
+        device,
+        requestId,
+        ACTIVITY_TRACKER_EVENTS.UPDATE_ELICITATION,
+        `Elicitation updated: ${changeDesc.join(', ')}`,
+        { oldData, newData }
+      );
+
+      logWithTime(
+        `✅ [updateElicitationService] Elicitation updated: ${elicitation._id}`
+      );
+    }
+
     return {
-      errorCode: OK,
       success: true,
-      data: { elicitation: updatedElicitation }
+      elicitation: updatedElicitation
     };
 
   } catch (error) {
     logWithTime(`❌ [updateElicitationService] Error: ${error.message}`);
-    if (error.name === "ValidationError") {
-      return {
-        errorCode: BAD_REQUEST,
-        success: false,
-        message: "Validation error: " + error.message
-      };
-    }
     return {
-      errorCode: INTERNAL_ERROR,
       success: false,
-      message: "Internal error while updating elicitation"
+      message: error.message
     };
   }
 };

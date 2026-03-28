@@ -1,15 +1,14 @@
 // middlewares/elicitations/validate-request-body.middleware.js
 
-const { validationSets } = require("@/configs/validation-sets.config");
-const { validateBody } = require("@middlewares/factory/field-validation.middleware-factory");
+const {
+  requiredFields
+} = require("@configs/required-fields.config");
+const { checkBodyPresence } = require("../factory/validate-request-body.middleware-factory");
 
-const validationMiddlewares = {
-  deleteElicitationValidationMiddleware: validateBody("deleteElicitation", validationSets.deleteElicitationValidationSet),
-  updateElicitationValidationMiddleware: validateBody("updateElicitation", validationSets.updateElicitationValidationSet),
-  createFastValidationMiddleware: validateBody("createFast", validationSets.createFastValidationSet),
-  updateFastValidationMiddleware: validateBody("updateFast", validationSets.updateFastValidationSet),
-  addFastParticipantValidationMiddleware: validateBody("addFastParticipant", validationSets.addFastParticipantValidationSet),
-  removeFastParticipantValidationMiddleware: validateBody("removeFastParticipant", validationSets.removeFastParticipantValidationSet),
+const presenceMiddlewares = { 
+  createElicitationPresenceMiddleware: checkBodyPresence("createElicitationPresence", requiredFields.createElicitationField),
+  updateElicitationPresenceMiddleware: checkBodyPresence("updateElicitationPresence", requiredFields.updateElicitationField),
+  deleteElicitationPresenceMiddleware: checkBodyPresence("deleteElicitationPresence", requiredFields.deleteElicitationField)
 };
 
-module.exports = { validationMiddlewares };
+module.exports = { presenceMiddlewares };
