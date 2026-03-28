@@ -9,14 +9,19 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 /**
  * Soft-deletes an inception (sets isDeleted = true).
  *
- * Guards:
- *   1. Prevents deletion if the project type is DEVELOPMENT
- *   2. Project must be in ACTIVE or DRAFT status (checked via middleware)
+ * Logic:
+ *   1. Check if a frozen inception exists for this project
+ *   2. If frozen inception EXISTS → allow deletion ✅
+ *   3. If frozen inception DOES NOT EXIST:
+ *      - If project type is DEVELOPMENT → block deletion ❌
+ *      - If project type is NOT DEVELOPMENT → allow deletion ✅
+ *   4. Validate criticality & description
  *
- * @param {Object} inception
+ * @param {Object} inception - Inception to delete (latest non-frozen)
  * @param {string} inception._id
  * @param {string} inception.projectId
  * @param {Object} params
+ * @param {Object} params.project - Project document
  * @param {string} params.deletedBy - Admin USR ID
  * @param {string} params.deletionReasonType - Enum reason for deletion
  * @param {string} [params.deletionReasonDescription] - Optional description
@@ -28,6 +33,7 @@ const deleteInceptionService = async (inception, params) => {
   try {
     const { project, deletedBy, deletionReasonType, deletionReasonDescription, auditContext } = params;
     
+    // ── 1. Check project status ────────────────────────────────────────
     if (project.projectStatus !== ProjectStatus.ACTIVE && project.projectStatus !== ProjectStatus.DRAFT) {
       return {
         success: false,
@@ -35,14 +41,23 @@ const deleteInceptionService = async (inception, params) => {
       };
     }
 
-    // ── Guard 1: Check if project type is DEVELOPMENT ──────────────────────────
-    if (project.projectType === ProjectTypes.DEVELOPMENT) {
+    // ── 2. Check if FROZEN inception exists for this project ──────────
+    const frozenInception = await InceptionModel.findOne({
+      projectId: project._id,
+      isFrozen: true,
+      isDeleted: false
+    }).lean();
+
+    // ── 3. Guard: If NO frozen inception AND project type is DEVELOPMENT ──
+    // (Only block if no frozen doc exists)
+    if (!frozenInception && project.projectType === ProjectTypes.DEVELOPMENT) {
       return {
         success: false,
         message: "Inception cannot be deleted for Project Development type."
       };
     }
 
+    // ── 4. Check criticality and description ────────────────────────
     if (project.projectCriticality === PriorityLevels.CRITICAL && !deletionReasonDescription) {
       return {
         success: false,
@@ -50,7 +65,7 @@ const deleteInceptionService = async (inception, params) => {
       };
     }
 
-    // ── Soft-delete the inception ────────────────────────────────────────────
+    // ── 5. Soft-delete the inception ────────────────────────────────
     const updatePayload = {
       isDeleted: true,
       deletedAt: new Date(),
@@ -65,7 +80,7 @@ const deleteInceptionService = async (inception, params) => {
       { new: true, runValidators: true }
     );
 
-    // ── Fire-and-forget: activity tracking ───────────────────────────────────
+    // ── 6. Activity tracking ────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(inception, updatedInception);
 

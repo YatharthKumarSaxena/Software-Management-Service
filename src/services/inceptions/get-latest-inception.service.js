@@ -1,34 +1,24 @@
 // services/inceptions/get-latest-inception.service.js
 
-const { InceptionModel } = require("@models/inception.model");
-
 /**
- * Fetches the latest (highest version.major) inception for a given project.
+ * Returns the latest inception that was already fetched by middleware.
  *
- * @param {string} projectId - Project MongoDB ObjectId
+ * @param {Object} inception - Latest inception document (fetched by fetchLatestInceptionMiddleware)
  *
- * @returns {{ success: true, inception } | { success: false, message }}
+ * @returns {{ success: true, inception }}
  */
-const getLatestInceptionService = async (projectId) => {
+const getLatestInceptionService = async (inception) => {
   try {
-    const latestInception = await InceptionModel
-      .findOne({
-        projectId,
-        isDeleted: false
-      })
-      .sort({ "version.major": -1 })
-      .lean();
-
-    if (!latestInception) {
+    if (!inception) {
       return {
         success: false,
-        message: "No inception found for this project."
+        message: "No inception found"
       };
     }
 
     return {
       success: true,
-      inception: latestInception
+      inception
     };
   } catch (error) {
     return {

@@ -5,8 +5,7 @@ const { sendLatestInceptionFetchedSuccess } = require("@/responses/success/incep
 const {
   throwInternalServerError,
   getLogIdentifiers,
-  throwSpecificInternalServerError,
-  throwDBResourceNotFoundError
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 
@@ -25,17 +24,16 @@ const { logWithTime } = require("@utils/time-stamps.util");
  */
 const getLatestInceptionController = async (req, res) => {
   try {
+    const inception = req.inception; // From fetchLatestInceptionMiddleware
 
-    const  projectId = req.project._id;
+    logWithTime(
+      `📍 [getLatestInceptionController] Fetching latest inception for project | ${getLogIdentifiers(req)}`
+    );
 
     // Call service
-    const result = await getLatestInceptionService(projectId);
+    const result = await getLatestInceptionService(inception);
 
     if (!result.success) {
-      if (result.message === "No inception found for this project.") {
-        logWithTime(`⚠️ [getLatestInceptionController] No inception found for projectId: ${projectId} | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Inception");
-      }
       logWithTime(`❌ [getLatestInceptionController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, "Inception");
     }

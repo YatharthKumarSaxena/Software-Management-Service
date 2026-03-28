@@ -11,26 +11,35 @@ const {
 const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
- * Controller: Delete an Inception
+ * Controller: Delete Latest Inception for a Project
  *
- * @route  DELETE /software-management-service/api/v1/inceptions/delete/:inceptionId
+ * @route  DELETE /software-management-service/api/v1/inceptions/delete/:projectId
  * @access Private – CEO only
  *
- * Soft-deletes an inception (sets isDeleted = true, deletedAt, deletedBy).
+ * Soft-deletes the latest (most recent) inception for a project.
  * Prevents deletion if the associated project type is DEVELOPMENT.
  *
+ * Expects:
+ *   - req.project: Fetched by fetchProjectMiddleware
+ *   - req.inception: Latest inception (fetched by fetchLatestInceptionMiddleware)
+ *   - req.body: { deletionReasonType, deletionReasonDescription }
+ *
  * @returns {200} Inception deleted successfully
- * @returns {400} Invalid inceptionId
+ * @returns {400} Invalid projectId or validation failed
  * @returns {403} Project Development type - deletion not allowed
- * @returns {404} Inception not found
+ * @returns {404} Project or inception not found
  * @returns {500} Internal server error
  */
 const deleteInceptionController = async (req, res) => {
   try {
     const { adminId } = req.admin;
-    const { project } = req; // From projectMiddlewares.fetchProjectMiddleware
-    const inception = req.inception; // From fetchInceptionMiddleware
+    const { project } = req; // From fetchProjectMiddleware
+    const inception = req.inception; // From fetchLatestInceptionMiddleware
     const { deletionReasonType, deletionReasonDescription } = req.body;
+
+    logWithTime(
+      `📍 [deleteInceptionController] Deleting latest inception for project: ${project._id} | ${getLogIdentifiers(req)}`
+    );
 
     // Call service with deletion logic and Project Development guard
     const result = await deleteInceptionService(inception, {
