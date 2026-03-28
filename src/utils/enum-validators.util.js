@@ -27,6 +27,9 @@ const {
   ApproveProductRequestReasonType,
   RejectProductRequestReasonType,
   ProjectActivationReason,
+  ChangeProjectOwnerReasons,
+  ElicitationModes,
+  PhaseDeletionReason,
   ScopeTypes,
   CommentEntityTypes
 } = require("@configs/enums.config");
@@ -83,6 +86,9 @@ const PriorityLevelsHelper = createEnumHelper(PriorityLevels, "PriorityLevels");
 const ApproveProductRequestReasonTypeHelper = createEnumHelper(ApproveProductRequestReasonType, "ApproveProductRequestReasonType");
 const RejectProductRequestReasonTypeHelper = createEnumHelper(RejectProductRequestReasonType, "RejectProductRequestReasonType");
 const ProjectActivationReasonHelper = createEnumHelper(ProjectActivationReason, "ProjectActivationReason");
+const ChangeProjectOwnerReasonsHelper = createEnumHelper(ChangeProjectOwnerReasons, "ChangeProjectOwnerReasons");
+const ElicitationModesHelper = createEnumHelper(ElicitationModes, "ElicitationModes");
+const PhaseDeletionReasonHelper = createEnumHelper(PhaseDeletionReason, "PhaseDeletionReason");
 const ScopeTypesHelper = createEnumHelper(ScopeTypes, "ScopeTypes");
 const CommentEntityTypesHelper = createEnumHelper(CommentEntityTypes, "CommentEntityTypes");
 
@@ -111,6 +117,9 @@ module.exports = {
   ApproveProductRequestReasonTypeHelper,
   RejectProductRequestReasonTypeHelper,
   ProjectActivationReasonHelper,
+  ChangeProjectOwnerReasonsHelper,
+  ElicitationModesHelper,
+  PhaseDeletionReasonHelper,
   ScopeTypesHelper,
   CommentEntityTypesHelper
 };

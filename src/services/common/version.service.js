@@ -1,6 +1,6 @@
 // services/common/version.service.js
 
-const { Phases, ValidationPhaseStatus } = require("@configs/enums.config");
+const { Phases } = require("@configs/enums.config");
 const { InceptionModel } = require("@models/inception.model");
 const { ElicitationModel } = require("@models/elicitation.model");
 const { ElaborationModel } = require("@models/elaboration.model");
@@ -24,30 +24,15 @@ const PHASE_MODEL_MAP = {
 const determineNextVersion = async (project, PhaseModel) => {
   const projectId = project._id;
 
-  const latestValidation = await ValidationModel
+  const existingPhaseDoc = await PhaseModel
     .findOne({ projectId, isDeleted: false })
     .sort({ "version.major": -1 })
     .lean();
-
-  const existingPhaseDoc = await PhaseModel
-    .findOne({ projectId, isDeleted: false })
-    .sort({ "version.major": -1, "version.minor": -1 })
-    .lean();
-
-  const shouldIncrementCycle =
-    latestValidation &&
-    latestValidation.status === ValidationPhaseStatus.COMPLETED &&
-    latestValidation.isApproved === true;
 
   let version;
 
   if (!existingPhaseDoc?.version) {
     version = { major: 1, minor: 0 };
-  } else if (shouldIncrementCycle) {
-    version = {
-      major: existingPhaseDoc.version.major + 1,
-      minor: 0
-    };
   } else {
     version = {
       major: existingPhaseDoc.version.major,
