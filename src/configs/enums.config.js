@@ -292,7 +292,8 @@ const ProjectRoleTypes = Object.freeze({
   DEVELOPER: "developer",
   TESTER: "tester",
   ANALYST: "analyst",
-  OTHER: "other"
+  OTHER: "other",
+  OWNER: "owner"
 });
 
 const ProjectCategoryTypes = Object.freeze({
@@ -406,6 +407,96 @@ const MeetingPlatformTypes = Object.freeze({
   OTHER: "OTHER"
 });
 
+const MeetingStatuses = Object.freeze({
+  DRAFT: "DRAFT",
+  SCHEDULED: "SCHEDULED",
+  ONGOING: "ONGOING",
+  COMPLETED: "COMPLETED",
+  CANCELLED: "CANCELLED"
+});
+
+const RelationTypes = Object.freeze({
+  DEPENDS_ON: "DEPENDS_ON",
+  REQUIRES: "REQUIRES",              // soft dependency
+  BLOCKS: "BLOCKS",
+  DUPLICATE_OF: "DUPLICATE_OF",
+
+  RELATED_TO: "RELATED_TO",
+  CONFLICTS_WITH: "CONFLICTS_WITH",
+
+  REFINES: "REFINES",
+  DERIVED_FROM: "DERIVED_FROM",
+
+  PRECEDES: "PRECEDES"               // sequencing
+});
+
+const ContributionTypes = Object.freeze({
+  PRIMARY: "PRIMARY",
+  SUPPORTING: "SUPPORTING"
+});
+
+const RejectedReasonTypes = Object.freeze({
+  OUT_OF_SCOPE: "OUT_OF_SCOPE",
+  DUPLICATE: "DUPLICATE",
+  BUSINESS_DECISION: "BUSINESS_DECISION",
+  TECHNICAL_LIMITATION: "TECHNICAL_LIMITATION",
+  OTHER: "OTHER"
+});
+
+const DeferredReasonTypes = Object.freeze({
+  LOW_PRIORITY: "LOW_PRIORITY",
+  DEPENDENCY_ISSUE: "DEPENDENCY_ISSUE",
+  CLARIFICATION_NEEDED: "CLARIFICATION_NEEDED",
+  RESOURCE_CONSTRAINT: "RESOURCE_CONSTRAINT",
+  OTHER: "OTHER"
+});
+
+const ChangeProjectOwnerReasons = Object.freeze({
+  RESIGNATION: "resignation",
+  ROLE_CHANGE: "role_change",
+  PERFORMANCE_ISSUES: "performance_issues",
+  PERSONAL_REASONS: "personal_reasons",
+  OTHER: "other"
+});
+
+const MeetingGroups = Object.freeze({
+  GENERAL: "GENERAL",
+
+  // Core System Areas
+  AUTH: "AUTH",
+  PAYMENT: "PAYMENT",
+  NOTIFICATION: "NOTIFICATION",
+  SEARCH: "SEARCH",
+  ANALYTICS: "ANALYTICS",
+
+  // Product / Feature Areas
+  USER_MANAGEMENT: "USER_MANAGEMENT",
+  ORDER_MANAGEMENT: "ORDER_MANAGEMENT",
+  INVENTORY: "INVENTORY",
+  BILLING: "BILLING",
+
+  // Integration & External
+  THIRD_PARTY: "THIRD_PARTY",
+  API: "API",
+  INTEGRATION: "INTEGRATION",
+
+  // Technical / Engineering
+  PERFORMANCE: "PERFORMANCE",
+  SECURITY: "SECURITY",
+  DATABASE: "DATABASE",
+  INFRASTRUCTURE: "INFRASTRUCTURE",
+
+  // Process / Discussion Types
+  REQUIREMENTS: "REQUIREMENTS",
+  DESIGN: "DESIGN",
+  REVIEW: "REVIEW",
+  PLANNING: "PLANNING",
+
+  // Misc
+  BUG_FIX: "BUG_FIX",
+  ENHANCEMENT: "ENHANCEMENT",
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -461,5 +552,12 @@ module.exports = {
   CommentSpecifiedEntityTypes,
   ParticipantTypes,
   ElicitationModes,
-  MeetingPlatformTypes
+  MeetingPlatformTypes,
+  MeetingStatuses,
+  RelationTypes,
+  ContributionTypes,
+  RejectedReasonTypes,
+  DeferredReasonTypes,
+  ChangeProjectOwnerReasons,
+  MeetingGroups
 };

@@ -19,7 +19,8 @@ const DB_COLLECTIONS = {
     COMMENTS: "comments",
     REQUIREMENTS: "requirements",
     HIGH_LEVEL_FEATURES: "high_level_features",
-    FEATURE_REQUIREMENT_MAPPINGS: "feature_requirement_mappings"
+    FEATURE_REQUIREMENT_MAPPINGS: "feature_requirement_mappings",
+    MEETINGS: "meetings"
 }
 
 module.exports = { DB_COLLECTIONS };

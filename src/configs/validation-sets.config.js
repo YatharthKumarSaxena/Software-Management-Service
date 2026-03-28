@@ -13,6 +13,7 @@ const validationSets = {
     deleteProjectValidationSet: getValidationSet(FieldDefinitions.DELETE_PROJECT),
     archiveProjectValidationSet: getValidationSet(FieldDefinitions.ARCHIVE_PROJECT),
     activateProjectValidationSet: getValidationSet(FieldDefinitions.ACTIVATE_PROJECT),
+    changeProjectOwnerValidationSet: getValidationSet(FieldDefinitions.CHANGE_PROJECT_OWNER),
     createStakeholderValidationSet: getValidationSet(FieldDefinitions.CREATE_STAKEHOLDER),
     updateStakeholderValidationSet: getValidationSet(FieldDefinitions.UPDATE_STAKEHOLDER),
     deleteStakeholderValidationSet: getValidationSet(FieldDefinitions.DELETE_STAKEHOLDER),
@@ -34,7 +35,10 @@ const validationSets = {
     createCommentValidationSet: getValidationSet(FieldDefinitions.CREATE_COMMENT),
     updateCommentValidationSet: getValidationSet(FieldDefinitions.UPDATE_COMMENT),
     deleteCommentValidationSet: getValidationSet(FieldDefinitions.DELETE_COMMENT),
-    deleteInceptionValidationSet: getValidationSet(FieldDefinitions.DELETE_INCEPTION)
+    deleteInceptionValidationSet: getValidationSet(FieldDefinitions.DELETE_INCEPTION),
+    createElicitationValidationSet: getValidationSet(FieldDefinitions.CREATE_ELICITATION),
+    updateElicitationValidationSet: getValidationSet(FieldDefinitions.UPDATE_ELICITATION),
+    deleteElicitationValidationSet: getValidationSet(FieldDefinitions.DELETE_ELICITATION)
 
 };
 

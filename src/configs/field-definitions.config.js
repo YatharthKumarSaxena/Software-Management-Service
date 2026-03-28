@@ -220,6 +220,34 @@ const FieldDefinitions = {
     },
   },
 
+  // ── CHANGE PROJECT OWNER ────────────────────────────────────────────
+  CHANGE_PROJECT_OWNER: {
+    USER_ID: {
+      field: "userId",
+      required: true,
+      validation: validationRules.userId,
+      description: "USR-prefixed custom user ID of the new owner"
+    },
+    CHANGE_OWNER_REASON_TYPE: {
+      field: "changeOwnerReasonType",
+      required: true,
+      validation: validationRules.changeOwnerReasonType,
+      description: "Reason category for changing the owner (enum)"
+    },
+    DESCRIPTION: {
+      field: "ownerChangeReasonDescription",
+      required: false,
+      validation: validationRules.reasonDescription,
+      description: "Optional description (mandatory if criticality is CRITICAL)"
+    },
+    PREV_OWNER_ROLE: {
+      field: "prevOwnerRole",
+      required: false,
+      validation: validationRules.projectRole,
+      description: "New role for the previous owner (optional, cannot be owner type; if not provided, defaults to analyst)"
+    },
+  },
+
   // ── DELETE PROJECT ───────────────────────────────────────────────────
   DELETE_PROJECT: {
     DELETION_REASON_TYPE: {
@@ -613,6 +641,42 @@ const FieldDefinitions = {
       required: false,
       validation: validationRules.reasonDescription,
       description: "Optional free-text elaboration on deletion reason"
+    },
+  },
+
+  // ── CREATE ELICITATION ───────────────────────────────────────────
+  CREATE_ELICITATION: {
+    MODE: {
+      field: "mode",
+      required: true,
+      validation: validationRules.elicitationMode,
+      description: "Elicitation mode: OPEN | FAST (enum)"
+    },
+  },
+
+  // ── UPDATE ELICITATION ───────────────────────────────────────────
+  UPDATE_ELICITATION: {
+    MODE: {
+      field: "mode",
+      required: true,
+      validation: validationRules.elicitationMode,
+      description: "Updated elicitation mode: OPEN | FAST (enum)"
+    },
+  },
+
+  // ── DELETE ELICITATION ───────────────────────────────────────────
+  DELETE_ELICITATION: {
+    DELETION_REASON_TYPE: {
+      field: "deletionReasonType",
+      required: true,
+      validation: validationRules.phaseDeletionReasonType,
+      description: "Reason category for deleting elicitation (enum)"
+    },
+    DELETION_REASON_DESCRIPTION: {
+      field: "deletionReasonDescription",
+      required: false,
+      validation: validationRules.reasonDescription,
+      description: "Optional description (mandatory if criticality = HIGH)"
     },
   },
 

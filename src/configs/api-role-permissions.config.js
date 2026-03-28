@@ -60,6 +60,11 @@ const ApiRolePermissions = Object.freeze({
       AdminRoleTypes.MANAGER,
     ],
 
+    changeProjectOwner: [
+      AdminRoleTypes.CEO,
+      AdminRoleTypes.MANAGER,
+    ],
+
     getProject: [
       AdminRoleTypes.CEO,
       AdminRoleTypes.BUSINESS_ANALYST,

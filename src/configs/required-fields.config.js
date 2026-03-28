@@ -26,6 +26,7 @@ const requiredFields = {
     deleteProjectField  :getRequiredFields(FieldDefinitions.DELETE_PROJECT),
     archiveProjectField :getRequiredFields(FieldDefinitions.ARCHIVE_PROJECT),
     activateProjectField :getRequiredFields(FieldDefinitions.ACTIVATE_PROJECT),
+    changeProjectOwnerField :getRequiredFields(FieldDefinitions.CHANGE_PROJECT_OWNER),
 
     // ── Stakeholder ──────────────────────────────────────────────────────────────
     createStakeholderField:getRequiredFields(FieldDefinitions.CREATE_STAKEHOLDER),
@@ -61,7 +62,12 @@ const requiredFields = {
     commentEntityField:getRequiredFields(FieldDefinitions.COMMENT_ENTITY),
 
     // ── Inception ────────────────────────────────────────────────────────────────
-    deleteInceptionField:getRequiredFields(FieldDefinitions.DELETE_INCEPTION)
+    deleteInceptionField:getRequiredFields(FieldDefinitions.DELETE_INCEPTION),
+
+    // ── Elicitation ───────────────────────────────────────────────────────────────
+    createElicitationField:getRequiredFields(FieldDefinitions.CREATE_ELICITATION),
+    updateElicitationField:getRequiredFields(FieldDefinitions.UPDATE_ELICITATION),
+    deleteElicitationField:getRequiredFields(FieldDefinitions.DELETE_ELICITATION)
 }
 
 module.exports = {

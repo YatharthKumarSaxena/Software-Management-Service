@@ -65,7 +65,8 @@ module.exports = {
         ARCHIVE_PROJECT: `/archive/:projectId`,           // PATCH   /api/v1/projects/archive/:projectId
         GET_PROJECT:     `/get/:projectId`,               // GET     /api/v1/projects/get/:projectId
         LIST_PROJECTS:    `/list`,                        // GET     /api/v1/projects/list
-        ACTIVATE_PROJECT: `/activate/:projectId`         // PATCH   /api/v1/projects/activate/:projectId
+        ACTIVATE_PROJECT: `/activate/:projectId`,         // PATCH   /api/v1/projects/activate/:projectId
+        CHANGE_PROJECT_OWNER: `/change-owner/:projectId`  // PATCH   /api/v1/projects/change-owner/:projectId
     },
     STAKEHOLDER_ROUTES: {
         CREATE_STAKEHOLDER: `/create`,                     // POST    /api/v1/stakeholders/create
@@ -125,10 +126,12 @@ module.exports = {
     },
     ELICITATION_ROUTES: {
         CREATE_ELICITATION: `/create/:projectId`,  // POST /api/v1/elicitations/create/:projectId
-        UPDATE_ELICITATION: `/update/:projectId/:elicitationId`, // PATCH /api/v1/elicitations/update/:projectId/:elicitationId
-        DELETE_ELICITATION: `/delete/:projectId/:elicitationId`, // DELETE /api/v1/elicitations/delete/:projectId/:elicitationId
-        GET_ELICITATION:    `/get/:projectId/:elicitationId`,    // GET /api/v1/elicitations/get/:projectId/:elicitationId
-        LIST_ELICITATIONS:  `/list/:projectId`       // GET /api/v1/elicitations/list/:projectId
+        UPDATE_ELICITATION: `/update/:projectId`, // PATCH /api/v1/elicitations/update/:projectId/:elicitationId
+        DELETE_ELICITATION: `/delete/:projectId`, // DELETE /api/v1/elicitations/delete/:projectId/:elicitationId
+        GET_ELICITATION:    `/get/:elicitationId`,    // GET /api/v1/elicitations/get/:projectId/:elicitationId
+        GET_LATEST_ELICITATION: `/latest/:projectId`,            // GET /api/v1/elicitations/latest/:projectId
+        LIST_ELICITATIONS:  `/list/:projectId`,       // GET /api/v1/elicitations/list/:projectId
+        FREEZE_ELICITATION: `/freeze/:projectId`  // PATCH /api/v1/elicitations/freeze/:elicitationId
     },
     FAST_ROUTES: {
         CREATE_FAST: `/create/:projectId`, // POST /api/v1/fast/create/:projectId
@@ -143,6 +146,8 @@ module.exports = {
         GET_LATEST_INCEPTION: `/get-latest/:projectId`,      // GET /software-management-service/api/v1/inceptions/get/:projectId
         GET_INCEPTION:    `/get/:inceptionId`,      // GET /api/v1/inceptions/get/:inceptionId
         LIST_INCEPTIONS:  `/list/:projectId`,     // GET /api/v1/inceptions/list/:projectId
-        DELETE_INCEPTION: `/delete/:inceptionId`  // DELETE /api/v1/inceptions/delete/:inceptionId
+        DELETE_INCEPTION: `/delete/:projectId`,  // DELETE /api/v1/inceptions/delete/:inceptionId
+        CREATE_INCEPTION: `/create/:projectId`,  // POST /api/v1/inceptions/create/:projectId
+        FREEZE_INCEPTION: `/freeze/:projectId`  // PATCH /api/v1/inceptions/freeze/:inceptionId
     }
 };

@@ -23,6 +23,9 @@ const {
   ProjectTypesHelper,
   PriorityLevelsHelper,
   ProjectActivationReasonHelper,
+  ChangeProjectOwnerReasonsHelper,
+  ElicitationModesHelper,
+  PhaseDeletionReasonHelper,
   ApproveProductRequestReasonTypeHelper,
   RejectProductRequestReasonTypeHelper,
   ScopeTypesHelper,
@@ -127,6 +130,9 @@ const validationRules = {
   projectActivationReasonType: {
     enum: ProjectActivationReasonHelper
   },
+  changeOwnerReasonType: {
+    enum: ChangeProjectOwnerReasonsHelper
+  },
   scopeType: {
     enum: ScopeTypesHelper
   },
@@ -172,6 +178,14 @@ const validationRules = {
   },
   entityId: {
     regex: mongoIdRegex
+  },
+
+  // ── Elicitation fields ───────────────────────────────
+  elicitationMode: {
+    enum: ElicitationModesHelper
+  },
+  phaseDeletionReasonType: {
+    enum: PhaseDeletionReasonHelper
   }
 };
 

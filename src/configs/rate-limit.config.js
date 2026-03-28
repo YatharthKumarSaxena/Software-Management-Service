@@ -98,6 +98,13 @@ module.exports = {
       reason: "Archive project endpoint abuse",
       message: "Too many requests to archive project endpoint. Please try again later."
     },
+    changeProjectOwner: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "change_project_owner",
+      reason: "Change project owner endpoint abuse",
+      message: "Too many requests to change project owner endpoint. Please try again later."
+    },
     getProject: {
       maxRequests: 30,
       windowMs: 60 * 1000,
@@ -415,6 +422,13 @@ module.exports = {
       reason: "Delete elicitation endpoint abuse",
       message: "Too many requests to delete elicitation endpoint. Please try again later."
     },
+    freezeElicitation: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "freeze_elicitation",
+      reason: "Freeze elicitation endpoint abuse",
+      message: "Too many requests to freeze elicitation endpoint. Please try again later."
+    },
     getElicitation: {
       maxRequests: 30,
       windowMs: 60 * 1000,
@@ -428,6 +442,13 @@ module.exports = {
       prefix: "list_elicitations",
       reason: "List elicitations endpoint abuse",
       message: "Too many requests to list elicitations endpoint. Please try again later."
+    },
+    createInception: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "create_inception",
+      reason: "Create inception endpoint abuse",
+      message: "Too many requests to create inception endpoint. Please try again later."
     },
     getInception: {
       maxRequests: 30,
@@ -450,12 +471,61 @@ module.exports = {
       reason: "Delete inception endpoint abuse",
       message: "Too many requests to delete inception endpoint. Please try again later."
     },
+    freezeInception: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "freeze_inception",
+      reason: "Freeze inception endpoint abuse",
+      message: "Too many requests to freeze inception endpoint. Please try again later."
+    },
     getLatestInception: {
       maxRequests: 30,
       windowMs: 60 * 1000,
       prefix: "get_latest_inception",
       reason: "Get latest inception endpoint abuse",
       message: "Too many requests to get latest inception endpoint. Please try again later."
+    },
+    createElicitation: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "create_elicitation",
+      reason: "Create elicitation endpoint abuse",
+      message: "Too many requests to create elicitation endpoint. Please try again later."
+    },
+    updateElicitation: {
+      maxRequests: 50,
+      windowMs: 60 * 1000,
+      prefix: "update_elicitation",
+      reason: "Update elicitation endpoint abuse",
+      message: "Too many requests to update elicitation endpoint. Please try again later."
+    },
+    deleteElicitation: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "delete_elicitation",
+      reason: "Delete elicitation endpoint abuse",
+      message: "Too many requests to delete elicitation endpoint. Please try again later."
+    },
+    getElicitation: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_elicitation",
+      reason: "Get elicitation endpoint abuse",
+      message: "Too many requests to get elicitation endpoint. Please try again later."
+    },
+    getLatestElicitation: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_latest_elicitation",
+      reason: "Get latest elicitation endpoint abuse",
+      message: "Too many requests to get latest elicitation endpoint. Please try again later."
+    },
+    listElicitations: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_elicitations",
+      reason: "List elicitations endpoint abuse",
+      message: "Too many requests to list elicitations endpoint. Please try again later."
     }
   }
 }
