@@ -15,6 +15,7 @@ const resumeProjectRateLimiter   = createRateLimiter(perUserAndDevice.resumeProj
 const deleteProjectRateLimiter   = createRateLimiter(perUserAndDevice.deleteProject);
 const archiveProjectRateLimiter  = createRateLimiter(perUserAndDevice.archiveProject);
 const activateProjectRateLimiter = createRateLimiter(perUserAndDevice.activateProject);
+const changeProjectOwnerRateLimiter = createRateLimiter(perUserAndDevice.changeProjectOwner);
 const getProjectRateLimiter      = createRateLimiter(perUserAndDevice.getProject);
 const getProjectsRateLimiter     = createRateLimiter(perUserAndDevice.getProjects);
 
@@ -65,10 +66,20 @@ const updateProductVisionRateLimiter = createRateLimiter(perUserAndDevice.update
 const deleteProductVisionRateLimiter = createRateLimiter(perUserAndDevice.deleteProductVision);
 const getProductVisionRateLimiter    = createRateLimiter(perUserAndDevice.getProductVision);
 
+const createInceptionRateLimiter = createRateLimiter(perUserAndDevice.createInception);
 const getInceptionRateLimiter    = createRateLimiter(perUserAndDevice.getInception);
 const listInceptionsRateLimiter  = createRateLimiter(perUserAndDevice.listInceptions);
 const deleteInceptionRateLimiter = createRateLimiter(perUserAndDevice.deleteInception);
+const freezeInceptionRateLimiter = createRateLimiter(perUserAndDevice.freezeInception);
 const getLatestInceptionRateLimiter = createRateLimiter(perUserAndDevice.getLatestInception);
+
+const createElicitationRateLimiter = createRateLimiter(perUserAndDevice.createElicitation);
+const updateElicitationRateLimiter = createRateLimiter(perUserAndDevice.updateElicitation);
+const deleteElicitationRateLimiter = createRateLimiter(perUserAndDevice.deleteElicitation);
+const freezeElicitationRateLimiter = createRateLimiter(perUserAndDevice.freezeElicitation);
+const getElicitationRateLimiter    = createRateLimiter(perUserAndDevice.getElicitation);
+const getLatestElicitationRateLimiter = createRateLimiter(perUserAndDevice.getLatestElicitation);
+const listElicitationsRateLimiter  = createRateLimiter(perUserAndDevice.listElicitations);
 
 module.exports = {
     welcomeAdminRateLimiter,
@@ -81,6 +92,8 @@ module.exports = {
     resumeProjectRateLimiter,
     deleteProjectRateLimiter,
     archiveProjectRateLimiter,
+    activateProjectRateLimiter,
+    changeProjectOwnerRateLimiter,
     getProjectRateLimiter,
     getProjectsRateLimiter,
     createStakeholderRateLimiter,
@@ -127,5 +140,14 @@ module.exports = {
     getInceptionRateLimiter,
     listInceptionsRateLimiter,
     deleteInceptionRateLimiter,
-    getLatestInceptionRateLimiter
+    freezeInceptionRateLimiter,
+    getLatestInceptionRateLimiter,
+    createElicitationRateLimiter,
+    updateElicitationRateLimiter,
+    deleteElicitationRateLimiter,
+    freezeElicitationRateLimiter,
+    getElicitationRateLimiter,
+    getLatestElicitationRateLimiter,
+    listElicitationsRateLimiter,
+    createInceptionRateLimiter
 }

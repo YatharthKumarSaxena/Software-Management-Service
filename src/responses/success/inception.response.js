@@ -1,6 +1,22 @@
 // responses/success/inception.response.js
 
-const { OK } = require("@configs/http-status.config");
+const { CREATED, OK } = require("@configs/http-status.config");
+
+/**
+ * Sends a 201 response after an inception is successfully created.
+ *
+ * @param {Object} res - Express response object
+ * @param {Object} inception - Newly created inception document
+ */
+const sendInceptionCreatedSuccess = (res, inception) => {
+  return res.status(CREATED).json({
+    success: true,
+    message: "Inception created successfully.",
+    data: {
+      inception,
+    },
+  });
+};
 
 /**
  * Sends a 200 response with the latest inception details.
@@ -54,9 +70,25 @@ const sendInceptionDeletedSuccess = (res) => {
   });
 };
 
+/**
+ * Sends a 200 response after an inception is successfully frozen.
+ *
+ * @param {Object} res - Express response object
+ * @param {Object} inception - Frozen inception document
+ */
+const sendInceptionFrozenSuccess = (res, inception) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Inception frozen successfully.",
+    data: { inception }
+  });
+};
+
 module.exports = {
+  sendInceptionCreatedSuccess,
   sendInceptionFetchedSuccess,
   sendInceptionsListFetchedSuccess,
   sendInceptionDeletedSuccess,
-  sendLatestInceptionFetchedSuccess
+  sendLatestInceptionFetchedSuccess,
+  sendInceptionFrozenSuccess
 };
