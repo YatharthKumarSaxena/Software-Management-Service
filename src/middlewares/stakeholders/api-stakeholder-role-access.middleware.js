@@ -9,6 +9,8 @@ const stakeholderRoleAccessMiddlewares = {
     deleteInceptionStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),
     freezeInceptionStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),
     freezeElicitationStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),
+    createMeetingStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),
+    cancelMeetingStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),
 };
 module.exports = {
     stakeholderRoleAccessMiddlewares
