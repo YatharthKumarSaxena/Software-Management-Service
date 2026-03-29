@@ -497,6 +497,14 @@ const MeetingGroups = Object.freeze({
   ENHANCEMENT: "ENHANCEMENT",
 });
 
+const MeetingCancellationReasons = Object.freeze({
+  SCHEDULING_CONFLICT: "SCHEDULING_CONFLICT",
+  TECHNICAL_ISSUES: "TECHNICAL_ISSUES",
+  CHANGE_IN_PLANS: "CHANGE_IN_PLANS",
+  STAKEHOLDER_UNAVAILABILITY: "STAKEHOLDER_UNAVAILABILITY",
+  OTHER: "OTHER"
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -559,5 +567,6 @@ module.exports = {
   RejectedReasonTypes,
   DeferredReasonTypes,
   ChangeProjectOwnerReasons,
-  MeetingGroups
+  MeetingGroups,
+  MeetingCancellationReasons
 };

@@ -680,6 +680,134 @@ const FieldDefinitions = {
     },
   },
 
+  // ── CREATE MEETING ───────────────────────────────────────────────────
+  CREATE_MEETING: {
+    TITLE: {
+      field: "title",
+      required: true,
+      validation: validationRules.meetingTitle,
+      description: "Meeting title (required)"
+    },
+    DESCRIPTION: {
+      field: "description",
+      required: false,
+      validation: validationRules.meetingDescription,
+      description: "Meeting description (optional)"
+    },
+    FACILITATOR_ID: {
+      field: "facilitatorId",
+      required: false,
+      validation: validationRules.userId,
+      description: "Facilitator ID (optional, will default to createdBy)"
+    },
+    MEETING_GROUP: {
+      field: "meetingGroup",
+      required: false,
+      validation: validationRules.meetingGroup,
+      description: "Meeting functional group (optional, enum)"
+    },
+    PLATFORM: {
+      field: "platform",
+      required: false,
+      validation: validationRules.meetingPlatform,
+      description: "Meeting platform type (optional, enum)"
+    }
+  },
+
+  // ── UPDATE MEETING ───────────────────────────────────────────────────
+  UPDATE_MEETING: {
+    TITLE: {
+      field: "title",
+      required: false,
+      validation: validationRules.meetingTitle,
+      description: "Updated meeting title"
+    },
+    DESCRIPTION: {
+      field: "description",
+      required: false,
+      validation: validationRules.meetingDescription,
+      description: "Updated meeting description"
+    },
+    FACILITATOR_ID: {
+      field: "facilitatorId",
+      required: false,
+      validation: validationRules.userId,
+      description: "Updated facilitator ID (optional)"
+    },
+    MEETING_GROUP: {
+      field: "meetingGroup",
+      required: false,
+      validation: validationRules.meetingGroup,
+      description: "Updated meeting group (optional, enum)"
+    },
+    PLATFORM: {
+      field: "platform",
+      required: false,
+      validation: validationRules.meetingPlatform,
+      description: "Updated platform type (optional, enum)"
+    }
+  },
+
+  // ── CANCEL MEETING ───────────────────────────────────────────────────
+  CANCEL_MEETING: {
+    CANCELLATION_REASON: {
+      field: "cancelReason",
+      required: false,
+      validation: validationRules.meetingCancellationReason,
+      description: "Cancellation reason (optional, required for HIGH/CRITICAL criticality)"
+    },
+    CANCELLATION_DESCRIPTION: {
+      field: "cancelDescription",
+      required: false,
+      validation: validationRules.description,
+      description: "Cancellation description (optional)"
+    }
+  },
+  // ── ADD PARTICIPANT ──────────────────────────────
+  ADD_PARTICIPANT: {
+    USER_ID: {
+      field: "userId",
+      required: true,
+      validation: validationRules.userId,
+      description: "USR-prefixed custom user ID of participant to add (required)"
+    },
+    ROLE_DESCRIPTION: {
+      field: "roleDescription",
+      required: false,
+      validation: validationRules.title,
+      description: "Custom role description e.g., SCRIBE, OBSERVER (optional)"
+    }
+  },
+
+  // ── UPDATE PARTICIPANT ──────────────────────────────
+  UPDATE_PARTICIPANT: {
+    USER_ID: {
+      field: "userId",
+      required: true,
+      validation: validationRules.userId,
+      description: "USR-prefixed custom user ID of participant to update (required)"
+    },
+    ROLE_DESCRIPTION: {
+      field: "roleDescription",
+      required: false,
+      validation: validationRules.title,
+      description: "Updated role description (optional)"
+    }
+  },
+  REMOVE_PARTICIPANT: {
+    USER_ID: {
+      field: "userId",
+      required: true,
+      validation: validationRules.userId,
+      description: "USR-prefixed custom user ID of participant to remove (required)"
+    },
+    REMOVAL_REASON: {
+      field: "removeReason",
+      required: false,
+      validation: validationRules.description,
+      description: "Reason for participant removal (optional, required for HIGH/CRITICAL criticality)"
+    }
+  }
 };
 
 module.exports = { FieldDefinitions };

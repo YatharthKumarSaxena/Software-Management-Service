@@ -29,7 +29,11 @@ const {
   ApproveProductRequestReasonTypeHelper,
   RejectProductRequestReasonTypeHelper,
   ScopeTypesHelper,
-  CommentEntityTypesHelper
+  CommentEntityTypesHelper,
+  MeetingPlatformTypesHelper,
+  MeetingGroupsHelper,
+  MeetingCancellationReasonsHelper,
+  ParticipantTypesHelper
 } = require("@utils/enum-validators.util");
 
 const { customIdRegex, mongoIdRegex, budgetRegex, timelineRegex } = require("./regex.config");
@@ -136,6 +140,37 @@ const validationRules = {
   scopeType: {
     enum: ScopeTypesHelper
   },
+
+  // ── Meeting string fields ────────────────────────
+  meetingTitle: {
+    length: {
+      min: titleLength.min,
+      max: titleLength.max
+    }
+  },
+  meetingDescription: {
+    length: {
+      min: descriptionLength.min,
+      max: descriptionLength.max
+    }
+  },
+
+  // ── Meeting enum fields ─────────────────────────
+  meetingPlatform: {
+    enum: MeetingPlatformTypesHelper
+  },
+  meetingGroup: {
+    enum: MeetingGroupsHelper
+  },
+  meetingCancellationReason: {
+    enum: MeetingCancellationReasonsHelper
+  },
+
+  // ── Participant enum fields ──────────────────────
+  participantRole: {
+    enum: ParticipantTypesHelper
+  },
+
   title: {
     length: {
       min: titleLength.min,

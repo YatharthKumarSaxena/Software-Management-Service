@@ -19,8 +19,9 @@ const PRODUCT_VISION_BASE = `${API_PREFIX}/product-vision`; // /software-managem
 const COMMENT_BASE = `${API_PREFIX}/comments`; // /software-management-service/api/v1/comments
 const ACTIVITY_TRACKER_BASE = `${API_PREFIX}/activity-trackers`; // /software-management-service/api/v1/activity-trackers
 const ELICITATION_BASE = `${API_PREFIX}/elicitations`; // /software-management-service/api/v1/elicitations
-const FAST_BASE = `${API_PREFIX}/fast`; // /software-management-service/api/v1/fast
 const INCEPTION_BASE = `${API_PREFIX}/inceptions`; // /software-management-service/api/v1/inceptions
+const MEETINGS_BASE = `${API_PREFIX}/meetings`; // /software-management-service/api/v1/meetings
+const PARTICIPANTS_BASE = `${API_PREFIX}/participants`; // /software-management-service/api/v1/participants
 
 module.exports = {
     INTERNAL_BASE,
@@ -35,8 +36,9 @@ module.exports = {
     COMMENT_BASE,
     ACTIVITY_TRACKER_BASE,
     ELICITATION_BASE,
-    FAST_BASE,
     INCEPTION_BASE,
+    MEETINGS_BASE,
+    PARTICIPANTS_BASE,
     INTERNAL_ROUTES: {
         CREATE_SUPER_ADMIN: `/create-super-admin`, // /software-management-service/api/v1/internal/create-super-admin
         CREATE_USER: `/create-user`, // /software-management-service/api/v1/internal/admin-panel/create-user
@@ -149,5 +151,19 @@ module.exports = {
         DELETE_INCEPTION: `/delete/:projectId`,  // DELETE /api/v1/inceptions/delete/:inceptionId
         CREATE_INCEPTION: `/create/:projectId`,  // POST /api/v1/inceptions/create/:projectId
         FREEZE_INCEPTION: `/freeze/:projectId`  // PATCH /api/v1/inceptions/freeze/:inceptionId
+    },
+    MEETING_ROUTES: {
+        CREATE_MEETING: `/create/:entityType/:projectId`,  // POST /api/v1/meetings/create/:entityType/:entityId
+        UPDATE_MEETING: `/update/:entityType/:meetingId`,              // PATCH /api/v1/meetings/update/:meetingId
+        CANCEL_MEETING: `/cancel/:entityType/:meetingId`,               // PATCH /api/v1/meetings/cancel/:meetingId
+        GET_MEETING:    `/get/:entityType/:meetingId`,                  // GET /api/v1/meetings/get/:meetingId
+        LIST_MEETINGS:  `/list/:entityType/:projectId`                  // GET /api/v1/meetings/list/:projectId
+    },
+    PARTICIPANT_ROUTES: {
+        ADD_PARTICIPANT: `/add/:entityType/:meetingId`, // PATCH /api/v1/participants/add/:meetingId
+        REMOVE_PARTICIPANT: `/remove/:entityType/:meetingId`, // PATCH /api/v1/participants/remove/:meetingId
+        UPDATE_PARTICIPANT: `/update/:entityType/:meetingId`, // PATCH /api/v1/participants/update/:participantId
+        GET_PARTICIPANT: `/get/:entityType/:meetingId/:participantId`, // GET /api/v1/participants/get/:participantId
+        LIST_PARTICIPANTS: `/list/:entityType/:meetingId` // GET /api/v1/participants/list/:meetingId
     }
 };

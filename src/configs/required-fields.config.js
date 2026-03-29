@@ -67,7 +67,14 @@ const requiredFields = {
     // ── Elicitation ───────────────────────────────────────────────────────────────
     createElicitationField:getRequiredFields(FieldDefinitions.CREATE_ELICITATION),
     updateElicitationField:getRequiredFields(FieldDefinitions.UPDATE_ELICITATION),
-    deleteElicitationField:getRequiredFields(FieldDefinitions.DELETE_ELICITATION)
+    deleteElicitationField:getRequiredFields(FieldDefinitions.DELETE_ELICITATION),
+
+    createMeetingField: getRequiredFields(FieldDefinitions.CREATE_MEETING),
+    updateMeetingField: getRequiredFields(FieldDefinitions.UPDATE_MEETING),
+    cancelMeetingField: getRequiredFields(FieldDefinitions.CANCEL_MEETING),
+    addParticipantField: getRequiredFields(FieldDefinitions.ADD_PARTICIPANT),
+    updateParticipantField: getRequiredFields(FieldDefinitions.UPDATE_PARTICIPANT),
+    removeParticipantField: getRequiredFields(FieldDefinitions.REMOVE_PARTICIPANT)
 }
 
 module.exports = {
