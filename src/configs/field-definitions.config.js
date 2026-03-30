@@ -680,6 +680,70 @@ const FieldDefinitions = {
     },
   },
 
+  // ── DELETE NEGOTIATION ───────────────────────────────────────────────
+  DELETE_NEGOTIATION: {
+    DELETION_REASON_TYPE: {
+      field: "deletionReasonType",
+      required: true,
+      validation: validationRules.phaseDeletionReasonType,
+      description: "Reason category for deleting negotiation (enum)"
+    },
+    DELETION_REASON_DESCRIPTION: {
+      field: "deletionReasonDescription",
+      required: false,
+      validation: validationRules.reasonDescription,
+      description: "Optional description for deletion"
+    },
+  },
+
+  // ── DELETE SPECIFICATION ─────────────────────────────────────────────
+  DELETE_SPECIFICATION: {
+    DELETION_REASON_TYPE: {
+      field: "deletionReasonType",
+      required: true,
+      validation: validationRules.phaseDeletionReasonType,
+      description: "Reason category for deleting specification (enum)"
+    },
+    DELETION_REASON_DESCRIPTION: {
+      field: "deletionReasonDescription",
+      required: false,
+      validation: validationRules.reasonDescription,
+      description: "Optional description for deletion"
+    },
+  },
+
+  // ── DELETE ELABORATION ───────────────────────────────────────────────
+  DELETE_ELABORATION: {
+    DELETION_REASON_TYPE: {
+      field: "deletionReasonType",
+      required: true,
+      validation: validationRules.phaseDeletionReasonType,
+      description: "Reason category for deleting elaboration (enum)"
+    },
+    DELETION_REASON_DESCRIPTION: {
+      field: "deletionReasonDescription",
+      required: false,
+      validation: validationRules.reasonDescription,
+      description: "Optional description for deletion"
+    },
+  },
+
+  // ── DELETE VALIDATION ────────────────────────────────────────────────
+  DELETE_VALIDATION: {
+    DELETION_REASON_TYPE: {
+      field: "deletionReasonType",
+      required: true,
+      validation: validationRules.phaseDeletionReasonType,
+      description: "Reason category for deleting validation (enum)"
+    },
+    DELETION_REASON_DESCRIPTION: {
+      field: "deletionReasonDescription",
+      required: false,
+      validation: validationRules.reasonDescription,
+      description: "Optional description for deletion"
+    },
+  },
+
   // ── CREATE MEETING ───────────────────────────────────────────────────
   CREATE_MEETING: {
     TITLE: {

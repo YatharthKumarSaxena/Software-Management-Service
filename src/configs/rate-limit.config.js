@@ -526,6 +526,237 @@ module.exports = {
       prefix: "list_elicitations",
       reason: "List elicitations endpoint abuse",
       message: "Too many requests to list elicitations endpoint. Please try again later."
+    },
+    addParticipant: {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+      prefix: "add_participant",
+      reason: "Add participant endpoint abuse",
+      message: "Too many requests to add participant endpoint. Please try again later."
+    },
+    removeParticipant: {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+      prefix: "remove_participant",
+      reason: "Remove participant endpoint abuse",
+      message: "Too many requests to remove participant endpoint. Please try again later."
+    },
+    updateParticipant: {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+      prefix: "update_participant",
+      reason: "Update participant endpoint abuse",
+      message: "Too many requests to update participant endpoint. Please try again later."
+    },
+    getParticipant: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_participant",
+      reason: "Get participant endpoint abuse",
+      message: "Too many requests to get participant endpoint. Please try again later."
+    },
+    listParticipants: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_participants",
+      reason: "List participants endpoint abuse",
+      message: "Too many requests to list participants endpoint. Please try again later."
+    },
+    createNegotiation: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "create_negotiation",
+      reason: "Create negotiation endpoint abuse",
+      message: "Too many requests to create negotiation endpoint. Please try again later."
+    },
+    updateNegotiation: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "update_negotiation",
+      reason: "Update negotiation endpoint abuse",
+      message: "Too many requests to update negotiation endpoint. Please try again later."
+    },
+    deleteNegotiation: {
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      prefix: "delete_negotiation",
+      reason: "Delete negotiation endpoint abuse",
+      message: "Too many requests to delete negotiation endpoint. Please try again later."
+    },
+    freezeNegotiation: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "freeze_negotiation",
+      reason: "Freeze negotiation endpoint abuse",
+      message: "Too many requests to freeze negotiation endpoint. Please try again later."
+    },
+    getNegotiation: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_negotiation",
+      reason: "Get negotiation endpoint abuse",
+      message: "Too many requests to get negotiation endpoint. Please try again later."
+    },
+    getLatestNegotiation: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_latest_negotiation",
+      reason: "Get latest negotiation endpoint abuse",
+      message: "Too many requests to get latest negotiation endpoint. Please try again later."
+    },
+    listNegotiations: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_negotiations",
+      reason: "List negotiations endpoint abuse",
+      message: "Too many requests to list negotiations endpoint. Please try again later."
+    },
+    createSpecification: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "create_specification",
+      reason: "Create specification endpoint abuse",
+      message: "Too many requests to create specification endpoint. Please try again later."
+    },
+    updateSpecification: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "update_specification",
+      reason: "Update specification endpoint abuse",
+      message: "Too many requests to update specification endpoint. Please try again later."
+    },
+    deleteSpecification: {
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      prefix: "delete_specification",
+      reason: "Delete specification endpoint abuse",
+      message: "Too many requests to delete specification endpoint. Please try again later."
+    },
+    freezeSpecification: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "freeze_specification",
+      reason: "Freeze specification endpoint abuse",
+      message: "Too many requests to freeze specification endpoint. Please try again later."
+    },
+    getSpecification: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_specification",
+      reason: "Get specification endpoint abuse",
+      message: "Too many requests to get specification endpoint. Please try again later."
+    },
+    getLatestSpecification: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_latest_specification",
+      reason: "Get latest specification endpoint abuse",
+      message: "Too many requests to get latest specification endpoint. Please try again later."
+    },
+    listSpecifications: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_specifications",
+      reason: "List specifications endpoint abuse",
+      message: "Too many requests to list specifications endpoint. Please try again later."
+    },
+    createElaboration: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "create_elaboration",
+      reason: "Create elaboration endpoint abuse",
+      message: "Too many requests to create elaboration endpoint. Please try again later."
+    },
+    updateElaboration: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "update_elaboration",
+      reason: "Update elaboration endpoint abuse",
+      message: "Too many requests to update elaboration endpoint. Please try again later."
+    },
+    deleteElaboration: {
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      prefix: "delete_elaboration",
+      reason: "Delete elaboration endpoint abuse",
+      message: "Too many requests to delete elaboration endpoint. Please try again later."
+    },
+    freezeElaboration: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "freeze_elaboration",
+      reason: "Freeze elaboration endpoint abuse",
+      message: "Too many requests to freeze elaboration endpoint. Please try again later."
+    },
+    getElaboration: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_elaboration",
+      reason: "Get elaboration endpoint abuse",
+      message: "Too many requests to get elaboration endpoint. Please try again later."
+    },
+    getLatestElaboration: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_latest_elaboration",
+      reason: "Get latest elaboration endpoint abuse",
+      message: "Too many requests to get latest elaboration endpoint. Please try again later."
+    },
+    listElaborations: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_elaborations",
+      reason: "List elaborations endpoint abuse",
+      message: "Too many requests to list elaborations endpoint. Please try again later."
+    },
+    createValidation: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "create_validation",
+      reason: "Create validation endpoint abuse",
+      message: "Too many requests to create validation endpoint. Please try again later."
+    },
+    updateValidation: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "update_validation",
+      reason: "Update validation endpoint abuse",
+      message: "Too many requests to update validation endpoint. Please try again later."
+    },
+    deleteValidation: {
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      prefix: "delete_validation",
+      reason: "Delete validation endpoint abuse",
+      message: "Too many requests to delete validation endpoint. Please try again later."
+    },
+    freezeValidation: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "freeze_validation",
+      reason: "Freeze validation endpoint abuse",
+      message: "Too many requests to freeze validation endpoint. Please try again later."
+    },
+    getValidation: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_validation",
+      reason: "Get validation endpoint abuse",
+      message: "Too many requests to get validation endpoint. Please try again later."
+    },
+    getLatestValidation: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_latest_validation",
+      reason: "Get latest validation endpoint abuse",
+      message: "Too many requests to get latest validation endpoint. Please try again later."
+    },
+    listValidations: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_validations",
+      reason: "List validations endpoint abuse",
+      message: "Too many requests to list validations endpoint. Please try again later."
     }
   }
 }

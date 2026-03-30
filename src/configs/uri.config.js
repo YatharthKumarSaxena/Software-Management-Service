@@ -22,6 +22,10 @@ const ELICITATION_BASE = `${API_PREFIX}/elicitations`; // /software-management-s
 const INCEPTION_BASE = `${API_PREFIX}/inceptions`; // /software-management-service/api/v1/inceptions
 const MEETINGS_BASE = `${API_PREFIX}/meetings`; // /software-management-service/api/v1/meetings
 const PARTICIPANTS_BASE = `${API_PREFIX}/participants`; // /software-management-service/api/v1/participants
+const ELABORATION_BASE = `${API_PREFIX}/elaborations`; // /software-management-service/api/v1/elaborations
+const VALIDATION_BASE = `${API_PREFIX}/validations`; // /software-management-service/api/v1/validations
+const SPECIFICATION_BASE = `${API_PREFIX}/specifications`; // /software-management-service/api/v1/specifications
+const NEGOTIATION_BASE = `${API_PREFIX}/negotiations`; // /software-management-service/api/v1/negotiations
 
 module.exports = {
     INTERNAL_BASE,
@@ -39,6 +43,10 @@ module.exports = {
     INCEPTION_BASE,
     MEETINGS_BASE,
     PARTICIPANTS_BASE,
+    ELABORATION_BASE,
+    VALIDATION_BASE,
+    SPECIFICATION_BASE,
+    NEGOTIATION_BASE,
     INTERNAL_ROUTES: {
         CREATE_SUPER_ADMIN: `/create-super-admin`, // /software-management-service/api/v1/internal/create-super-admin
         CREATE_USER: `/create-user`, // /software-management-service/api/v1/internal/admin-panel/create-user
@@ -165,5 +173,37 @@ module.exports = {
         UPDATE_PARTICIPANT: `/update/:entityType/:meetingId`, // PATCH /api/v1/participants/update/:participantId
         GET_PARTICIPANT: `/get/:entityType/:meetingId/:participantId`, // GET /api/v1/participants/get/:participantId
         LIST_PARTICIPANTS: `/list/:entityType/:meetingId` // GET /api/v1/participants/list/:meetingId
+    },
+    NEGOTIATION_ROUTES: {
+        CREATE_NEGOTIATION: `/create/:projectId`, // POST /api/v1/negotiations/create/:projectId
+        UPDATE_NEGOTIATION: `/update/:projectId/:negotiationId`, // PATCH /api/v1/negotiations/update/:projectId/:negotiationId
+        DELETE_NEGOTIATION: `/delete/:projectId/:negotiationId`, // DELETE /api/v1/negotiations/delete/:projectId/:negotiationId
+        GET_NEGOTIATION: `/get/:projectId/:negotiationId`, // GET /api/v1/negotiations/get/:projectId/:negotiationId
+        LIST_NEGOTIATIONS: `/list/:projectId`, // GET /api/v1/negotiations/list/:projectId
+        GET_LATEST_NEGOTIATION: `/latest/:projectId` // GET /api/v1/negotiations/latest/:projectId
+    },
+    ELABORATION_ROUTES: {
+        CREATE_ELABORATION: `/create/:projectId`, // POST /api/v1/elaborations/create/:projectId
+        UPDATE_ELABORATION: `/update/:projectId/:elaborationId`, // PATCH /api/v1/elaborations/update/:projectId/:elaborationId
+        DELETE_ELABORATION: `/delete/:projectId/:elaborationId`, // DELETE /api/v1/elaborations/delete/:projectId/:elaborationId
+        GET_ELABORATION: `/get/:projectId/:elaborationId`, // GET /api/v1/elaborations/get/:projectId/:elaborationId
+        LIST_ELABORATIONS: `/list/:projectId`, // GET /api/v1/elaborations/list/:projectId
+        GET_LATEST_ELABORATION: `/latest/:projectId` // GET /api/v1/elaborations/latest/:projectId
+    },
+    VALIDATION_ROUTES: {
+        CREATE_VALIDATION: `/create/:projectId`, // POST /api/v1/validations/create/:projectId
+        UPDATE_VALIDATION: `/update/:projectId/:validationId`, // PATCH /api/v1/validations/update/:projectId/:validationId
+        DELETE_VALIDATION: `/delete/:projectId/:validationId`, // DELETE /api/v1/validations/delete/:projectId/:validationId
+        GET_VALIDATION: `/get/:projectId/:validationId`, // GET /api/v1/validations/get/:projectId/:validationId
+        LIST_VALIDATIONS: `/list/:projectId`, // GET /api/v1/validations/list/:projectId
+        GET_LATEST_VALIDATION: `/latest/:projectId` // GET /api/v1/validations/latest/:projectId
+    },
+    SPECIFICATION_ROUTES: {
+        CREATE_SPECIFICATION: `/create/:projectId`, // POST /api/v1/specifications/create/:projectId
+        UPDATE_SPECIFICATION: `/update/:projectId/:specificationId`, // PATCH /api/v1/specifications/update/:projectId/:specificationId
+        DELETE_SPECIFICATION: `/delete/:projectId/:specificationId`, // DELETE /api/v1/specifications/delete/:projectId/:specificationId
+        GET_SPECIFICATION: `/get/:projectId/:specificationId`, // GET /api/v1/specifications/get/:projectId/:specificationId
+        LIST_SPECIFICATIONS: `/list/:projectId`, // GET /api/v1/specifications/list/:projectId
+        GET_LATEST_SPECIFICATION: `/latest/:projectId` // GET /api/v1/specifications/latest/:projectId
     }
 };

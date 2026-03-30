@@ -69,6 +69,18 @@ const requiredFields = {
     updateElicitationField:getRequiredFields(FieldDefinitions.UPDATE_ELICITATION),
     deleteElicitationField:getRequiredFields(FieldDefinitions.DELETE_ELICITATION),
 
+    // ── Negotiation ───────────────────────────────────────────────────────────────
+    deleteNegotiationField:getRequiredFields(FieldDefinitions.DELETE_NEGOTIATION),
+
+    // ── Specification ───────────────────────────────────────────────────────────────
+    deleteSpecificationField:getRequiredFields(FieldDefinitions.DELETE_SPECIFICATION),
+
+    // ── Elaboration ───────────────────────────────────────────────────────────────
+    deleteElaborationField:getRequiredFields(FieldDefinitions.DELETE_ELABORATION),
+
+    // ── Validation ───────────────────────────────────────────────────────────────
+    deleteValidationField:getRequiredFields(FieldDefinitions.DELETE_VALIDATION),
+
     createMeetingField: getRequiredFields(FieldDefinitions.CREATE_MEETING),
     updateMeetingField: getRequiredFields(FieldDefinitions.UPDATE_MEETING),
     cancelMeetingField: getRequiredFields(FieldDefinitions.CANCEL_MEETING),
