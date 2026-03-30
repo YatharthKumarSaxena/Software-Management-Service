@@ -40,6 +40,7 @@ const fetchNegotiationMiddleware = async (req, res, next) => {
     }
 
     req.negotiation = negotiation;
+    req.projectId = negotiation.projectId; // Attach projectId for downstream middlewares
     logWithTime(`✅ [fetchNegotiationMiddleware] Negotiation fetched: ${negotiationId}`);
     return next();
   } catch (error) {
