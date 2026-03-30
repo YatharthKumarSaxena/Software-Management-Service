@@ -1,6 +1,6 @@
 // middlewares/specifications/fetch-latest-specification.middleware.js
 
-const { SpecificationModel } = require("@models");
+const { SpecificationModel } = require("@models/specification.model");
 const { isValidMongoID } = require("@utils/id-validators.util");
 const {
   throwBadRequestError,
@@ -23,6 +23,7 @@ const fetchLatestSpecificationMiddleware = async (req, res, next) => {
     const specification = await SpecificationModel.findOne({
       projectId,
       isDeleted: false,
+      isFrozen: false // Ensure we only delete if not frozen
     })
       .sort({ "version.major": -1, "version.minor": -1 })
       .lean();

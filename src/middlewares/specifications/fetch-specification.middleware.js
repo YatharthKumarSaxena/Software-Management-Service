@@ -1,6 +1,6 @@
 // middlewares/specifications/fetch-specification.middleware.js
 
-const { SpecificationModel } = require("@models");
+const { SpecificationModel } = require("@models/specification.model");
 const { isValidMongoID } = require("@utils/id-validators.util");
 const {
   throwBadRequestError,
