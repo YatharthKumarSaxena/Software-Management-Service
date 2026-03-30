@@ -84,11 +84,20 @@ const sendInceptionFrozenSuccess = (res, inception) => {
   });
 };
 
+const sendInceptionUpdatedSuccess = (res, inception) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Inception updated successfully.",
+    data: { inception }
+  });
+};
+
 module.exports = {
   sendInceptionCreatedSuccess,
   sendInceptionFetchedSuccess,
   sendInceptionsListFetchedSuccess,
   sendInceptionDeletedSuccess,
   sendLatestInceptionFetchedSuccess,
-  sendInceptionFrozenSuccess
+  sendInceptionFrozenSuccess,
+  sendInceptionUpdatedSuccess
 };
