@@ -30,6 +30,7 @@ const fetchElaborationMiddleware = async (req, res, next) => {
       return throwBadRequestError(res, "Elaboration is deleted");
     }
     req.elaboration = elaboration;
+    req.projectId = elaboration.projectId; // Attach projectId for downstream middlewares
     logWithTime(`✅ [fetchElaborationMiddleware] Elaboration fetched: ${elaborationId}`);
     return next(); 
   } catch (error) {

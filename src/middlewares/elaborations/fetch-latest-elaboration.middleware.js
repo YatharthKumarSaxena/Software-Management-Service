@@ -22,8 +22,7 @@ const fetchLatestElaborationMiddleware = async (req, res, next) => {
     }
     const elaboration = await ElaborationModel.findOne({
       projectId,
-      isDeleted: false,
-      isFrozen: false // Ensure we only delete if not frozen
+      isDeleted: false
     })
       .sort({ "version.major": -1, "version.minor": -1 })
       .lean();
