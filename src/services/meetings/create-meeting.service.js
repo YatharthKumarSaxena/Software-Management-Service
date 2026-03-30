@@ -3,6 +3,10 @@
 const { MeetingModel } = require("@models/meeting.model");
 const { ElicitationModel } = require("@models/elicitation.model");
 const { NegotiationModel } = require("@models/negotiation.model");
+const { ElaborationModel } = require("@models/elaboration.model");
+const { SpecificationModel } = require("@models/specification.model");
+const { ValidationModel } = require("@models/validation.model");
+const { InceptionModel } = require("@models/inception.model");
 const { StakeholderModel } = require("@models/stakeholder.model");
 const { MeetingStatuses, ParticipantTypes } = require("@configs/enums.config");
 const { DB_COLLECTIONS } = require("@configs/db-collections.config");
@@ -16,7 +20,11 @@ const { addParticipantService } = require("@services/participants");
 // ── Parent model mapping for entity types ──────────────────────────────
 const PARENT_MODEL_MAP = {
     [DB_COLLECTIONS.ELICITATIONS]: ElicitationModel,
-    [DB_COLLECTIONS.NEGOTIATIONS]: NegotiationModel
+    [DB_COLLECTIONS.NEGOTIATIONS]: NegotiationModel,
+    [DB_COLLECTIONS.ELABORATIONS]: ElaborationModel,
+    [DB_COLLECTIONS.INCEPTIONS]: InceptionModel,
+    [DB_COLLECTIONS.SPECIFICATIONS]: SpecificationModel,
+    [DB_COLLECTIONS.VALIDATIONS]: ValidationModel
 };
 
 /**

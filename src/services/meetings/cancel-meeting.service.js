@@ -3,6 +3,10 @@
 const { MeetingModel } = require("@models/meeting.model");
 const { ElicitationModel } = require("@models/elicitation.model");
 const { NegotiationModel } = require("@models/negotiation.model");
+const { ElaborationModel } = require("@models/elaboration.model");
+const { SpecificationModel } = require("@models/specification.model");
+const { ValidationModel } = require("@models/validation.model");
+const { InceptionModel } = require("@models/inception.model");
 const { MeetingStatuses, PriorityLevels } = require("@configs/enums.config");
 const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 const { BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
@@ -15,7 +19,11 @@ const { prepareAuditData } = require("@utils/audit-data.util");
 // ── Model mapping for entity types ─────────────────────────────────────
 const MODEL_MAP = {
   [DB_COLLECTIONS.ELICITATIONS]: ElicitationModel,
-  [DB_COLLECTIONS.NEGOTIATIONS]: NegotiationModel
+  [DB_COLLECTIONS.NEGOTIATIONS]: NegotiationModel,
+  [DB_COLLECTIONS.ELABORATIONS]: ElaborationModel,
+  [DB_COLLECTIONS.INCEPTIONS]: InceptionModel,
+  [DB_COLLECTIONS.SPECIFICATIONS]: SpecificationModel,
+  [DB_COLLECTIONS.VALIDATIONS]: ValidationModel
 };
 
 /**
