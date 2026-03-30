@@ -2,7 +2,7 @@
 
 const { listSpecificationsService } = require("../../services/specifications/list-specifications.service");
 const {
-  sendSpecificationListSuccess,
+  sendSpecificationsListSuccess,
 } = require("../../responses/success/specification.response");
 const {
   throwInternalServerError,
@@ -27,7 +27,7 @@ const listSpecificationsController = async (req, res) => {
     return throwInternalServerError(res, new Error(result.message));
   }
 
-  return sendSpecificationListSuccess(res, result.specifications, result.pagination);
+  return sendSpecificationsListSuccess(res, result.specifications, result.pagination);
 };
 
 module.exports = { listSpecificationsController };

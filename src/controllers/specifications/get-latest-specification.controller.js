@@ -2,7 +2,7 @@
 
 const { getLatestSpecificationService } = require("../../services/specifications/get-latest-specification.service");
 const {
-  sendSpecificationLatestRetrievedSuccess,
+  sendLatestSpecificationRetrievedSuccess,
 } = require("../../responses/success/specification.response");
 const {
   throwInternalServerError,
@@ -23,7 +23,7 @@ const getLatestSpecificationController = async (req, res) => {
     return throwInternalServerError(res, new Error(result.message));
   }
 
-  return sendSpecificationLatestRetrievedSuccess(res, result.specification);
+  return sendLatestSpecificationRetrievedSuccess(res, result.specification);
 };
 
 module.exports = { getLatestSpecificationController };
