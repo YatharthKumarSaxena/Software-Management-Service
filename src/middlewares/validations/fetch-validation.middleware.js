@@ -30,6 +30,7 @@ const fetchValidationMiddleware = async (req, res, next) => {
       return throwBadRequestError(res, "Validation is deleted");
     }
     req.validation = validation;
+    req.projectId = validation.projectId; // Attach projectId for downstream middlewares
     logWithTime(`✅ [fetchValidationMiddleware] Validation fetched: ${validationId}`);
     return next();
   } catch (error) {

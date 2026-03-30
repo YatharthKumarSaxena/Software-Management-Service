@@ -22,8 +22,7 @@ const fetchLatestValidationMiddleware = async (req, res, next) => {
     }
     const validation = await ValidationModel.findOne({
       projectId,
-      isDeleted: false,
-      isFrozen: false // Ensure we only delete if not frozen
+      isDeleted: false
     })
       .sort({ "version.major": -1, "version.minor": -1 })
       .lean();
