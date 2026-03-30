@@ -44,7 +44,7 @@ const deleteInceptionService = async (inception, params) => {
     // ── 2. Check if FROZEN inception exists for this project ──────────
     const frozenInception = await InceptionModel.findOne({
       projectId: project._id,
-      isFrozen: true,
+      isFrozen: false, // Ensure we only delete if not frozen
       isDeleted: false
     }).lean();
 

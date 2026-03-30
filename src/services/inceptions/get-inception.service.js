@@ -1,5 +1,8 @@
 // services/inceptions/get-inception.service.js
 
+const { INTERNAL_ERROR } = require("@/configs/http-status.config");
+const { errorMessage } = require("@/utils/log-error.util");
+
 /**
  * Fetches the latest (highest version.major) inception for a given project.
  *
@@ -14,10 +17,11 @@ const getInceptionService = async (inception) => {
       inception: inception
     };
   } catch (error) {
+    errorMessage(error);
     return {
       success: false,
       message: "Internal error while fetching inception",
-      error: error.message
+      error: INTERNAL_ERROR
     };
   }
 };
