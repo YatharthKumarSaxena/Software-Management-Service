@@ -14,14 +14,16 @@ const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.co
  * Creates a new inception document in the database.
  *
  * @param {Object} params
- * @param {string} params.projectId        - Project MongoDB ObjectId
- * @param {string} params.createdBy        - Admin USR ID
- * @param {Object} params.auditContext     - { user, device, requestId }
+ * @param {string} params.projectId              - Project MongoDB ObjectId
+ * @param {boolean} [params.allowParallelMeetings] - Allow parallel meetings (default: false)
+ * @param {string} params.createdBy              - Admin USR ID
+ * @param {Object} params.auditContext           - { user, device, requestId }
  *
  * @returns {{ success: true, inception } | { success: false, message, errorCode }}
  */
 const createInceptionService = async ({
   projectId,
+  allowParallelMeetings,
   createdBy,
   auditContext
 }) => {
@@ -76,6 +78,7 @@ const createInceptionService = async ({
     logWithTime(`[createInceptionService] Creating INCEPTION phase with version management`);
     const phaseResult = await createPhaseWithVersionManagement({
       project: updatedProject,
+      allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
       createdBy,
       auditContext
     });
