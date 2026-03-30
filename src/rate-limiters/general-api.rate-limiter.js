@@ -81,6 +81,44 @@ const getElicitationRateLimiter    = createRateLimiter(perUserAndDevice.getElici
 const getLatestElicitationRateLimiter = createRateLimiter(perUserAndDevice.getLatestElicitation);
 const listElicitationsRateLimiter  = createRateLimiter(perUserAndDevice.listElicitations);
 
+const addParticipantRateLimiter = createRateLimiter(perUserAndDevice.addParticipant);
+const removeParticipantRateLimiter = createRateLimiter(perUserAndDevice.removeParticipant);
+const updateParticipantRateLimiter = createRateLimiter(perUserAndDevice.updateParticipant);
+const getParticipantRateLimiter = createRateLimiter(perUserAndDevice.getParticipant);
+const listParticipantsRateLimiter = createRateLimiter(perUserAndDevice.listParticipants);
+
+const createNegotiationRateLimiter = createRateLimiter(perUserAndDevice.createNegotiation);
+const updateNegotiationRateLimiter = createRateLimiter(perUserAndDevice.updateNegotiation);
+const deleteNegotiationRateLimiter = createRateLimiter(perUserAndDevice.deleteNegotiation);
+const freezeNegotiationRateLimiter = createRateLimiter(perUserAndDevice.freezeNegotiation);
+const getNegotiationRateLimiter = createRateLimiter(perUserAndDevice.getNegotiation);
+const getLatestNegotiationRateLimiter = createRateLimiter(perUserAndDevice.getLatestNegotiation);
+const listNegotiationsRateLimiter = createRateLimiter(perUserAndDevice.listNegotiations);
+
+const createSpecificationRateLimiter = createRateLimiter(perUserAndDevice.createSpecification);
+const updateSpecificationRateLimiter = createRateLimiter(perUserAndDevice.updateSpecification);
+const deleteSpecificationRateLimiter = createRateLimiter(perUserAndDevice.deleteSpecification);
+const freezeSpecificationRateLimiter = createRateLimiter(perUserAndDevice.freezeSpecification);
+const getSpecificationRateLimiter = createRateLimiter(perUserAndDevice.getSpecification);
+const getLatestSpecificationRateLimiter = createRateLimiter(perUserAndDevice.getLatestSpecification);
+const listSpecificationsRateLimiter = createRateLimiter(perUserAndDevice.listSpecifications);
+
+const createElaborationRateLimiter = createRateLimiter(perUserAndDevice.createElaboration);
+const updateElaborationRateLimiter = createRateLimiter(perUserAndDevice.updateElaboration);
+const deleteElaborationRateLimiter = createRateLimiter(perUserAndDevice.deleteElaboration);
+const freezeElaborationRateLimiter = createRateLimiter(perUserAndDevice.freezeElaboration);
+const getElaborationRateLimiter = createRateLimiter(perUserAndDevice.getElaboration);
+const getLatestElaborationRateLimiter = createRateLimiter(perUserAndDevice.getLatestElaboration);
+const listElaborationsRateLimiter = createRateLimiter(perUserAndDevice.listElaborations);
+
+const createValidationRateLimiter = createRateLimiter(perUserAndDevice.createValidation);
+const updateValidationRateLimiter = createRateLimiter(perUserAndDevice.updateValidation);
+const deleteValidationRateLimiter = createRateLimiter(perUserAndDevice.deleteValidation);
+const freezeValidationRateLimiter = createRateLimiter(perUserAndDevice.freezeValidation);
+const getValidationRateLimiter = createRateLimiter(perUserAndDevice.getValidation);
+const getLatestValidationRateLimiter = createRateLimiter(perUserAndDevice.getLatestValidation);
+const listValidationsRateLimiter = createRateLimiter(perUserAndDevice.listValidations);
+
 module.exports = {
     welcomeAdminRateLimiter,
     welcomeClientRateLimiter,
@@ -149,5 +187,38 @@ module.exports = {
     getElicitationRateLimiter,
     getLatestElicitationRateLimiter,
     listElicitationsRateLimiter,
-    createInceptionRateLimiter
+    createInceptionRateLimiter,
+    addParticipantRateLimiter,
+    removeParticipantRateLimiter,
+    updateParticipantRateLimiter,
+    getParticipantRateLimiter,
+    listParticipantsRateLimiter,
+    createNegotiationRateLimiter,
+    updateNegotiationRateLimiter,
+    deleteNegotiationRateLimiter,
+    freezeNegotiationRateLimiter,
+    getNegotiationRateLimiter,
+    getLatestNegotiationRateLimiter,
+    listNegotiationsRateLimiter,
+    createSpecificationRateLimiter,
+    updateSpecificationRateLimiter,
+    deleteSpecificationRateLimiter,
+    freezeSpecificationRateLimiter,
+    getSpecificationRateLimiter,
+    getLatestSpecificationRateLimiter,
+    listSpecificationsRateLimiter,
+    createElaborationRateLimiter,
+    updateElaborationRateLimiter,
+    deleteElaborationRateLimiter,
+    freezeElaborationRateLimiter,
+    getElaborationRateLimiter,
+    getLatestElaborationRateLimiter,
+    listElaborationsRateLimiter,
+    createValidationRateLimiter,
+    updateValidationRateLimiter,
+    deleteValidationRateLimiter,
+    freezeValidationRateLimiter,
+    getValidationRateLimiter,
+    getLatestValidationRateLimiter,
+    listValidationsRateLimiter
 }
