@@ -1,6 +1,6 @@
 // middlewares/validations/fetch-validation.middleware.js
 
-const { ValidationModel } = require("@models");
+const { ValidationModel } = require("@models/validation.model");
 const { isValidMongoID } = require("@utils/id-validators.util");
 const {
   throwBadRequestError,
