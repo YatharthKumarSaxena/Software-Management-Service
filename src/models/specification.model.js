@@ -71,6 +71,11 @@ const specificationSchema = new mongoose.Schema({
     default: null,
     minlength: descriptionLength.min,
     maxlength: descriptionLength.max
+  },
+
+  isFrozen: {
+    type: Boolean,
+    default: false
   }
 
 }, { timestamps: true });
