@@ -7,101 +7,72 @@ const { ElaborationModel } = require("@/models/elaboration.model");
 const { ValidationModel } = require("@/models/validation.model");
 const { throwBadRequestError, logMiddlewareError, throwDBResourceNotFoundError, throwInternalServerError, throwValidationError } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@/utils/time-stamps.util");
+const { 
+    checkInceptionNotFrozen, checkElicitationNotFrozen, checkElaborationNotFrozen, 
+    checkNegotiationNotFrozen, checkSpecificationNotFrozen, checkValidationNotFrozen 
+} = require("../common/check-phase-frozen.middleware");
 
-const validEntityTypes = {
-    [DB_COLLECTIONS.INCEPTIONS]: DB_COLLECTIONS.INCEPTIONS,
-    [DB_COLLECTIONS.ELICITATIONS]: DB_COLLECTIONS.ELICITATIONS,
-    [DB_COLLECTIONS.NEGOTIATIONS]: DB_COLLECTIONS.NEGOTIATIONS,
-    [DB_COLLECTIONS.SPECIFICATIONS]: DB_COLLECTIONS.SPECIFICATIONS,
-    [DB_COLLECTIONS.ELABORATIONS]: DB_COLLECTIONS.ELABORATIONS,
-    [DB_COLLECTIONS.VALIDATIONS]: DB_COLLECTIONS.VALIDATIONS
-}
+// 1. Map each entity type to its model, request key, and validation function
+const ENTITY_CONFIG = {
+    [DB_COLLECTIONS.INCEPTIONS]:     { model: InceptionModel,     reqKey: "inception",     validateStatus: checkInceptionNotFrozen },
+    [DB_COLLECTIONS.ELICITATIONS]:   { model: ElicitationModel,   reqKey: "elicitation",   validateStatus: checkElicitationNotFrozen },
+    [DB_COLLECTIONS.NEGOTIATIONS]:   { model: NegotiationModel,   reqKey: "negotiation",   validateStatus: checkNegotiationNotFrozen },
+    [DB_COLLECTIONS.SPECIFICATIONS]: { model: SpecificationModel, reqKey: "specification", validateStatus: checkSpecificationNotFrozen },
+    [DB_COLLECTIONS.ELABORATIONS]:   { model: ElaborationModel,   reqKey: "elaboration",   validateStatus: checkElaborationNotFrozen },
+    [DB_COLLECTIONS.VALIDATIONS]:    { model: ValidationModel,    reqKey: "validation",    validateStatus: checkValidationNotFrozen }
+};
 
 const fetchEntityIdMiddleware = async (req, res, next) => {
     try {
         const { entityType } = req.params;
-        const project = req.project;
-        const projectId = project._id;
+        const projectId = req.project._id;
         
         if (!entityType) {
             logMiddlewareError("fetchEntityId", "entityType parameter is missing", req);
             return throwBadRequestError(res, "entityType parameter is required");
         }
 
-        if (!Object.values(validEntityTypes).includes(entityType)) {
+        const config = ENTITY_CONFIG[entityType];
+
+        // 2. Validate entity type gracefully using the config map
+        if (!config) {
             logMiddlewareError("fetchEntityId", `Invalid entityType: ${entityType}`, req);
-            const validValues = Object.values(validEntityTypes).join(", ");
             return throwValidationError(res, [{
                 field: "entityType",
-                message: `entityType must be one of: ${validValues}`,
+                message: `entityType must be one of: ${Object.keys(ENTITY_CONFIG).join(", ")}`,
                 received: entityType
             }]);
         }
 
-        // Fetch Latest phase entity for the project (all 6 phases)
-        if (entityType === DB_COLLECTIONS.INCEPTIONS) {
-            const latestInception = await InceptionModel.findOne({ projectId: projectId, isDeleted: false }).sort({ "version.major": -1 }).lean();
-            if (!latestInception) {
-                logMiddlewareError("fetchEntityId", "No inception found for the project", req);
-                return throwDBResourceNotFoundError(res, "Inception not found");
-            }
-            req.parentEntity = latestInception;
-            req.inception = latestInception;
-            req.projectId = latestInception.projectId;
-        } else if (entityType === DB_COLLECTIONS.ELICITATIONS) {
-            const latestElicitation = await ElicitationModel.findOne({ projectId: projectId, isDeleted: false }).sort({ "version.major": -1 }).lean();
-            if (!latestElicitation) {
-                logMiddlewareError("fetchEntityId", "No elicitation found for the project", req);
-                return throwDBResourceNotFoundError(res, "Elicitation not found");
-            }
-            req.parentEntity = latestElicitation;
-            req.elicitation = latestElicitation;
-            req.projectId = latestElicitation.projectId;
-        } else if (entityType === DB_COLLECTIONS.NEGOTIATIONS) {
-            const latestNegotiation = await NegotiationModel.findOne({ projectId: projectId, isDeleted: false }).sort({ "version.major": -1 }).lean();
-            if (!latestNegotiation) {
-                logMiddlewareError("fetchEntityId", "No negotiation found for the project", req);
-                return throwDBResourceNotFoundError(res, "Negotiation not found");
-            }
-            req.parentEntity = latestNegotiation;
-            req.negotiation = latestNegotiation;
-            req.projectId = latestNegotiation.projectId;
-        } else if (entityType === DB_COLLECTIONS.SPECIFICATIONS) {
-            const latestSpecification = await SpecificationModel.findOne({ projectId: projectId, isDeleted: false }).sort({ "version.major": -1 }).lean();
-            if (!latestSpecification) {
-                logMiddlewareError("fetchEntityId", "No specification found for the project", req);
-                return throwDBResourceNotFoundError(res, "Specification not found");
-            }
-            req.parentEntity = latestSpecification;
-            req.specification = latestSpecification;
-            req.projectId = latestSpecification.projectId;
-        } else if (entityType === DB_COLLECTIONS.ELABORATIONS) {
-            const latestElaboration = await ElaborationModel.findOne({ projectId: projectId, isDeleted: false }).sort({ "version.major": -1 }).lean();
-            if (!latestElaboration) {
-                logMiddlewareError("fetchEntityId", "No elaboration found for the project", req);
-                return throwDBResourceNotFoundError(res, "Elaboration not found");
-            }
-            req.parentEntity = latestElaboration;
-            req.elaboration = latestElaboration;
-            req.projectId = latestElaboration.projectId;
-        } else if (entityType === DB_COLLECTIONS.VALIDATIONS) {
-            const latestValidation = await ValidationModel.findOne({ projectId: projectId, isDeleted: false }).sort({ "version.major": -1 }).lean();
-            if (!latestValidation) {
-                logMiddlewareError("fetchEntityId", "No validation found for the project", req);
-                return throwDBResourceNotFoundError(res, "Validation not found");
-            }
-            req.parentEntity = latestValidation;
-            req.validation = latestValidation;
-            req.projectId = latestValidation.projectId;
+        // 3. Centralized Database Query (Works for all 6 models)
+        const latestEntity = await config.model
+            .findOne({ projectId, isDeleted: false })
+            .sort({ "version.major": -1 })
+            .lean();
+
+        if (!latestEntity) {
+            logMiddlewareError("fetchEntityId", `No ${config.reqKey} found for the project`, req);
+            // Capitalize the first letter for the error message
+            const entityName = config.reqKey.charAt(0).toUpperCase() + config.reqKey.slice(1);
+            return throwDBResourceNotFoundError(res, `${entityName} not found`);
         }
+
+        // 4. Centralized variable assignment to the request object
+        req.parentEntity = latestEntity;
+        req[config.reqKey] = latestEntity; 
+        req.projectId = latestEntity.projectId;
+
         logWithTime(`✅ Entity fetched successfully for type ${entityType} | Entity ID: ${req.parentEntity._id}`);
-        return next();
+        
+        // 5. Forward to the respective validation middleware
+        return config.validateStatus(req, res, next);
+
     } catch (error) {
         logMiddlewareError("fetchEntityId", `Error fetching entity ID: ${error.message}`, req);
         return throwInternalServerError(res, "Error fetching entity ID");
     }
-}
+};
 
 module.exports = {
     fetchEntityIdMiddleware
-}
+};
