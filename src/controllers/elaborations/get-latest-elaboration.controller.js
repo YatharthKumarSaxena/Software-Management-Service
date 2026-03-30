@@ -2,7 +2,7 @@
 
 const { getLatestElaborationService } = require("../../services/elaborations/get-latest-elaboration.service");
 const {
-  sendElaborationLatestRetrievedSuccess,
+  sendLatestElaborationRetrievedSuccess,
 } = require("../../responses/success/elaboration.response");
 const {
   throwInternalServerError,
@@ -23,7 +23,7 @@ const getLatestElaborationController = async (req, res) => {
     return throwInternalServerError(res, new Error(result.message));
   }
 
-  return sendElaborationLatestRetrievedSuccess(res, result.elaboration);
+  return sendLatestElaborationRetrievedSuccess(res, result.elaboration);
 };
 
 module.exports = { getLatestElaborationController };

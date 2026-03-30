@@ -2,7 +2,7 @@
 
 const { listElaborationsService } = require("../../services/elaborations/list-elaborations.service");
 const {
-  sendElaborationListSuccess,
+  sendElaborationsListSuccess
 } = require("../../responses/success/elaboration.response");
 const {
   throwInternalServerError,
@@ -27,7 +27,7 @@ const listElaborationsController = async (req, res) => {
     return throwInternalServerError(res, new Error(result.message));
   }
 
-  return sendElaborationListSuccess(res, result.elaborations, result.pagination);
+  return sendElaborationsListSuccess(res, result.elaborations, result.pagination);
 };
 
 module.exports = { listElaborationsController };

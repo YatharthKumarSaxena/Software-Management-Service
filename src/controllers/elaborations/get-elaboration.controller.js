@@ -10,9 +10,9 @@ const {
 } = require("@/responses/common/error-handler.response");
 
 const getElaborationController = async (req, res) => {
-  const { projectId } = req.params;
+  const elaboration = req.elaboration; // Retrieved from fetchElaborationMiddleware
 
-  const result = await getElaborationService({ projectId });
+  const result = await getElaborationService(elaboration);
 
   if (!result.success) {
     if (result.message.includes("not found")) {
