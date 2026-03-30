@@ -158,7 +158,8 @@ module.exports = {
         LIST_INCEPTIONS:  `/list/:projectId`,     // GET /api/v1/inceptions/list/:projectId
         DELETE_INCEPTION: `/delete/:projectId`,  // DELETE /api/v1/inceptions/delete/:inceptionId
         CREATE_INCEPTION: `/create/:projectId`,  // POST /api/v1/inceptions/create/:projectId
-        FREEZE_INCEPTION: `/freeze/:projectId`  // PATCH /api/v1/inceptions/freeze/:inceptionId
+        UPDATE_INCEPTION: `/update/:projectId`,  // PATCH /api/v1/inceptions/update/:projectId
+        FREEZE_INCEPTION: `/freeze/:projectId`,  // PATCH /api/v1/inceptions/freeze/:inceptionId
     },
     MEETING_ROUTES: {
         CREATE_MEETING: `/create/:entityType/:projectId`,  // POST /api/v1/meetings/create/:entityType/:entityId
@@ -176,34 +177,38 @@ module.exports = {
     },
     NEGOTIATION_ROUTES: {
         CREATE_NEGOTIATION: `/create/:projectId`, // POST /api/v1/negotiations/create/:projectId
-        UPDATE_NEGOTIATION: `/update/:projectId/:negotiationId`, // PATCH /api/v1/negotiations/update/:projectId/:negotiationId
-        DELETE_NEGOTIATION: `/delete/:projectId/:negotiationId`, // DELETE /api/v1/negotiations/delete/:projectId/:negotiationId
-        GET_NEGOTIATION: `/get/:projectId/:negotiationId`, // GET /api/v1/negotiations/get/:projectId/:negotiationId
+        UPDATE_NEGOTIATION: `/update/:projectId`, // PATCH /api/v1/negotiations/update/:projectId/:negotiationId
+        DELETE_NEGOTIATION: `/delete/:projectId`, // DELETE /api/v1/negotiations/delete/:projectId/:negotiationId
+        GET_NEGOTIATION: `/get/:negotiationId`, // GET /api/v1/negotiations/get/:projectId/:negotiationId
         LIST_NEGOTIATIONS: `/list/:projectId`, // GET /api/v1/negotiations/list/:projectId
-        GET_LATEST_NEGOTIATION: `/latest/:projectId` // GET /api/v1/negotiations/latest/:projectId
+        GET_LATEST_NEGOTIATION: `/latest/:projectId`, // GET /api/v1/negotiations/latest/:projectId
+        FREEZE_NEGOTIATION: `/freeze/:projectId`
     },
     ELABORATION_ROUTES: {
         CREATE_ELABORATION: `/create/:projectId`, // POST /api/v1/elaborations/create/:projectId
-        UPDATE_ELABORATION: `/update/:projectId/:elaborationId`, // PATCH /api/v1/elaborations/update/:projectId/:elaborationId
-        DELETE_ELABORATION: `/delete/:projectId/:elaborationId`, // DELETE /api/v1/elaborations/delete/:projectId/:elaborationId
-        GET_ELABORATION: `/get/:projectId/:elaborationId`, // GET /api/v1/elaborations/get/:projectId/:elaborationId
+        UPDATE_ELABORATION: `/update/:projectId`, // PATCH /api/v1/elaborations/update/:projectId/:elaborationId
+        DELETE_ELABORATION: `/delete/:projectId`, // DELETE /api/v1/elaborations/delete/:projectId/:elaborationId
+        GET_ELABORATION: `/get/:elaborationId`, // GET /api/v1/elaborations/get/:projectId/:elaborationId
         LIST_ELABORATIONS: `/list/:projectId`, // GET /api/v1/elaborations/list/:projectId
-        GET_LATEST_ELABORATION: `/latest/:projectId` // GET /api/v1/elaborations/latest/:projectId
+        GET_LATEST_ELABORATION: `/latest/:projectId`, // GET /api/v1/elaborations/latest/:projectId
+        FREEZE_ELABORATION: `/freeze/:projectId`
     },
     VALIDATION_ROUTES: {
         CREATE_VALIDATION: `/create/:projectId`, // POST /api/v1/validations/create/:projectId
-        UPDATE_VALIDATION: `/update/:projectId/:validationId`, // PATCH /api/v1/validations/update/:projectId/:validationId
-        DELETE_VALIDATION: `/delete/:projectId/:validationId`, // DELETE /api/v1/validations/delete/:projectId/:validationId
-        GET_VALIDATION: `/get/:projectId/:validationId`, // GET /api/v1/validations/get/:projectId/:validationId
+        UPDATE_VALIDATION: `/update/:projectId`, // PATCH /api/v1/validations/update/:projectId/:validationId
+        DELETE_VALIDATION: `/delete/:projectId`, // DELETE /api/v1/validations/delete/:projectId/:validationId
+        GET_VALIDATION: `/get/:validationId`, // GET /api/v1/validations/get/:projectId/:validationId
         LIST_VALIDATIONS: `/list/:projectId`, // GET /api/v1/validations/list/:projectId
-        GET_LATEST_VALIDATION: `/latest/:projectId` // GET /api/v1/validations/latest/:projectId
+        GET_LATEST_VALIDATION: `/latest/:projectId`, // GET /api/v1/validations/latest/:projectId
+        FREEZE_VALIDATION: `/freeze/:projectId` // PATCH /api/v1/validations/freeze/:validationId
     },
     SPECIFICATION_ROUTES: {
         CREATE_SPECIFICATION: `/create/:projectId`, // POST /api/v1/specifications/create/:projectId
-        UPDATE_SPECIFICATION: `/update/:projectId/:specificationId`, // PATCH /api/v1/specifications/update/:projectId/:specificationId
-        DELETE_SPECIFICATION: `/delete/:projectId/:specificationId`, // DELETE /api/v1/specifications/delete/:projectId/:specificationId
-        GET_SPECIFICATION: `/get/:projectId/:specificationId`, // GET /api/v1/specifications/get/:projectId/:specificationId
+        UPDATE_SPECIFICATION: `/update/:projectId`, // PATCH /api/v1/specifications/update/:projectId/:specificationId
+        DELETE_SPECIFICATION: `/delete/:projectId`, // DELETE /api/v1/specifications/delete/:projectId/:specificationId
+        GET_SPECIFICATION: `/get/:specificationId`, // GET /api/v1/specifications/get/:projectId/:specificationId
         LIST_SPECIFICATIONS: `/list/:projectId`, // GET /api/v1/specifications/list/:projectId
-        GET_LATEST_SPECIFICATION: `/latest/:projectId` // GET /api/v1/specifications/latest/:projectId
+        GET_LATEST_SPECIFICATION: `/latest/:projectId`, // GET /api/v1/specifications/latest/:projectId
+        FREEZE_SPECIFICATION: `/freeze/:projectId` // PATCH /api/v1/specifications/freeze/:projectId
     }
 };

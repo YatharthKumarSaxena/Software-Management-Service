@@ -450,6 +450,13 @@ module.exports = {
       reason: "Create inception endpoint abuse",
       message: "Too many requests to create inception endpoint. Please try again later."
     },
+    updateInception: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "update_inception",
+      reason: "Update inception endpoint abuse",
+      message: "Too many requests to update inception endpoint. Please try again later."
+    },
     getInception: {
       maxRequests: 30,
       windowMs: 60 * 1000,
