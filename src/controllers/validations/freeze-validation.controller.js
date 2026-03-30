@@ -5,11 +5,10 @@ const {
   sendValidationFrozenSuccess,
 } = require("../../responses/success/validation.response");
 const {
-  throwConflictError,
   throwInternalServerError,
   throwDBResourceNotFoundError,
 } = require("@/responses/common/error-handler.response");
-const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 const freezeValidationController = async (req, res) => {
   const { projectId } = req.params;
@@ -25,9 +24,6 @@ const freezeValidationController = async (req, res) => {
   });
 
   if (!result.success) {
-    if (result.errorCode === CONFLICT) {
-      return throwConflictError(res, result.message);
-    }
     if (result.errorCode === NOT_FOUND) {
       const resource = result.message.includes("Project") ? "Project" : "Validation";
       return throwDBResourceNotFoundError(res, resource);

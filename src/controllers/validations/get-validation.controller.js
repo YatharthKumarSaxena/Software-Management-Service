@@ -6,22 +6,19 @@ const {
 } = require("../../responses/success/validation.response");
 const {
   throwInternalServerError,
-  throwDBResourceNotFoundError,
 } = require("@/responses/common/error-handler.response");
+const { logWithTime } = require("@/utils/time-stamps.util");
 
 const getValidationController = async (req, res) => {
-  const { projectId } = req.params;
+  const validation = req.validation; // Set by previous middleware
 
-  const result = await getValidationService({ projectId });
+  const result = await getValidationService(validation);
 
   if (!result.success) {
-    if (result.message.includes("not found")) {
-      const resource = result.message.includes("Project") ? "Project" : "Validation";
-      return throwDBResourceNotFoundError(res, resource);
-    }
     return throwInternalServerError(res, new Error(result.message));
   }
 
+  logWithTime(`✅ Validation retrieved successfully for validationId: ${validation.validationId}`);
   return sendValidationRetrievedSuccess(res, result.validation);
 };
 

@@ -2,7 +2,7 @@
 
 const { listValidationsService } = require("../../services/validations/list-validations.service");
 const {
-  sendValidationListSuccess,
+  sendValidationsListSuccess,
 } = require("../../responses/success/validation.response");
 const {
   throwInternalServerError,
@@ -27,7 +27,7 @@ const listValidationsController = async (req, res) => {
     return throwInternalServerError(res, new Error(result.message));
   }
 
-  return sendValidationListSuccess(res, result.validations, result.pagination);
+  return sendValidationsListSuccess(res, result.validations, result.pagination);
 };
 
 module.exports = { listValidationsController };

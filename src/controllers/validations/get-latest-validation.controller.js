@@ -2,7 +2,7 @@
 
 const { getLatestValidationService } = require("../../services/validations/get-latest-validation.service");
 const {
-  sendValidationLatestRetrievedSuccess,
+  sendLatestValidationRetrievedSuccess,
 } = require("../../responses/success/validation.response");
 const {
   throwInternalServerError,
@@ -23,7 +23,7 @@ const getLatestValidationController = async (req, res) => {
     return throwInternalServerError(res, new Error(result.message));
   }
 
-  return sendValidationLatestRetrievedSuccess(res, result.validation);
+  return sendLatestValidationRetrievedSuccess(res, result.validation);
 };
 
 module.exports = { getLatestValidationController };
