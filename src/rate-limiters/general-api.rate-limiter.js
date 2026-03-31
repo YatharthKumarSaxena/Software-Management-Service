@@ -120,6 +120,20 @@ const getValidationRateLimiter = createRateLimiter(perUserAndDevice.getValidatio
 const getLatestValidationRateLimiter = createRateLimiter(perUserAndDevice.getLatestValidation);
 const listValidationsRateLimiter = createRateLimiter(perUserAndDevice.listValidations);
 
+// ── Meeting rate limiters ────────────────────────────────────────────────────
+const createMeetingRateLimiter = createRateLimiter(perUserAndDevice.createMeeting);
+const updateMeetingRateLimiter = createRateLimiter(perUserAndDevice.updateMeeting);
+const cancelMeetingRateLimiter = createRateLimiter(perUserAndDevice.cancelMeeting);
+const getMeetingRateLimiter = createRateLimiter(perUserAndDevice.getMeeting);
+const listMeetingsRateLimiter = createRateLimiter(perUserAndDevice.listMeetings);
+
+// ── Meeting scheduling operations rate limiters ───────────────────────────────
+const scheduleMeetingRateLimiter = createRateLimiter(perUserAndDevice.scheduleMeeting);
+const rescheduleMeetingRateLimiter = createRateLimiter(perUserAndDevice.rescheduleMeeting);
+const startMeetingRateLimiter = createRateLimiter(perUserAndDevice.startMeeting);
+const endMeetingRateLimiter = createRateLimiter(perUserAndDevice.endMeeting);
+const freezeMeetingRateLimiter = createRateLimiter(perUserAndDevice.freezeMeeting);
+
 module.exports = {
     welcomeAdminRateLimiter,
     welcomeClientRateLimiter,
@@ -222,5 +236,15 @@ module.exports = {
     freezeValidationRateLimiter,
     getValidationRateLimiter,
     getLatestValidationRateLimiter,
-    listValidationsRateLimiter
+    listValidationsRateLimiter,
+    createMeetingRateLimiter,
+    updateMeetingRateLimiter,
+    cancelMeetingRateLimiter,
+    getMeetingRateLimiter,
+    listMeetingsRateLimiter,
+    scheduleMeetingRateLimiter,
+    rescheduleMeetingRateLimiter,
+    startMeetingRateLimiter,
+    endMeetingRateLimiter,
+    freezeMeetingRateLimiter
 }

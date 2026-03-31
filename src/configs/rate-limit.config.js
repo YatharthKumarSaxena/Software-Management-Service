@@ -764,6 +764,80 @@ module.exports = {
       prefix: "list_validations",
       reason: "List validations endpoint abuse",
       message: "Too many requests to list validations endpoint. Please try again later."
+    },
+
+    // ── Meeting CRUD operations ──────────────────────────────────────────────
+    createMeeting: {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+      prefix: "create_meeting",
+      reason: "Create meeting endpoint abuse",
+      message: "Too many requests to create meeting endpoint. Please try again later."
+    },
+    updateMeeting: {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+      prefix: "update_meeting",
+      reason: "Update meeting endpoint abuse",
+      message: "Too many requests to update meeting endpoint. Please try again later."
+    },
+    cancelMeeting: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "cancel_meeting",
+      reason: "Cancel meeting endpoint abuse",
+      message: "Too many requests to cancel meeting endpoint. Please try again later."
+    },
+    getMeeting: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_meeting",
+      reason: "Get meeting endpoint abuse",
+      message: "Too many requests to get meeting endpoint. Please try again later."
+    },
+    listMeetings: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_meetings",
+      reason: "List meetings endpoint abuse",
+      message: "Too many requests to list meetings endpoint. Please try again later."
+    },
+
+    // ── Meeting Scheduling operations ────────────────────────────────────────
+    scheduleMeeting: {
+      maxRequests: 15,
+      windowMs: 60 * 1000,
+      prefix: "schedule_meeting",
+      reason: "Schedule meeting endpoint abuse",
+      message: "Too many requests to schedule meeting endpoint. Please try again later."
+    },
+    rescheduleMeeting: {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+      prefix: "reschedule_meeting",
+      reason: "Reschedule meeting endpoint abuse",
+      message: "Too many requests to reschedule meeting endpoint. Please try again later."
+    },
+    startMeeting: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "start_meeting",
+      reason: "Start meeting endpoint abuse",
+      message: "Too many requests to start meeting endpoint. Please try again later."
+    },
+    endMeeting: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "end_meeting",
+      reason: "End meeting endpoint abuse",
+      message: "Too many requests to end meeting endpoint. Please try again later."
+    },
+    freezeMeeting: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "freeze_meeting",
+      reason: "Freeze meeting endpoint abuse",
+      message: "Too many requests to freeze meeting endpoint. Please try again later."
     }
   }
 }

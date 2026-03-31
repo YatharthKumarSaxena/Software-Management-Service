@@ -13,6 +13,18 @@ const { projectMiddlewares } = require("@/middlewares/projects");
 const { stakeholderMiddlewares } = require("@/middlewares/stakeholders");
 const { stakeholderRoleAccessMiddlewares } = require("@/middlewares/stakeholders/api-stakeholder-role-access.middleware");
 const {
+  createMeetingRateLimiter,
+  updateMeetingRateLimiter,
+  cancelMeetingRateLimiter,
+  getMeetingRateLimiter,
+  listMeetingsRateLimiter,
+  scheduleMeetingRateLimiter,
+  rescheduleMeetingRateLimiter,
+  startMeetingRateLimiter,
+  endMeetingRateLimiter,
+  freezeMeetingRateLimiter
+} = require("@rate-limiters/general-api.rate-limiter");
+const {
   CREATE_MEETING,
   UPDATE_MEETING,
   CANCEL_MEETING,
@@ -30,6 +42,7 @@ const meetingRouter = express.Router();
 meetingRouter.post(
   CREATE_MEETING,[
     ...baseAuthAdminMiddlewares,
+    createMeetingRateLimiter,
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
@@ -53,6 +66,7 @@ meetingRouter.post(
 meetingRouter.patch(
   CANCEL_MEETING,[
     ...baseAuthAdminMiddlewares,
+    cancelMeetingRateLimiter,
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
@@ -84,6 +98,7 @@ meetingRouter.patch(
 meetingRouter.patch(
   UPDATE_MEETING ,[
     ...baseAuthAdminMiddlewares,
+    updateMeetingRateLimiter,
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
@@ -114,6 +129,7 @@ meetingRouter.patch(
 meetingRouter.get(
   GET_MEETING, [
     ...baseAuthClientOrAdminMiddlewares,
+    getMeetingRateLimiter,
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
@@ -134,6 +150,7 @@ meetingRouter.get(
 meetingRouter.get(
   LIST_MEETINGS, [
     ...baseAuthClientOrAdminMiddlewares,
+    listMeetingsRateLimiter,
 
     // Project (from projectId)
     projectMiddlewares.fetchProjectMiddleware,
@@ -151,6 +168,7 @@ meetingRouter.get(
 meetingRouter.patch(
   SCHEDULE_MEETING, [
     ...baseAuthAdminMiddlewares,
+    scheduleMeetingRateLimiter,
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
@@ -179,6 +197,7 @@ meetingRouter.patch(
 meetingRouter.patch(
   RESHEDULE_MEETING, [
     ...baseAuthAdminMiddlewares,
+    rescheduleMeetingRateLimiter,
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
@@ -206,6 +225,7 @@ meetingRouter.patch(
 meetingRouter.patch(
   END_MEETING, [
     ...baseAuthAdminMiddlewares,
+    endMeetingRateLimiter,
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
@@ -229,6 +249,7 @@ meetingRouter.patch(
 meetingRouter.patch(
   START_MEETING, [
     ...baseAuthAdminMiddlewares,
+    startMeetingRateLimiter,
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
@@ -251,6 +272,7 @@ meetingRouter.patch(
 meetingRouter.patch(
   FREEZE_MEETING, [
     ...baseAuthAdminMiddlewares,
+    freezeMeetingRateLimiter,
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
