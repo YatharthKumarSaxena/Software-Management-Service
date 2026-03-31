@@ -17,7 +17,12 @@ const {
   UPDATE_MEETING,
   CANCEL_MEETING,
   GET_MEETING,
-  LIST_MEETINGS
+  LIST_MEETINGS,
+  SCHEDULE_MEETING,
+  RESHEDULE_MEETING,
+  START_MEETING,
+  END_MEETING,
+  FREEZE_MEETING
 } = MEETING_ROUTES
 
 const meetingRouter = express.Router();
@@ -141,6 +146,130 @@ meetingRouter.get(
 
   ],
   meetingControllers.listMeetingsController
+)
+
+meetingRouter.patch(
+  SCHEDULE_MEETING, [
+    ...baseAuthAdminMiddlewares,
+
+    // Meeting (from meetingId + entity)
+    meetingMiddlewares.fetchMeetingMiddleware,
+    meetingMiddlewares.meetingStatusGuardMiddleware, // Ensure meeting is in DRAFT status before scheduling
+
+    // Project (derived from entity or meeting)
+    projectMiddlewares.fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+
+    // Entity (from entityType)
+    meetingMiddlewares.fetchEntityIdMiddleware,
+    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
+
+    // Stakeholder
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    meetingMiddlewares.validateUserIsParticipantMiddleware,
+
+    // Request validation
+    meetingMiddlewares.scheduleMeetingPresenceMiddleware,
+    meetingMiddlewares.scheduleMeetingValidationMiddleware
+
+  ],
+  meetingControllers.scheduleMeetingController
+)
+
+meetingRouter.patch(
+  RESHEDULE_MEETING, [
+    ...baseAuthAdminMiddlewares,
+
+    // Meeting (from meetingId + entity)
+    meetingMiddlewares.fetchMeetingMiddleware,
+
+    // Project (derived from entity or meeting)
+    projectMiddlewares.fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+
+    // Entity (from entityType)
+    meetingMiddlewares.fetchEntityIdMiddleware,
+    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
+
+    // Stakeholder
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    meetingMiddlewares.validateUserIsParticipantMiddleware,
+
+    // Request validation
+    meetingMiddlewares.rescheduleMeetingPresenceMiddleware,
+    meetingMiddlewares.rescheduleMeetingValidationMiddleware
+
+  ],
+  meetingControllers.rescheduleMeetingController
+)
+
+meetingRouter.patch(
+  END_MEETING, [
+    ...baseAuthAdminMiddlewares,
+
+    // Meeting (from meetingId + entity)
+    meetingMiddlewares.fetchMeetingMiddleware,
+
+    // Project (derived from entity or meeting)
+    projectMiddlewares.fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+
+    // Entity (from entityType)
+    meetingMiddlewares.fetchEntityIdMiddleware,
+    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
+
+    // Stakeholder
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    meetingMiddlewares.validateUserIsParticipantMiddleware
+
+  ],
+  meetingControllers.endMeetingController
+)
+
+meetingRouter.patch(
+  START_MEETING, [
+    ...baseAuthAdminMiddlewares,
+
+    // Meeting (from meetingId + entity)
+    meetingMiddlewares.fetchMeetingMiddleware,
+
+    // Project (derived from entity or meeting)
+    projectMiddlewares.fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+
+    // Entity (from entityType)
+    meetingMiddlewares.fetchEntityIdMiddleware,
+
+    // Stakeholder
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    meetingMiddlewares.validateUserIsParticipantMiddleware
+
+  ],
+  meetingControllers.startMeetingController
+)
+
+meetingRouter.patch(
+  FREEZE_MEETING, [
+    ...baseAuthAdminMiddlewares,
+
+    // Meeting (from meetingId + entity)
+    meetingMiddlewares.fetchMeetingMiddleware,
+
+    // Project (derived from entity or meeting)
+    projectMiddlewares.fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+
+    // Entity (from entityType)
+    meetingMiddlewares.fetchEntityIdMiddleware,
+    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
+
+    // Stakeholder
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    stakeholderRoleAccessMiddlewares.freezeMeetingStakeholderRoleAccessMiddleware,
+    meetingMiddlewares.validateUserIsParticipantMiddleware
+
+  ],
+  meetingControllers.freezeMeetingController
 )
 
 module.exports = {
