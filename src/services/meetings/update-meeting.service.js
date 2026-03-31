@@ -1,7 +1,7 @@
 // services/meetings/update-meeting.service.js
 
 const { MeetingModel } = require("@models/meeting.model");
-const { ParticipantTypes } = require("@configs/enums.config");
+const { ParticipantTypes, ProjectRoleTypes } = require("@configs/enums.config");
 const { UNAUTHORIZED, INTERNAL_ERROR } = require("@configs/http-status.config");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
@@ -72,9 +72,9 @@ const updateMeetingService = async (
         // ── 1. AUTHORIZATION CHECK (VERY BEGINNING) ───────────────────────
         // Allow update ONLY IF user is FACILITATOR OR PROJECT OWNER
         const isFacilitator = participantRole === ParticipantTypes.FACILITATOR;
-        const isProjectOwner = stakeholderRole?.toLowerCase() === 'owner';
+        const isAllowedProjectRole = stakeholderRole === ProjectRoleTypes.OWNER || stakeholderRole === ProjectRoleTypes.MANAGER;
 
-        if (!isFacilitator && !isProjectOwner) {
+        if (!isAllowedProjectRole && !isFacilitator) {
             logWithTime(
                 `❌ [updateMeetingService] User ${updatedBy} not authorized. Must be meeting FACILITATOR or project OWNER`
             );
@@ -105,7 +105,7 @@ const updateMeetingService = async (
         // ── 3. Handle facilitator change via participant services ──────────
         if (facilitatorChanged) {
 
-            if (isFacilitator && !isProjectOwner) {
+            if (isFacilitator && !isAllowedProjectRole) {
                 logWithTime(
                     `❌ [updateMeetingService] User ${updatedBy} is FACILITATOR and not PROJECT OWNER, cannot change facilitator`
                 );
