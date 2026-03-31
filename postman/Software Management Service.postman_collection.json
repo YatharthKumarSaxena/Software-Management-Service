@@ -17633,7 +17633,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"meetingPassword\": \"STAKEHOLDER_UNAVAILABILITY\",  // Optional\n    \"platform\": \"Hello i Am not \",  // Optional\n    \"meetingLink\": \"\",\n    \"scheduledAt\": \"\"\n}",
+              "raw": "{\n    \"meetingPassword\": \"STAKEHOLDER_UNAVAILABILITY\",  // Optional\n    \"platform\": \"Hello i Am not \",  // Optional\n    \"meetingLink\": \"\",\n    \"scheduledAt\": \"\",\n    \"expectedDuration\": 120 // In Minutes, Optional Backend Otherwise auto sets to 60\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -17835,7 +17835,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"meetingPassword\": \"STAKEHOLDER_UNAVAILABILITY\",  // Optional\n    \"platform\": \"Hello i Am not \",  // Optional\n    \"meetingLink\": \"\", // Optional\n    \"scheduledAt\": \"\" // Optional\n}",
+              "raw": "{\n    \"meetingPassword\": \"STAKEHOLDER_UNAVAILABILITY\",  // Optional\n    \"platform\": \"Hello i Am not \",  // Optional\n    \"meetingLink\": \"\", // Optional\n    \"scheduledAt\": \"\", // Optional\n    \"expectedDuration\": 120 // In Minutes, Optional Backend Otherwise auto sets to 60\n}",
               "options": {
                 "raw": {
                   "language": "json"
