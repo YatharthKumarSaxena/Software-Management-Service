@@ -5,7 +5,7 @@ const { MeetingStatuses } = require("@configs/enums.config");
 const { BAD_REQUEST, INTERNAL_ERROR, CONFLICT, FORBIDDEN } = require("@configs/http-status.config");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { versionControlService } = require("@services/common/version.service");const { logWithTime } = require("@utils/time-stamps.util");
+const { versionControlService } = require("@services/common/version.service"); const { logWithTime } = require("@utils/time-stamps.util");
 const { validateMeetingLink, isTimeOverlapping, validatePlatform } = require("@utils/meeting-validation.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
 
@@ -75,19 +75,20 @@ const rescheduleMeetingService = async (meeting, project, payload, userId, audit
         const meetingLinkChanged = payload.meetingLink && payload.meetingLink.trim() !== meeting.meetingLink;
         const platformChanged = payload.platform && payload.platform !== meeting.platform;
         const passwordChanged = payload.meetingPassword !== undefined && payload.meetingPassword !== meeting.meetingPassword;
+        const expectedDurationChanged = payload.expectedDuration !== undefined && payload.expectedDuration !== meeting.expectedDuration;
 
-        const changeDetected = scheduledAtChanged || meetingLinkChanged || platformChanged || passwordChanged;
+        const changeDetected = scheduledAtChanged || meetingLinkChanged || platformChanged || passwordChanged || expectedDurationChanged;
 
         logWithTime(
             `[rescheduleMeetingService] Changes detected: ` +
-            `scheduledAt=${scheduledAtChanged}, link=${meetingLinkChanged}, platform=${platformChanged}, password=${passwordChanged}`
+            `scheduledAt=${scheduledAtChanged}, link=${meetingLinkChanged}, platform=${platformChanged}, password=${passwordChanged}, expectedDuration=${expectedDurationChanged}`
         );
 
         if (!changeDetected) {
             logWithTime(`⛔ [rescheduleMeetingService] No changes detected in payload`);
             return {
                 success: false,
-                message: "No changes detected. Provide at least one field to reschedule: scheduledAt, meetingLink, platform, or meetingPassword",
+                message: "No changes detected. Provide at least one field to reschedule: scheduledAt, meetingLink, platform, meetingPassword, or expectedDuration",
                 errorCode: BAD_REQUEST
             };
         }
@@ -97,9 +98,26 @@ const rescheduleMeetingService = async (meeting, project, payload, userId, audit
         const finalMeetingLink = payload.meetingLink ? payload.meetingLink.trim() : meeting.meetingLink;
         const finalPlatform = payload.platform || meeting.platform;
         const finalMeetingPassword = payload.meetingPassword !== undefined ? payload.meetingPassword : meeting.meetingPassword;
+        const finalExpectedDuration = payload.expectedDuration !== undefined ? payload.expectedDuration : meeting.expectedDuration;
+
+        // ── Validate scheduledAt is in future ───────────────────────
+        if (payload.scheduledAt) {
+            const now = new Date();
+
+            if (finalScheduledAt <= now) {
+                logWithTime(
+                    `⛔ [rescheduleMeetingService] scheduledAt is not in future: ${finalScheduledAt}`
+                );
+                return {
+                    success: false,
+                    message: "scheduledAt must be a future date and time",
+                    errorCode: BAD_REQUEST
+                };
+            }
+        }
 
         logWithTime(
-            `[rescheduleMeetingService] Final values resolved: platform=${finalPlatform}`
+            `[rescheduleMeetingService] Final values resolved: platform=${finalPlatform}, expectedDuration=${finalExpectedDuration}`
         );
 
         // ── 6. Validate platform ────────────────────────────────────────────
@@ -245,6 +263,10 @@ const rescheduleMeetingService = async (meeting, project, payload, userId, audit
             updatePayload.meetingPassword = finalMeetingPassword;
         }
 
+        if (expectedDurationChanged) {
+            updatePayload.expectedDuration = finalExpectedDuration;
+        }
+
         updatePayload.updatedBy = userId;
 
         const updatedMeeting = await MeetingModel.findByIdAndUpdate(
@@ -271,6 +293,7 @@ const rescheduleMeetingService = async (meeting, project, payload, userId, audit
         if (meetingLinkChanged) changes.push(`meetingLink updated`);
         if (platformChanged) changes.push(`platform: ${meeting.platform} → ${finalPlatform}`);
         if (passwordChanged) changes.push(`meetingPassword updated`);
+        if (expectedDurationChanged) changes.push(`expectedDuration: ${meeting.expectedDuration} → ${finalExpectedDuration}`);
 
         await versionControlService(
             project,
