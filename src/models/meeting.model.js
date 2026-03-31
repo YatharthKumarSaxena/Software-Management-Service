@@ -121,6 +121,13 @@ const meetingSchema = new mongoose.Schema({
     default: null
   },
 
+  expectedDuration: {
+    type: Number, // in minutes
+    default: 60,
+    min: 15,
+    max: 480
+  },
+
   meetingLink: {
     type: String,
     default: null
