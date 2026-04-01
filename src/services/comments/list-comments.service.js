@@ -27,9 +27,13 @@ const listCommentsService = async ({
     // ── Build query filter ──────────────────────────────────────────────
     const query = {
       entityType,
-      entityId,
       isDeleted: false,
     };
+
+    // ── Only add entityId filter if it's not "all" ───────────────────────
+    if (entityId !== "all") {
+      query.entityId = entityId;
+    }
 
     // ── Get total count ─────────────────────────────────────────────────
     const total = await CommentModel.countDocuments(query);

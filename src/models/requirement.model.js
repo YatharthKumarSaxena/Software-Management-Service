@@ -86,6 +86,27 @@ const RequirementSchema = new mongoose.Schema({
             type: Date,
             default: null
         }
+    },
+    acceptanceCriteria: {
+        type: [String], // Array of strings (e.g., ["User should receive OTP within 5 secs", "Error message should be red"])
+        default: []
+    }, 
+    tags: {
+        type: [String],
+        default: []
+    },
+    attachments: {
+        type: [{
+            fileName: String,
+            fileUrl: String,
+            uploadedAt: { type: Date, default: Date.now }
+        }],
+        default: []
+    },
+    assigneeId: {
+        type: String,
+        match: customIdRegex,
+        default: null
     }
 }, {
     timestamps: true
