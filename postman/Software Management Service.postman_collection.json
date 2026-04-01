@@ -3108,7 +3108,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"projectId\": \"69bee96c3455c40e3b02a2ae\",\n    \"userId\": \"USR1100000\",\n    \"role\": \"sponsor\"\n    // \"orgId\": \"69b2de17e59ad1c6fbcc9608\" // Compulsary for Multi Org Cases\n}",
+              "raw": "{\n    \"projectId\": \"69cd04389a1697aaacd15a84\",\n    \"userId\": \"USR1100004\",\n    \"role\": \"manager\"\n    // \"orgId\": \"69b2de17e59ad1c6fbcc9608\" // Compulsary for Multi Org Cases\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -17068,7 +17068,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c924f19331289bd34b3d1b",
+                  "value": "69cd10e1518d746051fa0cbd",
                   "type": "string"
                 }
               ]
@@ -17261,7 +17261,7 @@
                 },
                 {
                   "key": "projectId",
-                  "value": "69c8e238308b3ed6c29836dd",
+                  "value": "69cd04389a1697aaacd15a84",
                   "type": "string"
                 }
               ]
@@ -17277,7 +17277,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0Nzg5NDc5LCJleHAiOjE3NzQ3OTU0Nzl9.EAhkTCd_GdVEt3jUfbMBFNjwFKMXD1lBeXaAjId-Dog",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc1MDQ0OTY2LCJleHAiOjE3NzUwNTA5NjZ9.mSWmlIuwp2GmndB5Hk5NCmd3pGDo4J_39t5M0tUguaU",
                   "type": "string"
                 }
               ]
@@ -17463,7 +17463,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c90808942bb6e350c2459b",
+                  "value": "69cd196ff45b91c9df93eeb0",
                   "type": "string"
                 }
               ]
@@ -17479,7 +17479,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0Nzg5NDc5LCJleHAiOjE3NzQ3OTU0Nzl9.EAhkTCd_GdVEt3jUfbMBFNjwFKMXD1lBeXaAjId-Dog",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc1MDU2MTI4LCJleHAiOjE3NzUwNjIxMjh9.gr4uN5lEbcUDlhfEdVQZw2JmVD9kZ9-oxs7Uy04CtUo",
                   "type": "string"
                 }
               ]
@@ -17633,7 +17633,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"meetingPassword\": \"STAKEHOLDER_UNAVAILABILITY\",  // Optional\n    \"platform\": \"Hello i Am not \",  // Optional\n    \"meetingLink\": \"\",\n    \"scheduledAt\": \"\",\n    \"expectedDuration\": 120 // In Minutes, Optional Backend Otherwise auto sets to 60\n}",
+              "raw": "{\n    \"meetingPassword\": \"STAKEHOLDER_UNAVAILABILITY\",  // Optional\n    \"platform\": \"GOOGLE_MEET\",  // Optional\n    \"meetingLink\": \"https://meet.google.com/bpw-xdrq-bbb\",\n    \"scheduledAt\": \"2026-04-02T00:00:00.000Z\",\n    \"expectedDuration\": 120 // In Minutes, Optional Backend Otherwise auto sets to 60\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -17665,7 +17665,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c90808942bb6e350c2459b",
+                  "value": "69cd3828852ab9d3853ed01b",
                   "type": "string"
                 }
               ]
@@ -17681,7 +17681,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0Nzg5NDc5LCJleHAiOjE3NzQ3OTU0Nzl9.EAhkTCd_GdVEt3jUfbMBFNjwFKMXD1lBeXaAjId-Dog",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0NjgzMTAyLCJleHAiOjE3NzQ2ODkxMDJ9.7Ciamp6Cq_QKHIFj3v5dWAkMVh20R5otvcvPyB2m5mA",
                   "type": "string"
                 }
               ]
@@ -17835,7 +17835,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"meetingPassword\": \"STAKEHOLDER_UNAVAILABILITY\",  // Optional\n    \"platform\": \"Hello i Am not \",  // Optional\n    \"meetingLink\": \"\", // Optional\n    \"scheduledAt\": \"\", // Optional\n    \"expectedDuration\": 120 // In Minutes, Optional Backend Otherwise auto sets to 60\n}",
+              "raw": "{\n    \"meetingPassword\": \"STAKEHOLDER_UNAVAILABILITY\",  // Optional\n    \"platform\": \"GOOGLE_MEET\",  // Optional\n    \"meetingLink\": \"https://meet.google.com/bpw-xdrq-bbb\",  // Optional\n    \"scheduledAt\": \"2026-04-02T00:00:00.000Z\",  // Optional\n    \"expectedDuration\": 120 // In Minutes, Optional Backend Otherwise auto sets to 60\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -17867,7 +17867,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c90808942bb6e350c2459b",
+                  "value": "69cd3828852ab9d3853ed01b",
                   "type": "string"
                 }
               ]
@@ -17883,7 +17883,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0Nzg5NDc5LCJleHAiOjE3NzQ3OTU0Nzl9.EAhkTCd_GdVEt3jUfbMBFNjwFKMXD1lBeXaAjId-Dog",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc1MDQ0OTY2LCJleHAiOjE3NzUwNTA5NjZ9.mSWmlIuwp2GmndB5Hk5NCmd3pGDo4J_39t5M0tUguaU",
                   "type": "string"
                 }
               ]
@@ -18060,7 +18060,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c90808942bb6e350c2459b",
+                  "value": "69cd196ff45b91c9df93eeb0",
                   "type": "string"
                 }
               ]
@@ -18076,7 +18076,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0Nzg5NDc5LCJleHAiOjE3NzQ3OTU0Nzl9.EAhkTCd_GdVEt3jUfbMBFNjwFKMXD1lBeXaAjId-Dog",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc1MDQ0NDcwLCJleHAiOjE3NzUwNTA0NzB9.BWJ7aZe86CxDdKKAKWIntE4osB8zU_ux6IzfvkQzlWw",
                   "type": "string"
                 }
               ]
@@ -18253,7 +18253,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c90808942bb6e350c2459b",
+                  "value": "69cd10e1518d746051fa0cbd",
                   "type": "string"
                 }
               ]
@@ -18269,7 +18269,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0Nzg5NDc5LCJleHAiOjE3NzQ3OTU0Nzl9.EAhkTCd_GdVEt3jUfbMBFNjwFKMXD1lBeXaAjId-Dog",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0NjgzMTAyLCJleHAiOjE3NzQ2ODkxMDJ9.7Ciamp6Cq_QKHIFj3v5dWAkMVh20R5otvcvPyB2m5mA",
                   "type": "string"
                 }
               ]
@@ -18446,7 +18446,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c90808942bb6e350c2459b",
+                  "value": "69cd10e1518d746051fa0cbd",
                   "type": "string"
                 }
               ]
@@ -18462,7 +18462,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0NzgyNDcyLCJleHAiOjE3NzQ3ODg0NzJ9.BBGVDmg6qilZxtTBzb9F89vyJKPNV_M8O_8UucSL_X8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc1MDQ2ODgxLCJleHAiOjE3NzUwNTI4ODF9.BimX3pG-2vGcRbmtLyNH2ZuSaP7pmj-p5CfUhfslxIw",
                   "type": "string"
                 }
               ]
@@ -18616,7 +18616,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"\",  // Optional\n    \"description\": \"\", // Optional\n    \"facilitatorId\": \"USR1100004\", // Optional\n    \"meetingGroup\": \"NOTIFICATION\", // Optional\n    \"platform\": \"GOOGLE_MEET\" // Optional\n}\n",
+              "raw": "{\n    //\"title\": \"\",  // Optional\n    //\"description\": \"\", // Optional\n    \"facilitatorId\": \"USR1100004\", // Optional\n    \"meetingGroup\": \"NOTIFICATION\", // Optional\n    \"platform\": \"GOOGLE_MEET\" // Optional\n}\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -18648,7 +18648,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c90808942bb6e350c2459b",
+                  "value": "69cd10e1518d746051fa0cbd",
                   "type": "string"
                 }
               ]
@@ -18850,7 +18850,7 @@
                 },
                 {
                   "key": "projectId",
-                  "value": "69c8e238308b3ed6c29836dd",
+                  "value": "69cd04389a1697aaacd15a84",
                   "type": "string"
                 }
               ]
@@ -18871,7 +18871,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0NDY1NjAyLCJleHAiOjE3NzQ0NzE2MDJ9.CPAgbWi3K09hovIhlA0GXWMHjM8JILrrDe7V3UhgJdQ",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc1MDQ0OTY2LCJleHAiOjE3NzUwNTA5NjZ9.mSWmlIuwp2GmndB5Hk5NCmd3pGDo4J_39t5M0tUguaU",
                   "type": "string"
                 }
               ]
@@ -19049,12 +19049,12 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c924f19331289bd34b3d1b",
+                  "value": "69cd10e1518d746051fa0cbd",
                   "type": "string"
                 },
                 {
                   "key": "participantId",
-                  "value": "69c959908bd3305ae1e72777",
+                  "value": "69cd1150518d746051fa0cf4",
                   "type": "string"
                 }
               ]
@@ -19070,7 +19070,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0NDY1NjAyLCJleHAiOjE3NzQ0NzE2MDJ9.CPAgbWi3K09hovIhlA0GXWMHjM8JILrrDe7V3UhgJdQ",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc1MDQ3NjM1LCJleHAiOjE3NzUwNTM2MzV9.6cDtJL5dvBc5mer47otxNydrOn4vxUmqE8GUWRDHpBE",
                   "type": "string"
                 }
               ]
@@ -19247,7 +19247,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c924f19331289bd34b3d1b",
+                  "value": "69cd10e1518d746051fa0cbd",
                   "type": "string"
                 }
               ]
@@ -19263,7 +19263,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0ODAzNjQwLCJleHAiOjE3NzQ4MDk2NDB9.ppBgxlBkTONIqP1-w_D58m5JQ5YcVzorfEPkrqkOtT8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc1MDQ0OTY2LCJleHAiOjE3NzUwNTA5NjZ9.mSWmlIuwp2GmndB5Hk5NCmd3pGDo4J_39t5M0tUguaU",
                   "type": "string"
                 }
               ]
@@ -19449,7 +19449,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c924f19331289bd34b3d1b",
+                  "value": "69cd2f6c22ba8aa47595a4f2",
                   "type": "string"
                 }
               ]
@@ -19465,7 +19465,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0NzgyNDcyLCJleHAiOjE3NzQ3ODg0NzJ9.BBGVDmg6qilZxtTBzb9F89vyJKPNV_M8O_8UucSL_X8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc1MDQ0OTY2LCJleHAiOjE3NzUwNTA5NjZ9.mSWmlIuwp2GmndB5Hk5NCmd3pGDo4J_39t5M0tUguaU",
                   "type": "string"
                 }
               ]
@@ -19651,7 +19651,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c924f19331289bd34b3d1b",
+                  "value": "69cd17c9f45b91c9df93ee3a",
                   "type": "string"
                 }
               ]
@@ -19667,7 +19667,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc0NjgzMTAyLCJleHAiOjE3NzQ2ODkxMDJ9.7Ciamp6Cq_QKHIFj3v5dWAkMVh20R5otvcvPyB2m5mA",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJVU1IxMTAwMDAwIiwiZGlkIjoiOGZjZTFiMTAtNDVlMy00YTg3LTkzZDYtYjRjMWYyZTNjZDliIiwiaWF0IjoxNzc1MDU1MjM4LCJleHAiOjE3NzUwNjEyMzh9.yJM-RKx2mPvZ100LMzetyUwyqn5kxhRn-qOy_7QAlks",
                   "type": "string"
                 }
               ]
@@ -19853,7 +19853,7 @@
                 },
                 {
                   "key": "meetingId",
-                  "value": "69c924f19331289bd34b3d1b",
+                  "value": "69cd32166f858a359827a9cf",
                   "type": "string"
                 }
               ]
