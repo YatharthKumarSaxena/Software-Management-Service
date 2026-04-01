@@ -49,7 +49,7 @@ participantRouter.post(
     stakeholderMiddlewares.checkUserIsStakeholder,
 
     // Meeting validations
-    meetingMiddlewares.meetingStatusGuardMiddleware,
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware,
 
     // Request validation
@@ -79,7 +79,7 @@ participantRouter.patch(
     stakeholderMiddlewares.checkUserIsStakeholder,
 
     // Meeting validations
-    meetingMiddlewares.meetingStatusGuardMiddleware,
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware,
 
     // Request validation
@@ -110,7 +110,7 @@ participantRouter.patch(
     stakeholderMiddlewares.checkUserIsStakeholder,
 
     // Meeting validations
-    meetingMiddlewares.meetingStatusGuardMiddleware,
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware,
 
     // Request validation

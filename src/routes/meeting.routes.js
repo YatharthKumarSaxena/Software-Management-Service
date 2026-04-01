@@ -70,6 +70,7 @@ meetingRouter.patch(
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
@@ -84,7 +85,6 @@ meetingRouter.patch(
     stakeholderRoleAccessMiddlewares.cancelMeetingStakeholderRoleAccessMiddleware,
 
     // Meeting validations
-    meetingMiddlewares.meetingStatusGuardMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware,
 
     // Request validation
@@ -115,6 +115,7 @@ meetingRouter.patch(
     stakeholderMiddlewares.checkUserIsStakeholder,
 
     // Meeting validations
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
     meetingMiddlewares.meetingStatusGuardMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware,
 
@@ -172,6 +173,7 @@ meetingRouter.patch(
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
     meetingMiddlewares.meetingStatusGuardMiddleware, // Ensure meeting is in DRAFT status before scheduling
 
     // Project (derived from entity or meeting)
@@ -201,6 +203,7 @@ meetingRouter.patch(
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
@@ -229,6 +232,7 @@ meetingRouter.patch(
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
@@ -253,6 +257,7 @@ meetingRouter.patch(
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
@@ -260,6 +265,7 @@ meetingRouter.patch(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
+    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
 
     // Stakeholder
     stakeholderMiddlewares.checkUserIsStakeholder,
@@ -276,6 +282,7 @@ meetingRouter.patch(
 
     // Meeting (from meetingId + entity)
     meetingMiddlewares.fetchMeetingMiddleware,
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
