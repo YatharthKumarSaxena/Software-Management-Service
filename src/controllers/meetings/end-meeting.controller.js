@@ -26,7 +26,7 @@ const { ParticipantTypes, ProjectRoleTypes } = require("@configs/enums.config");
  */
 const endMeetingController = async (req, res) => {
   try {
-    const { meeting, participant, stakeholder } = req;
+    const { meeting, project, participant, stakeholder } = req;
 
     logWithTime(
       `📍 [endMeetingController] Ending meeting: ${meeting._id} | ${getLogIdentifiers(req)}`
