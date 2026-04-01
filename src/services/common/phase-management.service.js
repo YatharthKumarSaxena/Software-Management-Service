@@ -212,6 +212,7 @@ const createPhaseWithVersionManagement = async ({
   try {
     const targetPhase = project.currentPhase;
     const projectId = project._id.toString();
+
     // ── Validation ────────────────────────────────────────────────────
     if (!PHASE_MODEL_MAP[targetPhase]) {
       logWithTime(`❌ Invalid target phase: ${targetPhase}`);
@@ -223,75 +224,66 @@ const createPhaseWithVersionManagement = async ({
       return { success: false, message: "Invalid project ID", errorCode: 400 };
     }
 
-    // ── Step 1 & 2: Find active phase ──────────────────────────────────
-    const activePhaseInfo = await findActivePhase(projectId);
-    let newMajorVersion = 1;
+    // ── Step 1: Block multiple active documents for the SAME phase ────
+    // Agar same phase ka already ek unfrozen document hai, toh naya create mat karne do.
+    const TargetPhaseModel = PHASE_MODEL_MAP[targetPhase];
+    const existingActiveTarget = await TargetPhaseModel.findOne({
+      projectId,
+      isDeleted: false,
+      isFrozen: false
+    }).lean();
 
-    // ── Step 3: Apply transition logic ─────────────────────────────
-    if (activePhaseInfo) {
-      const activePhase = activePhaseInfo.phase;
-      const activeDoc = activePhaseInfo.document;
-      const activeMajorVersion = activeDoc.version.major;
-      const activePhaseOrder = PHASE_ORDER[activePhase]; // Typo fixed here
-      const targetPhaseOrder = PHASE_ORDER[targetPhase];
-
-      // ── CASE 1: Forward Movement ───────────────────────────────────
-      if (activePhaseOrder < targetPhaseOrder) {
-        const freezeSuccess = await freezePhase(activeDoc, activePhase, {
-          user: auditContext?.user, device: auditContext?.device, requestId: auditContext?.requestId, createdBy
-        });
-        if (!freezeSuccess) return { success: false, message: `Failed to freeze ${activePhase}`, errorCode: INTERNAL_ERROR };
-
-        newMajorVersion = activeMajorVersion;
-      }
-      // ── CASE 2: Backward Movement ──────────────────────────────────
-      else if (activePhaseOrder > targetPhaseOrder) {
-        const freezeSuccess = await freezePhase(activeDoc, activePhase, {
-          user: auditContext?.user, device: auditContext?.device, requestId: auditContext?.requestId, createdBy
-        });
-        if (!freezeSuccess) return { success: false, message: `Failed to freeze ${activePhase}`, errorCode: INTERNAL_ERROR };
-
-        newMajorVersion = activeMajorVersion + 1;
-      }
-      // ── CASE 2.5: Same Phase ───────────────────────────────────────
-      else {
-        return { success: false, message: `${targetPhase} is already active for this project`, errorCode: CONFLICT };
-      }
+    if (existingActiveTarget) {
+      logWithTime(`⚠️ [createPhase] ${targetPhase} is already active. Cannot create a new one.`);
+      return { 
+        success: false, 
+        message: `An active ${targetPhase} phase already exists. Please freeze it before creating a new one.`, 
+        errorCode: CONFLICT 
+      };
     }
-    // ── CASE 3: No Active Phase ────────────────────────────────────
-    else {
-      let highestMajor = 0;
-      let targetPhaseLatestMajor = 0;
 
-      for (const [phase] of Object.entries(PHASE_MODEL_MAP)) {
-        const latestDoc = await fetchLatestPhaseDocument(phase, projectId);
-        if (latestDoc) {
-          // Track highest overall version in the project
-          if (latestDoc.version.major > highestMajor) {
-            highestMajor = latestDoc.version.major;
-          }
-          // Track the highest version specifically for our target phase
-          if (phase === targetPhase) {
-            targetPhaseLatestMajor = latestDoc.version.major;
-          }
+    // ── Step 2: Find Max Major Version across ALL phases ──────────────
+    let highestMajor = 0;
+    let targetPhaseHighestMajor = 0;
+
+    // Poori list traverse karke max version find kar rahe hain
+    for (const [phase, PhaseModel] of Object.entries(PHASE_MODEL_MAP)) {
+      const latestDoc = await PhaseModel
+        .findOne({ projectId, isDeleted: false })
+        .sort({ "version.major": -1 })
+        .lean();
+
+      if (latestDoc) {
+        const docMajor = latestDoc.version.major;
+        
+        // Track overall highest major version in the project
+        if (docMajor > highestMajor) {
+          highestMajor = docMajor;
+        }
+        
+        // Track highest version specifically for our target phase
+        if (phase === targetPhase && docMajor > targetPhaseHighestMajor) {
+          targetPhaseHighestMajor = docMajor;
         }
       }
+    }
 
-      if (highestMajor === 0) {
-        // Scenario A: Brand new project, no phases exist at all
-        newMajorVersion = 1;
-      } else if (targetPhaseLatestMajor === highestMajor) {
-        // Scenario B: Target phase ALREADY exists in the current highest cycle!
-        // This means user froze it and is re-creating it. We MUST bump the cycle.
+    // ── Step 3: Determine New Major Version ───────────────────────────
+    let newMajorVersion = 1; // Default for brand new projects
+
+    if (highestMajor > 0) {
+      if (targetPhaseHighestMajor === highestMajor) {
+        // Target phase already exists with the current highest cycle's version.
+        // Ise dobara create kar rahe hain, iska matlab naya cycle start hoga.
         newMajorVersion = highestMajor + 1;
       } else {
-        // Scenario C: Normal forward movement (e.g., Inception v1 frozen -> Creating Elicitation)
-        // Elicitation doesn't have v1 yet, so it's safe to use highestMajor.
+        // Target phase pichle phases (e.g., Inception) ke aage badh raha hai,
+        // toh version same cycle wala hi rahega.
         newMajorVersion = highestMajor;
       }
-
-      logWithTime(`🆕 CASE 3 - No active phase. Continuing with majorVersion=${newMajorVersion}.`);
     }
+
+    logWithTime(`🆕 Proceeding with majorVersion=${newMajorVersion} for ${targetPhase}.`);
 
     // ── Step 4: Create the new phase document ──────────────────────
     const createdPhase = await createPhaseDocument({
@@ -302,7 +294,7 @@ const createPhaseWithVersionManagement = async ({
       additionalData
     });
 
-    // ── Step 5: Log activity tracker ───────────────────────────────────────
+    // ── Step 5: Log activity tracker ──────────────────────────────────
     const { oldData, newData } = prepareAuditData(null, createdPhase);
     logActivityTrackerEvent(
       auditContext?.user, auditContext?.device, auditContext?.requestId,
