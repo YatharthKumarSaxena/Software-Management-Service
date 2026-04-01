@@ -1,14 +1,15 @@
 // utils/meeting-validation.util.js
 
+const { googleMeetRegex, zoomMeetRegex, teamsRegex } = require("@/configs/regex.config");
 const { MeetingPlatformTypes } = require("@configs/enums.config");
 
 /**
  * Meeting link validation regex patterns per platform
  */
 const MEETING_LINK_PATTERNS = {
-  [MeetingPlatformTypes.GOOGLE_MEET]: /^https:\/\/meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}$/,
-  [MeetingPlatformTypes.ZOOM]: /^https:\/\/([a-z0-9-]+\.)?zoom\.us\/j\/\d+(\?pwd=[\w-]+)?$/,
-  [MeetingPlatformTypes.TEAMS]: /^https:\/\/teams\.microsoft\.com\/l\/meetup-join\/.+$/,
+  [MeetingPlatformTypes.GOOGLE_MEET]: googleMeetRegex,
+  [MeetingPlatformTypes.ZOOM]: zoomMeetRegex,
+  [MeetingPlatformTypes.TEAMS]: teamsRegex,
   [MeetingPlatformTypes.OTHER]: null // No validation for OTHER platform
 };
 
