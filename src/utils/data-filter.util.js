@@ -94,12 +94,12 @@ const filterParticipantDataByUserType = (participants, isAdmin) => {
     const displayName = participantObj.firstName || `User (${participantObj.userId})`;
 
     return {
+      _id: participantObj._id,
       userId: participantObj.userId,
       displayName: displayName,
       role: participantObj.role,
       roleDescription: participantObj.roleDescription
       // Don't include:
-      // - _id (internal db reference)
       // - firstName (internal field)
       // - addedBy, updatedBy, removedBy (audit fields)
       // - isDeleted, removedAt (audit fields)
