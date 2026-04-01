@@ -56,14 +56,25 @@ const cancelMeetingService = async (
       };
     }
 
-    if (project.projectCriticality === PriorityLevels.CRITICAL){
-       if (!cancelReason) {
-          return {
-            success: false,
-            message: "cancelReason is required for Critical Projects",
-            errorCode: BAD_REQUEST
-          }
-       }
+    if (project.projectCriticality === PriorityLevels.CRITICAL) {
+      if (!cancelReason) {
+        return {
+          success: false,
+          message: "cancelReason is required for Critical Projects",
+          errorCode: BAD_REQUEST
+        }
+      }
+    }
+
+    if (meeting.status !== MeetingStatuses.SCHEDULED && meeting.status !== MeetingStatuses.DRAFT) {
+      logWithTime(
+        `⛔ [cancelMeetingService] Meeting status is ${meeting.status}, expected SCHEDULED or DRAFT`
+      );
+      return {
+        success: false,
+        message: `Meeting cannot be cancelled. Current status: ${meeting.status}. Only DRAFT or SCHEDULED meetings can be cancelled.`,
+        errorCode: BAD_REQUEST
+      };
     }
 
     // ── 2. Build update payload ────────────────────────────────────────
@@ -92,7 +103,6 @@ const cancelMeetingService = async (
 
     // ── 4. Get project for version control ────────────────────────────
     const ParentModel = MODEL_MAP[meeting.entityType];
-    const parentEntity = await ParentModel.findById(meeting.entityId).lean();
 
     // ── 5. Call version control service to update elicitation minor version
     const { user, device, requestId } = auditContext || {};
