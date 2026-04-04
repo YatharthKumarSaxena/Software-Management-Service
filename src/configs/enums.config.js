@@ -367,7 +367,11 @@ const CommentEntityTypes = Object.freeze({
   SCOPES: DB_COLLECTIONS.SCOPES,
   REQUIREMENTS: DB_COLLECTIONS.REQUIREMENTS,
   INCEPTIONS: DB_COLLECTIONS.INCEPTIONS,
-  HIGH_LEVEL_FEATURES: DB_COLLECTIONS.HIGH_LEVEL_FEATURES
+  HIGH_LEVEL_FEATURES: DB_COLLECTIONS.HIGH_LEVEL_FEATURES,
+  EXTERNAL_INTERFACES: DB_COLLECTIONS.EXTERNAL_INTERFACES,
+  IDEAS: DB_COLLECTIONS.IDEAS,
+  MEETINGS: DB_COLLECTIONS.MEETINGS,
+  PROJECTS: DB_COLLECTIONS.PROJECTS
 });
 
 const CommentSpecifiedEntityTypes = {
@@ -505,6 +509,65 @@ const MeetingCancellationReasons = Object.freeze({
   OTHER: "OTHER"
 });
 
+const EIAuthTypes = Object.freeze({
+  LOCAL: "LOCAL",
+  OAUTH: "OAUTH",
+  API_KEY: "API_KEY",
+  JWT: "JWT",
+  NONE: "NONE"
+});
+
+const EIInterfaceTypes = Object.freeze({
+  USER: "USER",
+  SYSTEM: "SYSTEM",
+  HARDWARE: "HARDWARE",
+  SOFTWARE: "SOFTWARE"
+});
+
+const EIInteractionTypes = Object.freeze({
+  API: "API",
+  UI: "UI",
+  FILE: "FILE",
+  EVENT: "EVENT",
+  MESSAGE_QUEUE: "MESSAGE_QUEUE"
+});
+
+const EIFrequencyTypes = Object.freeze({
+  REAL_TIME: "REAL_TIME",
+  BATCH: "BATCH",
+  SCHEDULED: "SCHEDULED",
+  ON_DEMAND: "ON_DEMAND"
+});
+
+const ScopeCategoryTypes = Object.freeze({
+  LOCAL: "LOCAL",
+  GLOBAL: "GLOBAL"
+});
+
+const IdeaStatuses = Object.freeze({
+  PENDING: "PENDING",
+  ACCEPTED: "ACCEPTED",
+  REJECTED: "REJECTED",
+  DEFERRED: "DEFERRED"
+});
+
+const RejectedIdeaReasonTypes = Object.freeze({
+  OUT_OF_SCOPE: "OUT_OF_SCOPE",
+  DUPLICATE: "DUPLICATE",
+  NOT_FEASIBLE: "NOT_FEASIBLE",
+  TECHNICAL_LIMITATION: "TECHNICAL_LIMITATION",
+  BUSINESS_DECISION: "BUSINESS_DECISION",
+  OTHER: "OTHER"
+});
+
+const DeferredIdeaReasonTypes = Object.freeze({
+  LOW_PRIORITY: "LOW_PRIORITY",
+  FUTURE_SCOPE: "FUTURE_SCOPE",
+  DEPENDENCY_PENDING: "DEPENDENCY_PENDING",
+  RESOURCE_CONSTRAINT: "RESOURCE_CONSTRAINT",
+  OTHER: "OTHER"
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -568,5 +631,13 @@ module.exports = {
   DeferredReasonTypes,
   ChangeProjectOwnerReasons,
   MeetingGroups,
-  MeetingCancellationReasons
+  MeetingCancellationReasons,
+  EIAuthTypes,
+  EIInterfaceTypes,
+  EIInteractionTypes,
+  EIFrequencyTypes,
+  ScopeCategoryTypes,
+  IdeaStatuses,
+  RejectedIdeaReasonTypes,
+  DeferredIdeaReasonTypes
 };
