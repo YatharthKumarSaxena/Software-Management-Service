@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const HighLevelFeatureSchema = new mongoose.Schema({
   inceptionId: { type: mongoose.Schema.Types.ObjectId, ref: DB_COLLECTIONS.INCEPTIONS, required: true },
+  ideaId: { type: mongoose.Schema.Types.ObjectId, ref: DB_COLLECTIONS.IDEAS, default: null },
   projectId: { type: mongoose.Schema.Types.ObjectId, ref: DB_COLLECTIONS.PROJECTS, required: true },
   title: { type: String, trim: true, minlength: titleLength.min, maxlength: titleLength.max, required: true },
   description: { type: String, trim: true, default: null, minlength: descriptionLength.min, maxlength: descriptionLength.max },
