@@ -39,6 +39,15 @@ const cancelProductRequestRateLimiter = createRateLimiter(perUserAndDevice.cance
 const approveProductRequestRateLimiter = createRateLimiter(perUserAndDevice.approveProductRequest);
 const rejectProductRequestRateLimiter = createRateLimiter(perUserAndDevice.rejectProductRequest);
 
+const createOrgProjectRequestRateLimiter = createRateLimiter(perUserAndDevice.createOrgProjectRequest);
+const getOrgProjectRequestRateLimiter = createRateLimiter(perUserAndDevice.getOrgProjectRequest);
+const listMyOrgProjectRequestsRateLimiter = createRateLimiter(perUserAndDevice.listMyOrgProjectRequests);
+const listProjectOrgRequestsRateLimiter = createRateLimiter(perUserAndDevice.listProjectOrgRequests);
+const updateOrgProjectRequestRateLimiter = createRateLimiter(perUserAndDevice.updateOrgProjectRequest);
+const withdrawOrgProjectRequestRateLimiter = createRateLimiter(perUserAndDevice.withdrawOrgProjectRequest);
+const approveOrgProjectRequestRateLimiter = createRateLimiter(perUserAndDevice.approveOrgProjectRequest);
+const rejectOrgProjectRequestRateLimiter = createRateLimiter(perUserAndDevice.rejectOrgProjectRequest);
+
 const createCommentRateLimiter = createRateLimiter(perUserAndDevice.createComment);
 const updateCommentRateLimiter = createRateLimiter(perUserAndDevice.updateComment);
 const deleteCommentRateLimiter = createRateLimiter(perUserAndDevice.deleteComment);
@@ -54,12 +63,24 @@ const updateScopeRateLimiter = createRateLimiter(perUserAndDevice.updateScope);
 const deleteScopeRateLimiter = createRateLimiter(perUserAndDevice.deleteScope);
 const getScopeRateLimiter    = createRateLimiter(perUserAndDevice.getScope);
 const listScopesRateLimiter  = createRateLimiter(perUserAndDevice.listScopes);
+const linkScopeToHlfRateLimiter = createRateLimiter(perUserAndDevice.linkScopeToHLF);
 
 const createHLFRateLimiter = createRateLimiter(perUserAndDevice.createHLF);
 const updateHLFRateLimiter = createRateLimiter(perUserAndDevice.updateHLF);
 const deleteHLFRateLimiter = createRateLimiter(perUserAndDevice.deleteHLF);
 const getHLFRateLimiter    = createRateLimiter(perUserAndDevice.getHLF);
 const listHLFsRateLimiter  = createRateLimiter(perUserAndDevice.listHLFs);
+const linkHLFtoIdeaRateLimiter = createRateLimiter(perUserAndDevice.linkHLFtoIdea);
+
+const createIdeaRateLimiter  = createRateLimiter(perUserAndDevice.createIdea);
+const updateIdeaRateLimiter  = createRateLimiter(perUserAndDevice.updateIdea);
+const deleteIdeaRateLimiter  = createRateLimiter(perUserAndDevice.deleteIdea);
+const getIdeaRateLimiter     = createRateLimiter(perUserAndDevice.getIdea);
+const listIdeasRateLimiter   = createRateLimiter(perUserAndDevice.listIdeas);
+const acceptIdeaRateLimiter  = createRateLimiter(perUserAndDevice.acceptIdea);
+const rejectIdeaRateLimiter  = createRateLimiter(perUserAndDevice.rejectIdea);
+const deferIdeaRateLimiter   = createRateLimiter(perUserAndDevice.deferIdea);
+const reopenIdeaRateLimiter  = createRateLimiter(perUserAndDevice.reopenIdea);
 
 const createProductVisionRateLimiter = createRateLimiter(perUserAndDevice.createProductVision);
 const updateProductVisionRateLimiter = createRateLimiter(perUserAndDevice.updateProductVision);
@@ -166,6 +187,14 @@ module.exports = {
     cancelProductRequestRateLimiter,
     approveProductRequestRateLimiter,
     rejectProductRequestRateLimiter,
+    createOrgProjectRequestRateLimiter,
+    getOrgProjectRequestRateLimiter,
+    listMyOrgProjectRequestsRateLimiter,
+    listProjectOrgRequestsRateLimiter,
+    updateOrgProjectRequestRateLimiter,
+    withdrawOrgProjectRequestRateLimiter,
+    approveOrgProjectRequestRateLimiter,
+    rejectOrgProjectRequestRateLimiter,
     activateProjectRateLimiter,
     getMyActivityRateLimiter,
     getActivityByIdRateLimiter,
@@ -181,11 +210,22 @@ module.exports = {
     deleteScopeRateLimiter,
     getScopeRateLimiter,
     listScopesRateLimiter,
+    linkScopeToHlfRateLimiter,
     createHLFRateLimiter,
     updateHLFRateLimiter,
     deleteHLFRateLimiter,
     getHLFRateLimiter,
     listHLFsRateLimiter,
+    linkHLFtoIdeaRateLimiter,
+    createIdeaRateLimiter,
+    updateIdeaRateLimiter,
+    deleteIdeaRateLimiter,
+    getIdeaRateLimiter,
+    listIdeasRateLimiter,
+    acceptIdeaRateLimiter,
+    rejectIdeaRateLimiter,
+    deferIdeaRateLimiter,
+    reopenIdeaRateLimiter,
     createProductVisionRateLimiter,
     updateProductVisionRateLimiter,
     deleteProductVisionRateLimiter,
