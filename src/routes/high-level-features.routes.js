@@ -9,14 +9,16 @@ const { hlfControllers } = require("@controllers/high-level-features");
 const { hlfMiddlewares } = require("@/middlewares/high-level-features");
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { commonMiddlewares } = require("@/middlewares/common");
-const { createHLFRateLimiter, updateHLFRateLimiter, deleteHLFRateLimiter, getHLFRateLimiter, listHLFsRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
+const { createHLFRateLimiter, updateHLFRateLimiter, deleteHLFRateLimiter, getHLFRateLimiter, listHLFsRateLimiter, linkHLFtoIdeaRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
+const { ideaMiddlewares } = require("@/middlewares/ideas");
 
 const {
   CREATE_HLF,
   UPDATE_HLF,
   DELETE_HLF,
   GET_HLF,
-  LIST_HLF
+  LIST_HLF,
+  LINK_HLF_TO_IDEA
 } = HLF_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -124,6 +126,26 @@ hlfRouter.get(
     commonMiddlewares.checkUserIsStakeholder,
   ],
   hlfControllers.listHlfController
+);
+
+/**
+ * PATCH /software-management-service/api/v1/high-level-features/link/:hlfId/:ideaId
+ * Link a high-level feature to an idea.
+ * Allowed roles: CEO, Business Analyst, Manager
+ * Requires: admin is a stakeholder of the project
+ */
+hlfRouter.patch(
+  LINK_HLF_TO_IDEA,
+  [
+    ...baseAuthAdminMiddlewares,
+    linkHLFtoIdeaRateLimiter,
+    hlfMiddlewares.fetchHlfMiddleware,
+    commonMiddlewares.checkInceptionNotFrozen,
+    ideaMiddlewares.fetchIdeaMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    commonMiddlewares.checkUserIsStakeholder,
+  ],
+  hlfControllers.linkHlfToIdeaController
 );
 
 module.exports = { hlfRouter };

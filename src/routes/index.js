@@ -1,11 +1,13 @@
-const { INTERNAL_BASE, TEST_BASE, PROJECT_BASE, STAKEHOLDER_BASE, PRODUCT_REQUEST_BASE, SCOPE_BASE, HLF_BASE, PRODUCT_VISION_BASE, COMMENT_BASE, ACTIVITY_TRACKER_BASE, ELICITATION_BASE, INCEPTION_BASE, MEETINGS_BASE, PARTICIPANTS_BASE, ELABORATION_BASE, NEGOTIATION_BASE, SPECIFICATION_BASE, VALIDATION_BASE } = require("@/configs/uri.config");
+const { INTERNAL_BASE, TEST_BASE, PROJECT_BASE, STAKEHOLDER_BASE, PRODUCT_REQUEST_BASE, ORG_PROJECT_REQUEST_BASE, SCOPE_BASE, HLF_BASE, IDEAS_BASE, PRODUCT_VISION_BASE, COMMENT_BASE, ACTIVITY_TRACKER_BASE, ELICITATION_BASE, INCEPTION_BASE, MEETINGS_BASE, PARTICIPANTS_BASE, ELABORATION_BASE, NEGOTIATION_BASE, SPECIFICATION_BASE, VALIDATION_BASE } = require("@/configs/uri.config");
 const { internalRouter }    = require("./internal.routes");
 const { testRouter }        = require("./test.routes");
 const { projectRouter }     = require("./project.routes");
 const { stakeholderRouter } = require("./stakeholder.routes");
 const { productRequestRouter } = require("./product-request.routes");
+const { orgProjectRequestsRoutes } = require("./org-project-requests.routes");
 const { scopeRouter } = require("./scope.routes");
 const { hlfRouter } = require("./high-level-features.routes");
+const { ideaRouter } = require("./idea.routes");
 const { productVisionRouter } = require("./product-vision.routes");
 const { commentRouter } = require("./comment.routes");
 const { activityTrackerRouter } = require("./activity-tracker.routes");
@@ -33,11 +35,16 @@ module.exports = (app) => {
 
   app.use(PRODUCT_REQUEST_BASE, productRequestRouter);
 
+  app.use(ORG_PROJECT_REQUEST_BASE, orgProjectRequestsRoutes);
+
   // Admin/Client-facing API routes — scopes
   app.use(SCOPE_BASE, scopeRouter);
 
   // Admin/Client-facing API routes — high-level features
   app.use(HLF_BASE, hlfRouter);
+
+  // Admin/Client-facing API routes — ideas
+  app.use(IDEAS_BASE, ideaRouter);
 
   // Admin/Client-facing API routes — product vision
   app.use(PRODUCT_VISION_BASE, productVisionRouter);

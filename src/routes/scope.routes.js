@@ -8,7 +8,8 @@ const { baseAuthAdminMiddlewares, baseAuthClientOrAdminMiddlewares } = require("
 const { scopeControllers } = require("@controllers/scopes");
 const { scopeMiddlewares } = require("@/middlewares/scopes");
 const { projectMiddlewares } = require("@/middlewares/projects");
-const { createScopeRateLimiter, updateScopeRateLimiter, deleteScopeRateLimiter, getScopeRateLimiter, listScopesRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
+const { hlfMiddlewares } = require("@/middlewares/high-level-features");
+const { createScopeRateLimiter, updateScopeRateLimiter, deleteScopeRateLimiter, getScopeRateLimiter, listScopesRateLimiter, linkScopeToHlfRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
 const { commonMiddlewares } = require("@/middlewares/common");
 
 const {
@@ -16,7 +17,8 @@ const {
   UPDATE_SCOPE,
   DELETE_SCOPE,
   GET_SCOPE,
-  LIST_SCOPES
+  LIST_SCOPES,
+  LINK_SCOPE_TO_HLF
 } = SCOPE_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -125,6 +127,27 @@ scopeRouter.get(
     commonMiddlewares.checkUserIsStakeholder,
   ],
   scopeControllers.listScopesController
+);
+
+/**
+ * PATCH /software-management-service/api/v1/scope/link/:scopeId/:hlfId
+ * Link a scope to a high-level feature.
+ * Allowed roles: CEO, Business Analyst, Manager
+ * Requires: admin is a stakeholder of the project
+ */
+scopeRouter.patch(
+  LINK_SCOPE_TO_HLF,
+  [
+    ...baseAuthAdminMiddlewares,
+    linkScopeToHlfRateLimiter,
+    scopeMiddlewares.fetchScopeMiddleware,
+    hlfMiddlewares.fetchHlfMiddleware,
+    scopeMiddlewares.fetchInceptionFromProjectMiddleware,
+    commonMiddlewares.checkInceptionNotFrozen,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    commonMiddlewares.checkUserIsStakeholder,
+  ],
+  scopeControllers.linkScopeToHlfController
 );
 
 module.exports = { scopeRouter };
