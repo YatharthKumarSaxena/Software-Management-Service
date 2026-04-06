@@ -18,6 +18,7 @@ const { ScopeModel } = require("./scope-model.js");
 const { HighLevelFeatureModel } = require("./high-level-feature.model");
 const { RequirementModel } = require("./requirement.model");
 const { ProductRequestModel } = require("./product-request.model");
+const { OrgProjectRequest } = require("./org-project-request.model");
 const { FeatureRequirementMapModel } = require("./feature-requirement-map.model");
 
 const models = {
@@ -41,6 +42,7 @@ const models = {
     HighLevelFeatureModel,
     RequirementModel,
     ProductRequestModel,
+    OrgProjectRequest,
     FeatureRequirementMapModel
 }
 
