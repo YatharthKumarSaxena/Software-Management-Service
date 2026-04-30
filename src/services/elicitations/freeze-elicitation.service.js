@@ -1,8 +1,10 @@
 // services/elicitations/freeze-elicitation.service.js
 
 const { ElicitationModel } = require("@models/elicitation.model");
+const { ProjectModel } = require("@models/project.model");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
+const { Phases } = require("@configs/enums.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
 
@@ -46,7 +48,16 @@ const freezeElicitationService = async (
       { new: true }
     );
 
-    // ── 3. Log activity tracker event ────────────────────────────────
+    // ── 3. Remove phase from project currentPhase array ───────────────
+    if (frozenElicitation) {
+      await ProjectModel.findByIdAndUpdate(
+        elicitation.projectId,
+        { $pull: { currentPhase: Phases.ELICITATION } },
+        { new: true }
+      );
+    }
+
+    // ── 4. Log activity tracker event ────────────────────────────────
     if (frozenElicitation) {
       const { user, device, requestId } = auditContext || {};
       const { oldData, newData } = prepareAuditData(elicitation, frozenElicitation);

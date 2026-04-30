@@ -4,11 +4,13 @@ const { elicitationServices } = require("@services/elicitations");
 const {
   throwBadRequestError,
   throwInternalServerError,
+  throwConflictError,
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
 const { sendElicitationDeletedSuccess } = require("@/responses/success/elicitation.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { PriorityLevels } = require("@configs/enums.config");
+const { CONFLICT } = require("@configs/http-status.config");
 
 /**
  * DELETE /projects/:projectId/elicitations/:elicitationId
@@ -56,6 +58,10 @@ const deleteElicitationController = async (req, res) => {
 
     // ── Handle error response ─────────────────────────────────────────
     if (!result.success) {
+      if (result.errorCode === CONFLICT) {
+        logWithTime(`⚠️ [deleteElicitationController] Deletion blocked due to conflict: ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwConflictError(res, result.message);
+      }
       logWithTime(`❌ [deleteElicitationController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwBadRequestError(res, result.message);
     }

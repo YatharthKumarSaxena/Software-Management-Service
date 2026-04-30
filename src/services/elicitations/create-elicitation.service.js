@@ -58,7 +58,7 @@ const createElicitationService = async ({
     const updatedProject = await ProjectModel.findByIdAndUpdate(
       projectId,
       {
-        currentPhase: Phases.ELICITATION
+        $addToSet: { currentPhase: Phases.ELICITATION }
         // Agar project level minorVersion increment karni hai, toh yahan: $inc: { minorVersion: 1 } add karo
       },
       { new: true }
@@ -87,7 +87,7 @@ const createElicitationService = async ({
       createdBy,
       auditContext,
       additionalData: { 
-        elicitationMode: mode,
+        workflowMode: mode,
         allowParallelMeetings: allowParallelMeetings || false
       }
     });

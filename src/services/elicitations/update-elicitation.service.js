@@ -34,7 +34,7 @@ const updateElicitationService = async (
     const { MeetingStatuses } = require("@configs/enums.config");
 
     // ── 1. Check if any changes are being made ────────────────────────
-    const modeChanged = mode !== undefined && elicitation.elicitationMode !== mode;
+    const modeChanged = mode !== undefined && elicitation.workflowMode !== mode;
     const allowParallelChanged = allowParallelMeetings !== undefined && elicitation.allowParallelMeetings !== allowParallelMeetings;
 
     if (!modeChanged && !allowParallelChanged) {
@@ -82,7 +82,7 @@ const updateElicitationService = async (
     const updatePayload = { updatedBy, updatedAt: new Date() };
     
     if (modeChanged) {
-      updatePayload.elicitationMode = mode;
+      updatePayload.workflowMode = mode;
     }
     
     if (allowParallelChanged) {
@@ -102,7 +102,7 @@ const updateElicitationService = async (
       const { oldData, newData } = prepareAuditData(elicitation, updatedElicitation);
 
       let changeDesc = [];
-      if (modeChanged) changeDesc.push(`mode: '${elicitation.elicitationMode}' → '${mode}'`);
+      if (modeChanged) changeDesc.push(`mode: '${elicitation.workflowMode}' → '${mode}'`);
       if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${elicitation.allowParallelMeetings} → ${allowParallelMeetings}`);
 
       logActivityTrackerEvent(
