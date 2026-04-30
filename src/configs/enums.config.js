@@ -110,7 +110,7 @@ const requestType = Object.freeze({
   PERMISSION_GRANT: "permission_grant",
   PERMISSION_REVOKE: "permission_revoke",
   CLIENT_ONBOARDING: "client_onboarding_self",
-  CLIENT_ONBOARDING_ADMIN: "client_onboarding_admin", // New request type for admin-initiated client onboarding
+  CLIENT_ONBOAReviewNoteEntityTypesRDING_ADMIN: "client_onboarding_admin", // New request type for admin-initiated client onboarding
   CLIENT_REVERT: "client_revert"
 });
 
@@ -322,6 +322,13 @@ const PriorityLevels = Object.freeze({
   CRITICAL: "CRITICAL"
 });
 
+const MinBufferTime = Object.freeze({
+  [PriorityLevels.LOW]: 3 * 24 * 60 * 60 * 1000,     // 3 days
+  [PriorityLevels.MEDIUM]: 24 * 60 * 60 * 1000,      // 1 day
+  [PriorityLevels.HIGH]: 4 * 60 * 60 * 1000,         // 4 hours
+  [PriorityLevels.CRITICAL]: 30 * 60 * 1000          // 30 min
+});
+
 const RequestStatus = Object.freeze({
   PENDING: "PENDING",
   APPROVED: "APPROVED",
@@ -397,11 +404,14 @@ const CommentSpecifiedEntityTypes = {
 
 const RequirementStatuses = Object.freeze({
   DRAFT: "DRAFT",
-  ISSUE: "ISSUE",
+  UNDER_REVIEW: "UNDER_REVIEW",
+  ISSUED: "ISSUED",
   ACCEPTED: "ACCEPTED",
   DEFERRED: "DEFERRED",
-  REJECTED: "REJECTED"
+  REJECTED: "REJECTED",
+  REVOKED: "REVOKED"
 });
+
 
 const RequirementSources = Object.freeze({
   MANUAL: "MANUAL",
@@ -414,9 +424,9 @@ const ParticipantTypes = Object.freeze({
   PARTICIPANT: "PARTICIPANT"
 });
 
-const ElicitationModes = Object.freeze({
+const WorkflowModes = Object.freeze({
   OPEN: "OPEN",
-  FAST: "FAST"
+  MODERATION: "MODERATION"
 });
 
 const MeetingPlatformTypes = Object.freeze({
@@ -516,6 +526,7 @@ const MeetingGroups = Object.freeze({
   ENHANCEMENT: "ENHANCEMENT",
 });
 
+
 const MeetingCancellationReasons = Object.freeze({
   SCHEDULING_CONFLICT: "SCHEDULING_CONFLICT",
   TECHNICAL_ISSUES: "TECHNICAL_ISSUES",
@@ -583,6 +594,24 @@ const DeferredIdeaReasonTypes = Object.freeze({
   OTHER: "OTHER"
 });
 
+const MappingStatuses = Object.freeze({
+  LINKED: "LINKED",
+  UNLINKED: "UNLINKED"
+});
+
+const ReviewNoteEntityTypes = Object.freeze({
+  REQUIREMENT: "REQUIREMENT",
+  SCOPE: "SCOPE",
+  INCEPTION: "INCEPTION",
+  HIGH_LEVEL_FEATURE: "HIGH_LEVEL_FEATURE"
+});
+
+const AllowedPhaseTypes = Object.freeze({
+  [Phases.ELICITATION]: Phases.ELICITATION,
+  [Phases.ELABORATION]: Phases.ELABORATION,
+  [Phases.NEGOTIATION]: Phases.NEGOTIATION
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -639,7 +668,6 @@ module.exports = {
   ProjectActivationReason,
   CommentSpecifiedEntityTypes,
   ParticipantTypes,
-  ElicitationModes,
   MeetingPlatformTypes,
   MeetingStatuses,
   RelationTypes,
@@ -656,5 +684,10 @@ module.exports = {
   ScopeCategoryTypes,
   IdeaStatuses,
   RejectedIdeaReasonTypes,
-  DeferredIdeaReasonTypes
+  DeferredIdeaReasonTypes,
+  WorkflowModes,
+  MinBufferTime,
+  MappingStatuses,
+  ReviewNoteEntityTypes,
+  AllowedPhaseTypes
 };

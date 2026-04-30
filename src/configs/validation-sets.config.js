@@ -61,7 +61,28 @@ const validationSets = {
     createOrgProjectRequestValidationSet: getValidationSet(FieldDefinitions.CREATE_ORG_PROJECT_REQUEST),
     approveOrgProjectRequestValidationSet: getValidationSet(FieldDefinitions.APPROVE_ORG_PROJECT_REQUEST),
     rejectOrgProjectRequestValidationSet: getValidationSet(FieldDefinitions.REJECT_ORG_PROJECT_REQUEST),
-    updateOrgProjectRequestValidationSet: getValidationSet(FieldDefinitions.UPDATE_ORG_PROJECT_REQUEST)
+    updateOrgProjectRequestValidationSet: getValidationSet(FieldDefinitions.UPDATE_ORG_PROJECT_REQUEST),
+
+    // ── Requirement Operations ────────────────────────────────────────────────
+    createRequirementValidationSet: getValidationSet(FieldDefinitions.CREATE_REQUIREMENT),
+    updateRequirementValidationSet: getValidationSet(FieldDefinitions.UPDATE_REQUIREMENT),
+    deleteRequirementValidationSet: getValidationSet(FieldDefinitions.DELETE_REQUIREMENT),
+    transitionRequirementToReviewValidationSet: getValidationSet(FieldDefinitions.TRANSITION_REQUIREMENT_TO_REVIEW),
+    issueRequirementValidationSet: getValidationSet(FieldDefinitions.ISSUE_REQUIREMENT),
+    acceptRequirementValidationSet: getValidationSet(FieldDefinitions.ACCEPT_REQUIREMENT),
+    rejectRequirementValidationSet: getValidationSet(FieldDefinitions.REJECT_REQUIREMENT),
+    assignRequirementValidationSet: getValidationSet(FieldDefinitions.ASSIGN_REQUIREMENT),
+    unassignRequirementValidationSet: getValidationSet(FieldDefinitions.UNASSIGN_REQUIREMENT),
+    revokeRequirementValidationSet: getValidationSet(FieldDefinitions.REVOKE_REQUIREMENT),
+    deferRequirementValidationSet: getValidationSet(FieldDefinitions.DEFER_REQUIREMENT),
+    linkRequirementToHlfValidationSet: getValidationSet(FieldDefinitions.LINK_REQUIREMENT_TO_HLF),
+    revertToDraftValidationSet: getValidationSet(FieldDefinitions.REVERT_TO_DRAFT),
+    assignCollaboratorValidationSet: getValidationSet(FieldDefinitions.ASSIGN_COLLABORATOR),
+    unassignCollaboratorValidationSet: getValidationSet(FieldDefinitions.UNASSIGN_COLLABORATOR),
+    updateRequirementToHlfValidationSet: getValidationSet(FieldDefinitions.UPDATE_REQUIREMENT_TO_HLF),
+    unlinkRequirementToHlfValidationSet: getValidationSet(FieldDefinitions.UNLINK_REQUIREMENT_TO_HLF),
+
+    phaseRoleActionValidationSet: getValidationSet(FieldDefinitions.PHASE_ROLE_ACTION),
 };
 
 module.exports = { validationSets };

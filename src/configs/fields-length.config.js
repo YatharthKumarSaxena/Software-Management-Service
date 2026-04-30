@@ -29,11 +29,15 @@ module.exports = {
     min: 0,
     max: 500
   },
+  tagLength: {
+    min: 2,
+    max: 30
+  },
   adminIdLength: {
     min: 10,
     max: 10
-  }
-  , mongoIdLength: {
+  },
+  mongoIdLength: {
     min: 24,
     max: 24
   },
@@ -70,5 +74,9 @@ module.exports = {
   productVisionLength: {
     min: 20,
     max: 5000
+  },
+  acceptanceCriteriaLength: {
+    min: 20,
+    max: 2000
   }
 };

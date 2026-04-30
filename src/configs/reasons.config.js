@@ -272,6 +272,60 @@ const UnsuspensionReasons = Object.freeze({
   OTHER: "other"
 });
 
+const RejectedReasonTypes = Object.freeze({
+  OUT_OF_SCOPE: "OUT_OF_SCOPE",
+  DUPLICATE: "DUPLICATE",
+  BUSINESS_DECISION: "BUSINESS_DECISION",
+  TECHNICAL_LIMITATION: "TECHNICAL_LIMITATION",
+  OTHER: "OTHER"
+});
+
+const DeferredReasonTypes = Object.freeze({
+  LOW_PRIORITY: "LOW_PRIORITY",
+  DEPENDENCY_ISSUE: "DEPENDENCY_ISSUE",
+  CLARIFICATION_NEEDED: "CLARIFICATION_NEEDED",
+  RESOURCE_CONSTRAINT: "RESOURCE_CONSTRAINT",
+  OTHER: "OTHER"
+});
+
+const IssuedReasonTypes = Object.freeze({
+  INCOMPLETE_INFORMATION: "INCOMPLETE_INFORMATION", // Acceptance criteria ya detail missing hai
+  AMBIGUOUS_WORDING: "AMBIGUOUS_WORDING",           // Samajh nahi aa raha, double meaning hai
+  LOGICAL_CONFLICT: "LOGICAL_CONFLICT",             // Kisi aur requirement se clash kar raha hai
+  TECHNICAL_FEASIBILITY: "TECHNICAL_FEASIBILITY",   // Dev team ko doubt hai ki yeh ban payega ya nahi
+  COMPLIANCE_VIOLATION: "COMPLIANCE_VIOLATION",     // Security ya business rules tod raha hai
+  OTHER: "OTHER"
+});
+
+const UnlinkReasonTypes = Object.freeze({
+  REQUIREMENT_REMOVED: "REQUIREMENT_REMOVED",
+  FEATURE_REMOVED: "FEATURE_REMOVED",
+  MAPPING_ERROR: "MAPPING_ERROR",
+  SCOPE_CHANGE: "SCOPE_CHANGE",
+  RESTRUCTURING: "RESTRUCTURING",
+  OTHER: "OTHER"
+});
+
+const RevokeReasonTypes = Object.freeze({
+  MARKED_ACCEPTED_BY_MISTAKE: "MARKED_ACCEPTED_BY_MISTAKE",
+  OUT_OF_SCOPE: "OUT_OF_SCOPE",
+  DUPLICATE: "DUPLICATE",
+  BUSINESS_DECISION: "BUSINESS_DECISION",
+  TECHNICAL_LIMITATION: "TECHNICAL_LIMITATION",
+  OTHER: "OTHER"
+});
+
+const ReviewNoteDeletionReasons = Object.freeze({
+  INCORRECT_FEEDBACK: "INCORRECT_FEEDBACK",
+  DUPLICATE_REVIEW: "DUPLICATE_REVIEW",
+  IRRELEVANT_COMMENT: "IRRELEVANT_COMMENT",
+  PERSONAL_REQUEST: "PERSONAL_REQUEST",
+  NO_LONGER_APPLICABLE: "NO_LONGER_APPLICABLE",
+  CONFIDENTIAL_INFORMATION: "CONFIDENTIAL_INFORMATION",
+  ADMINISTRATIVE_CLEANUP: "ADMINISTRATIVE_CLEANUP",
+  OTHER: "OTHER"
+});
+
 module.exports = {
   BlockUserReasons,
   UnblockUserReasons,
@@ -300,5 +354,11 @@ module.exports = {
   SuspensionReasons,
   UnsuspensionReasons,
   BlockAdminReasons,
-  UnblockAdminReasons
+  UnblockAdminReasons,
+  RejectedReasonTypes,
+  DeferredReasonTypes,
+  IssuedReasonTypes,
+  UnlinkReasonTypes,
+  RevokeReasonTypes,
+  ReviewNoteDeletionReasons
 };

@@ -288,6 +288,12 @@ const FieldDefinitions = {
       required: false,
       validation: validationRules.mongoId,
       description: "MongoDB ObjectId of the Organization this stakeholder belongs to (derived from req.stakeholder but can be overridden)"
+    },
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phase,
+      description: "The phase to which the stakeholder belongs"
     }
   },
 
@@ -754,8 +760,8 @@ const FieldDefinitions = {
     MODE: {
       field: "mode",
       required: true,
-      validation: validationRules.elicitationMode,
-      description: "Elicitation mode: OPEN | FAST (enum)"
+      validation: validationRules.workflowMode,
+      description: "Elicitation mode: OPEN | MODERATION (enum)"
     },
   },
 
@@ -764,8 +770,8 @@ const FieldDefinitions = {
     MODE: {
       field: "mode",
       required: true,
-      validation: validationRules.elicitationMode,
-      description: "Updated elicitation mode: OPEN | FAST (enum)"
+      validation: validationRules.workflowMode,
+      description: "Updated elicitation mode: OPEN | MODERATION (enum)"
     },
   },
 
@@ -1115,7 +1121,372 @@ const FieldDefinitions = {
       validation: validationRules.reasonDescription,
       description: "Reason for requesting access to the org project (required)"
     }
+  },
+
+  // ── REQUIREMENT ───────────────────────────────────────────────────────────
+  CREATE_REQUIREMENT: {
+    TITLE: {
+      field: "title",
+      required: true,
+      validation: validationRules.requirementStatement,
+      description: "Requirement statement (10-500 chars)"
+    },
+    DESCRIPTION: {
+      field: "description",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Optional detailed description"
+    },
+    PRIORITY: {
+      field: "priority",
+      required: false,
+      validation: validationRules.priorityLevel,
+      description: "Priority level (HIGH, MEDIUM, LOW)"
+    },
+    TYPE: {
+      field: "type",
+      required: false,
+      validation: validationRules.requirementType,
+      description: "Requirement type (FUNCTIONAL, NON_FUNCTIONAL, CONSTRAINT)"
+    },
+    PROPOSED_DATE: {
+      field: "proposedDate",
+      required: false,
+      validation: validationRules.isoDate,
+      description: "Proposed implementation date (optional, ISO date)"
+    },
+    PARENT_HLF_ID: {
+      field: "parentHlfId",
+      required: false,
+      validation: validationRules.mongoId,
+      description: "ID of the parent high-level feature (optional, must be valid MongoDB ObjectId if provided)"
+    },
+    RELATION_TYPE: {
+      field: "relationType",
+      required: false,
+      validation: validationRules.RelationTypes,
+      description: "Type of relation to parent feature (optional, enum)"
+    },
+    RELATION_DESCRIPTION: {
+      field: "relationshipNotes",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Optional description of the relation to parent feature"
+    },
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phaseType,
+      description: "Specific phase for the requirement (optional, for multi-phase scenarios)"
+    }
+  },
+
+  UPDATE_REQUIREMENT: {
+    REQUIREMENT_STATEMENT: {
+      field: "title",
+      required: false,
+      validation: validationRules.title,
+      description: "Requirement statement (DRAFT only)"
+    },
+    DESCRIPTION: {
+      field: "description",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Optional detailed description"
+    },
+    PRIORITY: {
+      field: "priority",
+      required: false,
+      validation: validationRules.priorityLevel,
+      description: "Priority level"
+    },
+    TYPE: {
+      field: "type",
+      required: false,
+      validation: validationRules.requirementType,
+      description: "Requirement type"
+    },
+    PROPOSED_DATE: {
+      field: "proposedDate",
+      required: false,
+      validation: validationRules.isoDate,
+      description: "Proposed implementation date (optional, ISO date)"
+    },
+    PARENT_HLF_ID: {
+      field: "parentHlfId",
+      required: false,
+      validation: validationRules.mongoId,
+      description: "ID of the parent high-level feature (optional, must be valid MongoDB ObjectId if provided)"
+    },
+    RELATION_TYPE: {
+      field: "relationType",
+      required: false,
+      validation: validationRules.RelationTypes,
+      description: "Type of relation to parent feature (optional, enum)"
+    },
+    RELATION_DESCRIPTION: {
+      field: "relationshipNotes",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Optional description of the relation to parent feature"
+    },
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phaseType,
+      description: "Specific phase for the requirement (optional, for multi-phase scenarios)"
+    }
+  },
+
+  DELETE_REQUIREMENT: {
+    DELETION_REASON_TYPE: {
+      field: "deletionReasonType",
+      required: true,
+      validation: validationRules.requirementDeletionReasonType,
+      description: "Reason for deletion (required)"
+    },
+    DELETION_REASON_DESCRIPTION: {
+      field: "deletionReasonDescription",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Optional deletion reason description"
+    },
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phaseType,
+      description: "Specific phase for the requirement (optional, for multi-phase scenarios)"
+    }
+  },
+
+  TRANSITION_REQUIREMENT_TO_REVIEW: {
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phaseType,
+      description: "Specific phase for the requirement (optional, for multi-phase scenarios)"
+    }
+  },
+
+  ISSUE_REQUIREMENT: {
+    REASON_TYPE: {
+      field: "reasonType",
+      required: true,
+      validation: validationRules.issueRequirementTypes,
+      description: "Reason for issuing the requirement (required enum)"
+    },
+    REASON_DESCRIPTION: {
+      field: "reasonDescription",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Optional reason for issue"
+    },
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phaseType,
+      description: "Specific phase for the requirement (optional, for multi-phase scenarios)"
+    }
+  },
+
+  ACCEPT_REQUIREMENT: {
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phaseType,
+      description: "Specific phase to assign when accepting (optional, for multi-phase scenarios)"
+    }
+    // No additional fields
+  },
+
+  REJECT_REQUIREMENT: {
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phaseType,
+      description: "Specific phase to assign when rejecting (optional, for multi-phase scenarios)"
+    },
+    REASON_TYPE: {
+      field: "reasonType",
+      required: true,
+      validation: validationRules.rejectRequirementTypes,
+      description: "Reason for rejecting the requirement (required enum)"
+    },
+    REASON_DESCRIPTION: {
+      field: "reasonDescription",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Optional rejection reason"
+    }
+  },
+
+  REVERT_TO_DRAFT: {
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phaseType,
+      description: "Specific phase (optional, for multi-phase scenarios)"
+    }
+  },
+
+  ASSIGN_REQUIREMENT: {
+    USER_ID: {
+      field: "userId",
+      required: true,
+      validation: validationRules.mongoId,
+      description: "ID of the user to assign the requirement to (required)"
+    },
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phaseType,
+      description: "Specific phase (optional, for multi-phase scenarios)"
+    }
+  },
+
+  UNASSIGN_REQUIREMENT: {
+    USER_ID: {
+      field: "userId",
+      required: true,
+      validation: validationRules.mongoId,
+      description: "ID of the user to unassign from the requirement (required)"
+    },
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phaseType,
+      description: "Specific phase (optional, for multi-phase scenarios)"
+    }
+  },
+
+  ASSIGN_COLLABORATOR: {
+    USER_ID: {
+      field: "userId",
+      required: true,
+      validation: validationRules.mongoId,
+      description: "ID of the user to assign as collaborator (required)"
+    }
+  },
+
+  UNASSIGN_COLLABORATOR: {
+    USER_ID: {
+      field: "userId",
+      required: true,
+      validation: validationRules.mongoId,
+      description: "ID of the collaborator to unassign (required)"
+    }
+  },
+
+  REVOKE_REQUIREMENT: {
+    PHASE: {
+      field: "phase",
+      required: false,
+      validation: validationRules.phaseType,
+      description: "Specific phase to assign when deferring (optional, for multi-phase scenarios)"
+    },
+    REASON_TYPE: {
+      field: "reasonType",
+      required: true,
+      validation: validationRules.revokeRequirementTypes,
+      description: "Reason for revoking the requirement (required enum)"
+    },
+    REASON_DESCRIPTION: {
+      field: "reasonDescription",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Optional reason for revocation"
+    }
+  },
+
+  DEFER_REQUIREMENT: {
+    REASON_TYPE: {
+      field: "reasonType",
+      required: true,
+      validation: validationRules.deferRequirementTypes,
+      description: "Reason for deferring the requirement (required enum)"
+    },
+    REASON_DESCRIPTION: {
+      field: "reasonDescription",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Optional reason for deferral"
+    }
+  },
+  
+  LINK_REQUIREMENT_TO_HLF: {
+    HIGH_LEVEL_FEATURE_ID: {
+      field: "highLevelFeatureId",
+      required: true,
+      validation: validationRules.mongoId,
+      description: "ID of the high-level feature to link to (required)"
+    },
+    RELATION_TYPE: {
+      field: "relationType",
+      required: true,
+      validation: validationRules.RelationTypes,
+      description: "Type of relation between requirement and feature (required enum)"
+    },
+    RELATIONSHIP_NOTES: {
+      field: "relationshipNotes",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Optional description of the relation"
+    },
+    CONTRIBUTION_TYPES: {
+      field: "contributionTypes",
+      required: true,
+      validation: validationRules.ContributionTypes,
+      description: "Types of contribution to the feature (required enum, array)"
+    }
+  },
+
+  // ── COMMON PHASE FIELD (optional, for multi-phase scenarios) ───
+  PHASE: {
+    field: "phase",
+    required: false,
+    validation: validationRules.phaseType,
+    description: "Specific phase to assign when multiple phases are active (optional)"
+  },
+
+UPDATE_REQUIREMENT_TO_HLF: {
+  RELATIONSHIP_NOTES: {
+    field: "relationshipNotes",
+    required: false,
+    validation: validationRules.descriptionField,
+    description: "Updated description of relation between requirement and HLF (optional)"
+  },
+  RELATION_TYPE: {
+    field: "relationType",
+    required: false,
+    validation: validationRules.RelationTypes,
+    description: "Updated type of relation between requirement and feature (optional enum)"
   }
+},
+
+UNLINK_REQUIREMENT_TO_HLF: {
+  UNLINK_REASON: {
+    field: "unlinkReason",
+    required: true,
+    validation: validationRules.UnlinkReasonTypes,
+    description: "Reason for unlinking requirement from HLF (required enum)"
+  },
+  UNLINK_DESCRIPTION: {
+    field: "unlinkDescription",
+    required: false,
+    validation: validationRules.descriptionField,
+    description: "Optional description of the unlink reason"
+  }
+},
+
+PHASE_ROLE_ACTION: {
+  PHASE_TYPE: {
+    field: "phaseType",
+    required: true,
+    validation: validationRules.AllowedPhaseTypes,
+    description: "Phase to assign the role for (required)"
+  }
+}
+
 };
 
 module.exports = { FieldDefinitions };

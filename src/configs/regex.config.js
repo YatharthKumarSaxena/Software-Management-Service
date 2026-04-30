@@ -15,5 +15,7 @@ module.exports = {
     googleMeetRegex: /^https:\/\/meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}$/,
     zoomMeetRegex: /^https:\/\/([a-z0-9-]+\.)?zoom\.us\/j\/\d+(\?pwd=[\w-]+)?$/,
     teamsRegex: /^https:\/\/teams\.microsoft\.com\/l\/meetup-join\/.+$/,
-    isoDateRegex: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/
+    isoDateRegex: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/,
+    tagRegex: /^[a-z0-9_-]{2,30}$/,
+    acceptanceCriteriaRegex: /^(?=.*[a-zA-Z0-9])[\s\S]{20,2000}$/
 }

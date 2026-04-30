@@ -103,7 +103,28 @@ const requiredFields = {
     createOrgProjectRequestField: getRequiredFields(FieldDefinitions.CREATE_ORG_PROJECT_REQUEST),
     updateOrgProjectRequestField: getRequiredFields(FieldDefinitions.UPDATE_ORG_PROJECT_REQUEST),
     approveOrgProjectRequestField: getRequiredFields(FieldDefinitions.APPROVE_ORG_PROJECT_REQUEST),
-    rejectOrgProjectRequestField: getRequiredFields(FieldDefinitions.REJECT_ORG_PROJECT_REQUEST)
+    rejectOrgProjectRequestField: getRequiredFields(FieldDefinitions.REJECT_ORG_PROJECT_REQUEST),
+
+    // ── Requirement ───────────────────────────────────────────────────────────────
+    createRequirementField: getRequiredFields(FieldDefinitions.CREATE_REQUIREMENT),
+    updateRequirementField: getRequiredFields(FieldDefinitions.UPDATE_REQUIREMENT),
+    deleteRequirementField: getRequiredFields(FieldDefinitions.DELETE_REQUIREMENT),
+    transitionRequirementToReviewField: getRequiredFields(FieldDefinitions.TRANSITION_REQUIREMENT_TO_REVIEW),
+    issueRequirementField: getRequiredFields(FieldDefinitions.ISSUE_REQUIREMENT),
+    acceptRequirementField: getRequiredFields(FieldDefinitions.ACCEPT_REQUIREMENT),
+    rejectRequirementField: getRequiredFields(FieldDefinitions.REJECT_REQUIREMENT),
+    assignRequirementField: getRequiredFields(FieldDefinitions.ASSIGN_REQUIREMENT),
+    unassignRequirementField: getRequiredFields(FieldDefinitions.UNASSIGN_REQUIREMENT),
+    revokeRequirementField: getRequiredFields(FieldDefinitions.REVOKE_REQUIREMENT),
+    deferRequirementField: getRequiredFields(FieldDefinitions.DEFER_REQUIREMENT),
+    linkRequirementToHlfField: getRequiredFields(FieldDefinitions.LINK_REQUIREMENT_TO_HLF),
+    revertToDraftField: getRequiredFields(FieldDefinitions.REVERT_TO_DRAFT),
+    assignCollaboratorField: getRequiredFields(FieldDefinitions.ASSIGN_COLLABORATOR),
+    unassignCollaboratorField: getRequiredFields(FieldDefinitions.UNASSIGN_COLLABORATOR),
+    updateRequirementToHlfField: getRequiredFields(FieldDefinitions.UPDATE_REQUIREMENT_TO_HLF),
+    unlinkRequirementToHlfField: getRequiredFields(FieldDefinitions.UNLINK_REQUIREMENT_TO_HLF),
+
+    phaseRoleActionField: getRequiredFields(FieldDefinitions.PHASE_ROLE_ACTION),
 }
 
 module.exports = {

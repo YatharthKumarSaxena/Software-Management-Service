@@ -24,7 +24,8 @@ const {
   PriorityLevelsHelper,
   ProjectActivationReasonHelper,
   ChangeProjectOwnerReasonsHelper,
-  ElicitationModesHelper,
+  WorkflowModesHelper,
+  PhasesHelper,
   PhaseDeletionReasonHelper,
   ApproveProductRequestReasonTypeHelper,
   RejectProductRequestReasonTypeHelper,
@@ -38,7 +39,17 @@ const {
   ParticipantTypesHelper,
   IdeaStatusesHelper,
   RejectedIdeaReasonTypesHelper,
-  DeferredIdeaReasonTypesHelper
+  DeferredIdeaReasonTypesHelper,
+  RequirementTypesHelper,
+  RequirementDeletionReasonHelper,
+  RejectedReasonTypesHelper,
+  DeferredReasonTypesHelper,
+  IssuedReasonTypesHelper,
+  RelationTypesHelper,
+  ContributionTypesHelper,
+  RevokeRequirementTypesHelper,
+  UnlinkReasonTypesHelper,
+  AllowedPhaseTypesHelper
 } = require("@utils/enum-validators.util");
 
 const { customIdRegex, mongoIdRegex, budgetRegex, timelineRegex, isoDateRegex } = require("./regex.config");
@@ -226,10 +237,16 @@ const validationRules = {
     regex: mongoIdRegex
   },
 
-  // ── Elicitation fields ───────────────────────────────
-  elicitationMode: {
-    enum: ElicitationModesHelper
+  // ── Workflow mode fields ────────────────────────────────
+  workflowMode: {
+    enum: WorkflowModesHelper
   },
+
+  // ── Phase fields ───────────────────────────────────────
+  phaseType: {
+    enum: PhasesHelper
+  },
+
   phaseDeletionReasonType: {
     enum: PhaseDeletionReasonHelper
   },
@@ -246,6 +263,47 @@ const validationRules = {
   },
   deferredIdeaReasonType: {
     enum: DeferredIdeaReasonTypesHelper
+  },
+
+  // ── Requirement fields ──────────────────────────────────────────────────
+  requirementStatement: {
+    length: { min: 10, max: 500 }
+  },
+  descriptionField: {
+    length: { min: 20, max: 2000 }
+  },
+  priorityLevel: {
+    enum: PriorityLevelsHelper
+  },
+  requirementType: {
+    enum: RequirementTypesHelper
+  },
+  requirementDeletionReasonType: {
+    enum: RequirementDeletionReasonHelper
+  },
+  rejectRequirementTypes: {
+    enum: RejectedReasonTypesHelper
+  },
+  deferRequirementTypes: {
+    enum: DeferredReasonTypesHelper
+  },
+  issueRequirementTypes: {
+    enum: IssuedReasonTypesHelper
+  },
+  RelationTypes: {
+    enum: RelationTypesHelper
+  },
+  ContributionTypes: {
+    enum: ContributionTypesHelper
+  },
+  revokeRequirementTypes: {
+    enum: RevokeRequirementTypesHelper
+  },
+  UnlinkReasonTypes: {
+    enum: UnlinkReasonTypesHelper
+  },
+  AllowedPhaseTypes: {
+    enum: AllowedPhaseTypesHelper
   }
 };
 

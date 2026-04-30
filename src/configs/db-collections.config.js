@@ -18,6 +18,7 @@ const DB_COLLECTIONS = {
     ORG_PROJECT_REQUESTS: "org_project_requests",
     SCOPES: "scopes",
     COMMENTS: "comments",
+    REVIEW_NOTES: "review_notes",
     REQUIREMENTS: "requirements",
     HIGH_LEVEL_FEATURES: "high_level_features",
     FEATURE_REQUIREMENT_MAPPINGS: "feature_requirement_mappings",

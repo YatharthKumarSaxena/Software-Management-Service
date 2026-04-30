@@ -971,6 +971,85 @@ module.exports = {
       prefix: "freeze_meeting",
       reason: "Freeze meeting endpoint abuse",
       message: "Too many requests to freeze meeting endpoint. Please try again later."
+    },
+
+    // ── Requirement operations ───────────────────────────────────────────────────────
+    createRequirement: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "create_requirement",
+      reason: "Create requirement endpoint abuse",
+      message: "Too many requests to create requirement endpoint. Please try again later."
+    },
+    updateRequirement: {
+      maxRequests: 100,
+      windowMs: 60 * 1000,
+      prefix: "update_requirement",
+      reason: "Update requirement endpoint abuse",
+      message: "Too many requests to update requirement endpoint. Please try again later."
+    },
+    deleteRequirement: {
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      prefix: "delete_requirement",
+      reason: "Delete requirement endpoint abuse",
+      message: "Too many requests to delete requirement endpoint. Please try again later."
+    },
+    fetchRequirement: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "fetch_requirement",
+      reason: "Fetch requirement endpoint abuse",
+      message: "Too many requests to fetch requirement endpoint. Please try again later."
+    },
+    listRequirements: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_requirements",
+      reason: "List requirements endpoint abuse",
+      message: "Too many requests to list requirements endpoint. Please try again later."
+    },
+    transitionRequirementToReview: {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+      prefix: "transition_requirement_review",
+      reason: "Transition requirement to review endpoint abuse",
+      message: "Too many requests to transition requirement endpoint. Please try again later."
+    },
+    issueRequirement: {
+      maxRequests: 15,
+      windowMs: 60 * 1000,
+      prefix: "issue_requirement",
+      reason: "Issue requirement endpoint abuse",
+      message: "Too many requests to issue requirement endpoint. Please try again later."
+    },
+    acceptRequirement: {
+      maxRequests: 15,
+      windowMs: 60 * 1000,
+      prefix: "accept_requirement",
+      reason: "Accept requirement endpoint abuse",
+      message: "Too many requests to accept requirement endpoint. Please try again later."
+    },
+    rejectRequirement: {
+      maxRequests: 15,
+      windowMs: 60 * 1000,
+      prefix: "reject_requirement",
+      reason: "Reject requirement endpoint abuse",
+      message: "Too many requests to reject requirement endpoint. Please try again later."
+    },
+    mapFeatureRequirement: {
+      maxRequests: 50,
+      windowMs: 60 * 1000,
+      prefix: "map_feature_requirement",
+      reason: "Map feature requirement endpoint abuse",
+      message: "Too many requests to map feature requirement endpoint. Please try again later."
+    },
+    unmapFeatureRequirement: {
+      maxRequests: 50,
+      windowMs: 60 * 1000,
+      prefix: "unmap_feature_requirement",
+      reason: "Unmap feature requirement endpoint abuse",
+      message: "Too many requests to unmap feature requirement endpoint. Please try again later."
     }
   }
 }
