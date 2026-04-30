@@ -1,6 +1,8 @@
 // services/elaborations/freeze-elaboration.service.js
 
+const { ProjectModel } = require("../../models");
 const { ElaborationModel } = require("../../models");
+const { Phases } = require("@configs/enums.config");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
@@ -34,6 +36,13 @@ const freezeElaborationService = async ({
     elaboration.frozenBy = frozenBy;
 
     await elaboration.save();
+
+    // ── Remove phase from project currentPhase array  ────────────────
+    await ProjectModel.findByIdAndUpdate(
+      projectId,
+      { $pull: { currentPhase: Phases.ELABORATION } },
+      { new: true }
+    );
 
     // Log activity
     const { user, device, requestId } = auditContext || {};

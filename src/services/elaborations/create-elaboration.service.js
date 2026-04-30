@@ -55,7 +55,7 @@ const createElaborationService = async ({
     const updatedProject = await ProjectModel.findByIdAndUpdate(
       projectId,
       {
-        currentPhase: Phases.ELABORATION
+        $addToSet: { currentPhase: Phases.ELABORATION }
       },
       { new: true }
     );
