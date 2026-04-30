@@ -13,6 +13,7 @@ const { SpecificationModel } = require("./specification.model");
 const { ValidationModel } = require("./validation.model");
 const { StakeholderModel } = require("./stakeholder.model");
 const { CommentModel } = require("./comment.model");
+const { ReviewNoteModel } = require("./review-note.model");
 const { MeetingModel } = require("./meeting.model");
 const { ScopeModel } = require("./scope-model.js");
 const { HighLevelFeatureModel } = require("./high-level-feature.model");
@@ -37,6 +38,7 @@ const models = {
     ValidationModel,
     StakeholderModel,
     CommentModel,
+    ReviewNoteModel,
     MeetingModel,
     ScopeModel,
     HighLevelFeatureModel,

@@ -349,12 +349,15 @@ const projectSchema = new mongoose.Schema(
     /* ── Phase tracking ───────────────────────────────────────── */
 
     currentPhase: {
-      type: String,
-      default: Phases.INCEPTION,
-      enum: {
-        values: Object.values(Phases),
-        message: `currentPhase must be one of: ${Object.values(Phases).join(", ")}`
-      },
+      type: [String],
+      default: [Phases.INCEPTION],
+      validate: {
+        validator: function(phases) {
+          // Ensure all phases are valid enum values
+          return Array.isArray(phases) && phases.every(p => Object.values(Phases).includes(p));
+        },
+        message: `Each phase in currentPhase array must be one of: ${Object.values(Phases).join(", ")}`
+      }
     },
 
     /* ── Archive tracking ────────────────────────────────────── */

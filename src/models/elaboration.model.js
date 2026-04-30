@@ -1,5 +1,5 @@
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
-const { PhaseDeletionReason } = require("@/configs/enums.config");
+const { PhaseDeletionReason, WorkflowModes } = require("@/configs/enums.config");
 const { customIdRegex } = require("@/configs/regex.config");
 const { descriptionLength } = require("@/configs/fields-length.config");
 const mongoose = require("mongoose");
@@ -11,6 +11,12 @@ const elaborationSchema = new mongoose.Schema({
     ref: DB_COLLECTIONS.PROJECTS,
     required: true,
     index: true
+  },
+
+  workflowMode: { 
+    type: String,
+    enum: Object.values(WorkflowModes),
+    default: WorkflowModes.OPEN
   },
 
   meetingIds: [{
@@ -32,6 +38,33 @@ const elaborationSchema = new mongoose.Schema({
       type: Number, // updates inside cycle
       default: 0
     }
+  },
+
+  // People who can create/edit DRAFT requirements
+  contributors: {
+    type: [{
+      type: String,
+      match: customIdRegex
+    }],
+    default: []
+  },
+
+  // People who can add Review Notes in UNDER_REVIEW state (Moderation Mode only)
+  reviewers: {
+    type: [{
+      type: String,
+      match: customIdRegex
+    }],
+    default: []
+  },
+
+  // The final authority: Can ACCEPT, REJECT, or ISSUED requirements
+  approvers: {
+    type: [{
+      type: String,
+      match: customIdRegex
+    }],
+    default: []
   },
 
   createdBy: {

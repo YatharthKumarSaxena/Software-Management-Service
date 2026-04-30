@@ -1,6 +1,6 @@
 const { customIdRegex } = require("@/configs/regex.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
-const { PhaseDeletionReason, ElicitationModes } = require("@/configs/enums.config");
+const { PhaseDeletionReason, WorkflowModes } = require("@/configs/enums.config");
 const { descriptionLength } = require("@/configs/fields-length.config");
 const mongoose = require("mongoose");
 
@@ -21,6 +21,33 @@ const elicitationSchema = new mongoose.Schema({
   allowParallelMeetings: {
     type: Boolean,
     default: false
+  },
+
+  // People who can create/edit DRAFT requirements
+  contributors: {
+    type: [{
+      type: String,
+      match: customIdRegex
+    }],
+    default: []
+  },
+
+  // People who can add Review Notes in UNDER_REVIEW state (Moderation Mode only)
+  reviewers: {
+    type: [{
+      type: String,
+      match: customIdRegex
+    }],
+    default: []
+  },
+
+  // The final authority: Can ACCEPT, REJECT, or ISSUED requirements
+  approvers: {
+    type: [{
+      type: String,
+      match: customIdRegex
+    }],
+    default: []
   },
 
   version: {
@@ -62,10 +89,10 @@ const elicitationSchema = new mongoose.Schema({
     default: null
   },
 
-  elicitationMode: {
+  workflowMode: {
     type: String,
-    enum: Object.values(ElicitationModes),
-    default: ElicitationModes.OPEN
+    enum: Object.values(WorkflowModes),
+    default: WorkflowModes.OPEN
   },
 
   deletionReasonType: {
