@@ -3,6 +3,7 @@ const { isValidEnumValue, getEnumKeyByValue } = require("./validators-factory.ut
 const { logWithTime } = require("./time-stamps.util");
 
 const {
+  Phases,
   UserTypes,
   AuthModes,
   DeviceTypes,
@@ -30,7 +31,7 @@ const {
   RejectOrgProjectRequestReasonType,
   ProjectActivationReason,
   ChangeProjectOwnerReasons,
-  ElicitationModes,
+  WorkflowModes,
   PhaseDeletionReason,
   ScopeTypes,
   CommentEntityTypes,
@@ -40,9 +41,21 @@ const {
   ParticipantTypes,
   IdeaStatuses,
   RejectedIdeaReasonTypes,
-  DeferredIdeaReasonTypes
+  DeferredIdeaReasonTypes,
+  RequirementTypes,
+  RequirementDeletionReason,
+  RelationTypes,
+  ContributionTypes,
+  RevokeRequirementTypes,
+  AllowedPhaseTypes
 } = require("@configs/enums.config");
 
+const {
+  RejectedReasonTypes,
+  DeferredReasonTypes,
+  IssuedReasonTypes,
+  UnlinkReasonTypes
+} = require("@configs/reasons.config.js");
 /**
  * Factory to create enum helper with boolean returns
  * Returns true/false only - caller decides response handling
@@ -98,7 +111,8 @@ const ApproveOrgProjectRequestReasonTypeHelper = createEnumHelper(ApproveOrgProj
 const RejectOrgProjectRequestReasonTypeHelper = createEnumHelper(RejectOrgProjectRequestReasonType, "RejectOrgProjectRequestReasonType");
 const ProjectActivationReasonHelper = createEnumHelper(ProjectActivationReason, "ProjectActivationReason");
 const ChangeProjectOwnerReasonsHelper = createEnumHelper(ChangeProjectOwnerReasons, "ChangeProjectOwnerReasons");
-const ElicitationModesHelper = createEnumHelper(ElicitationModes, "ElicitationModes");
+const WorkflowModesHelper = createEnumHelper(WorkflowModes, "WorkflowModes");
+const PhasesHelper = createEnumHelper(Phases, "Phases");
 const PhaseDeletionReasonHelper = createEnumHelper(PhaseDeletionReason, "PhaseDeletionReason");
 const ScopeTypesHelper = createEnumHelper(ScopeTypes, "ScopeTypes");
 const CommentEntityTypesHelper = createEnumHelper(CommentEntityTypes, "CommentEntityTypes");
@@ -109,6 +123,16 @@ const ParticipantTypesHelper = createEnumHelper(ParticipantTypes, "ParticipantTy
 const IdeaStatusesHelper = createEnumHelper(IdeaStatuses, "IdeaStatuses");
 const RejectedIdeaReasonTypesHelper = createEnumHelper(RejectedIdeaReasonTypes, "RejectedIdeaReasonTypes");
 const DeferredIdeaReasonTypesHelper = createEnumHelper(DeferredIdeaReasonTypes, "DeferredIdeaReasonTypes");
+const RejectedReasonTypesHelper = createEnumHelper(RejectedReasonTypes, "RejectedReasonTypes");
+const DeferredReasonTypesHelper = createEnumHelper(DeferredReasonTypes, "DeferredReasonTypes");
+const IssuedReasonTypesHelper = createEnumHelper(IssuedReasonTypes, "IssuedReasonTypes");
+const RequirementTypesHelper = createEnumHelper(RequirementTypes, "RequirementTypes");
+const RequirementDeletionReasonHelper = createEnumHelper(RequirementDeletionReason, "RequirementDeletionReason");
+const ContributionTypesHelper = createEnumHelper(ContributionTypes, "ContributionTypes");
+const RelationTypesHelper = createEnumHelper(RelationTypes, "RelationTypes");
+const RevokeRequirementTypesHelper = createEnumHelper(RevokeRequirementTypes, "RevokeRequirementTypes");
+const UnlinkReasonTypesHelper = createEnumHelper(UnlinkReasonTypes, "UnlinkReasonTypes");
+const AllowedPhaseTypesHelper = createEnumHelper(AllowedPhaseTypes, "AllowedPhaseTypes");
 
 module.exports = {
   DeviceTypeHelper,
@@ -138,7 +162,8 @@ module.exports = {
   RejectOrgProjectRequestReasonTypeHelper,
   ProjectActivationReasonHelper,
   ChangeProjectOwnerReasonsHelper,
-  ElicitationModesHelper,
+  WorkflowModesHelper,
+  PhasesHelper,
   PhaseDeletionReasonHelper,
   ScopeTypesHelper,
   CommentEntityTypesHelper,
@@ -148,5 +173,15 @@ module.exports = {
   ParticipantTypesHelper,
   IdeaStatusesHelper,
   RejectedIdeaReasonTypesHelper,
-  DeferredIdeaReasonTypesHelper
+  DeferredIdeaReasonTypesHelper,
+  RequirementTypesHelper,
+  RequirementDeletionReasonHelper,
+  RejectedReasonTypesHelper,
+  DeferredReasonTypesHelper,
+  IssuedReasonTypesHelper,
+  RelationTypesHelper,
+  ContributionTypesHelper,
+  RevokeRequirementTypesHelper,
+  UnlinkReasonTypesHelper,
+  AllowedPhaseTypesHelper
 };
