@@ -64,6 +64,7 @@ const deleteScopeRateLimiter = createRateLimiter(perUserAndDevice.deleteScope);
 const getScopeRateLimiter    = createRateLimiter(perUserAndDevice.getScope);
 const listScopesRateLimiter  = createRateLimiter(perUserAndDevice.listScopes);
 const linkScopeToHlfRateLimiter = createRateLimiter(perUserAndDevice.linkScopeToHLF);
+const unlinkScopeToHlfRateLimiter = createRateLimiter(perUserAndDevice.linkScopeToHLF);
 
 const createHLFRateLimiter = createRateLimiter(perUserAndDevice.createHLF);
 const updateHLFRateLimiter = createRateLimiter(perUserAndDevice.updateHLF);
@@ -211,6 +212,7 @@ module.exports = {
     getScopeRateLimiter,
     listScopesRateLimiter,
     linkScopeToHlfRateLimiter,
+    unlinkScopeToHlfRateLimiter,
     createHLFRateLimiter,
     updateHLFRateLimiter,
     deleteHLFRateLimiter,
