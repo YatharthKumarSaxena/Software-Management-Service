@@ -99,9 +99,23 @@ const applyVersionUpdate = async ({
   return result;
 };
  
-const versionControlService = async (project, action, performedBy, auditContext) => {
+const versionControlService = async (project, action, performedBy, auditContext, options = {}) => {
 
-  const currentPhase = project.currentPhase;
+  // Handle both old (single string) and new (array) currentPhase format
+  let currentPhase;
+  const { targetPhase } = options;
+  const phasesArray = Array.isArray(project.currentPhase) ? project.currentPhase : [project.currentPhase];
+  
+  if (phasesArray.length === 0) {
+    return { success: true, message: "No active phases" };
+  } else if (phasesArray.length === 1) {
+    // Single phase - use it
+    currentPhase = phasesArray[0];
+  } else {
+    // Multiple phases - use targetPhase if provided, otherwise use first
+    currentPhase = targetPhase || phasesArray[0];
+  }
+
   const PhaseModel = PHASE_MODEL_MAP[currentPhase];
   if (!PhaseModel) return { success: true };
 
@@ -111,7 +125,7 @@ const versionControlService = async (project, action, performedBy, auditContext)
   await applyVersionUpdate({
     PhaseModel,
     projectId: project._id,
-    version: nextVersion,   // ✅ yahan change
+    version: nextVersion,   
     performedBy,
     existingDoc: existingPhaseDoc,
     currentPhase,
@@ -119,11 +133,11 @@ const versionControlService = async (project, action, performedBy, auditContext)
     auditContext
   });
 
-  logWithTime(`✅ Version updated → v${nextVersion.major}.${nextVersion.minor}`); // ✅ yahan change
+  logWithTime(`✅ Version updated → v${nextVersion.major}.${nextVersion.minor}`); 
 
   return {
     success: true,
-    newVersion: `v${nextVersion.major}.${nextVersion.minor}` // ✅ yahan change
+    newVersion: `v${nextVersion.major}.${nextVersion.minor}`
   };
 };
 
@@ -134,6 +148,9 @@ const manualVersionControlService = async ({
   performedBy,
   auditContext
 }) => {
+
+  // currentPhase should be a specific phase (string), not an array
+  if (!currentPhase) return { success: true, message: "No phase specified" };
 
   const PhaseModel = PHASE_MODEL_MAP[currentPhase];
   if (!PhaseModel) return { success: true };
