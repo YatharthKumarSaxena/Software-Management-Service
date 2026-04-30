@@ -38,6 +38,7 @@ const createStakeholderService = async ({
   user,
   role,
   organizationId = null,
+  phase = null,
   createdBy,
   auditContext,
 }) => {
@@ -163,6 +164,37 @@ const createStakeholderService = async ({
       }
     }
 
+    // ── Determine phase assignment based on current active phases ──────────────
+    let assignedPhase;
+    const activePhases = project.currentPhase || [];
+    
+    if (activePhases.length === 0) {
+      // This shouldn't happen, but guard against it
+      return { 
+        success: false, 
+        message: "Project has no active phases" 
+      };
+    } else if (activePhases.length === 1) {
+      // Single active phase - auto-assign
+      assignedPhase = activePhases[0];
+    } else {
+      // Multiple active phases - require explicit phase parameter
+      if (!phase) {
+        return {
+          success: false,
+          message: "Multiple phases are active. Please specify which phase to assign this stakeholder to."
+        };
+      }
+      // Validate that specified phase is in the active phases array
+      if (!activePhases.includes(phase)) {
+        return {
+          success: false,
+          message: "Specified phase is not currently active for this project"
+        };
+      }
+      assignedPhase = phase;
+    }
+
     // ── Create stakeholder ────────────────────────────────────────────────────
     const stakeholderData = {
       userId,
@@ -170,7 +202,7 @@ const createStakeholderService = async ({
       role,
       organizationId,
       createdBy,
-      phase: project.currentPhase
+      phase: assignedPhase
     };
 
     const stakeholder = await StakeholderModel.create(stakeholderData);
@@ -183,7 +215,8 @@ const createStakeholderService = async ({
       updatedProject,
       `Stakeholder ${userId} added to project — version bump`,
       createdBy,
-      auditContext
+      auditContext,
+      { targetPhase: assignedPhase }
     );
 
     // ── Activity tracker ──────────────────────────────────────────────────────

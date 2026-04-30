@@ -18,7 +18,7 @@ const { errorMessage } = require("@/utils/log-error.util");
 const createStakeholderController = async (req, res) => {
   try {
 
-    const { role, orgId } = req.body;
+    const { role, orgId, phase } = req.body;
     const createdBy = req.admin.adminId;
 
     const project = req.project;
@@ -30,6 +30,7 @@ const createStakeholderController = async (req, res) => {
       user,
       role,
       organizationId: orgId || null,
+      phase: phase || null,
       createdBy,
       auditContext: {
         user: req.admin,
@@ -44,6 +45,21 @@ const createStakeholderController = async (req, res) => {
       if (result.message === "Stakeholder already exists for this project") {
         logWithTime(`❌ [createStakeholderController] Stakeholder already exists | ${getLogIdentifiers(req)}`);
         return throwConflictError(res, result.message);
+      }
+
+      if (result.message === "Project has no active phases") {
+        logWithTime(`❌ [createStakeholderController] ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwBadRequestError(res, result.message);
+      }
+
+      if (result.message?.startsWith("Multiple phases are active")) {
+        logWithTime(`❌ [createStakeholderController] ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwBadRequestError(res, result.message);
+      }
+
+      if (result.message === "Specified phase is not currently active for this project") {
+        logWithTime(`❌ [createStakeholderController] ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwBadRequestError(res, result.message);
       }
 
       if (result.message?.startsWith("Cannot add a stakeholder")) {
