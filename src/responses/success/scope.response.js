@@ -59,10 +59,34 @@ const sendScopesListFetchedSuccess = (res, scopes, total, page, totalPages) => {
   });
 };
 
+/**
+ * 200 – Scope linked to HLF successfully.
+ */
+const sendScopeLinkedSuccess = (res, scope) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Scope linked to HLF successfully.",
+    data: { scope },
+  });
+};
+
+/**
+ * 200 – Scope unlinked from HLF successfully.
+ */
+const sendScopeUnlinkedSuccess = (res, scope) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Scope unlinked from HLF successfully.",
+    data: { scope },
+  });
+};
+
 module.exports = {
   sendScopeCreatedSuccess,
   sendScopeUpdatedSuccess,
   sendScopeDeletedSuccess,
   sendScopeFetchedSuccess,
   sendScopesListFetchedSuccess,
+  sendScopeLinkedSuccess,
+  sendScopeUnlinkedSuccess,
 };

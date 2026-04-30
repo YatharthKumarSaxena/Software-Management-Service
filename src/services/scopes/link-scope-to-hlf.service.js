@@ -1,6 +1,5 @@
 // services/scopes/link-scope-to-hlf.service.js
 
-const { ScopeModel } = require("@models/scope-model");
 const { manualVersionControlService } = require("@services/common/version.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");

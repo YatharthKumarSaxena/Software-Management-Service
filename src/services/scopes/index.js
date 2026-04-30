@@ -6,6 +6,7 @@ const { deleteScopeService } = require("./delete-scope.service");
 const { getScopeService } = require("./get-scope.service");
 const { listScopeService } = require("./list-scope.service");
 const { linkScopeToHlfService } = require("./link-scope-to-hlf.service");
+const { unlinkScopeToHlfService } = require("./unlink-scope-to-hlf.service");
 
 const scopeServices = {
   createScopeService,
@@ -13,7 +14,8 @@ const scopeServices = {
   deleteScopeService,
   getScopeService,
   listScopeService,
-  linkScopeToHlfService
+  linkScopeToHlfService,
+  unlinkScopeToHlfService
 };
 
 module.exports = { scopeServices };

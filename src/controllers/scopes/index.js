@@ -6,6 +6,7 @@ const { getScopeController } = require("./get-scope.controller");
 const { listScopesController } = require("./list-scopes.controller");
 const { updateScopeController } = require("./update-scope.controller");
 const { linkScopeToHlfController } = require("./link-scope-to-hlf.controller");
+const { unlinkScopeToHlfController } = require("./unlink-scope-to-hlf.controller");
 
 const scopeControllers = {
     createScopeController,
@@ -13,7 +14,8 @@ const scopeControllers = {
     getScopeController,
     listScopesController,
     deleteScopeController,
-    linkScopeToHlfController
+    linkScopeToHlfController,
+    unlinkScopeToHlfController
 }
 
 module.exports = { scopeControllers };

@@ -1,7 +1,7 @@
-// controllers/scopes/link-scope-to-hlf.controller.js
+// controllers/scopes/unlink-scope-to-hlf.controller.js
 
-const { linkScopeToHlfService } = require("@services/scopes/link-scope-to-hlf.service");
-const { sendScopeLinkedSuccess } = require("@/responses/success/scope.response");
+const { unlinkScopeToHlfService } = require("@services/scopes/unlink-scope-to-hlf.service");
+const { sendScopeUnlinkedSuccess } = require("@/responses/success/scope.response");
 const {
   throwConflictError,
   throwInternalServerError,
@@ -10,24 +10,22 @@ const {
 const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
- * PATCH /scopes/link/:scopeId/:hlfId
- * Link a scope to an HLF feature.
+ * PATCH /scopes/unlink/:scopeId
+ * Unlink a scope from an HLF feature.
  */
-const linkScopeToHlfController = async (req, res) => {
+const unlinkScopeToHlfController = async (req, res) => {
   try {
-    const { scope, hlf, inception } = req;
+    const { scope, inception } = req;
 
     logWithTime(
-      `📍 [linkScopeToHlfController] Linking scope ${scope._id} to HLF ${hlf._id} | ${getLogIdentifiers(req)}`
+      `📍 [unlinkScopeToHlfController] Unlinking scope ${scope._id} from HLF | ${getLogIdentifiers(req)}`
     );
 
     // ── Call service ──────────────────────────────────────────────────
-    const result = await linkScopeToHlfService({
+    const result = await unlinkScopeToHlfService({
       scope,
-      hlf,
       inception,
-      featureId: hlf._id?.toString(),
-      linkedBy: req.admin.adminId,
+      unlinkedBy: req.admin.adminId,
       auditContext: {
         user: req.admin,
         device: req.device,
@@ -38,19 +36,19 @@ const linkScopeToHlfController = async (req, res) => {
     // ── Handle error response ─────────────────────────────────────────
     if (!result.success) {
       logWithTime(
-        `❌ [linkScopeToHlfController] ${result.message} | ${getLogIdentifiers(req)}`
+        `❌ [unlinkScopeToHlfController] ${result.message} | ${getLogIdentifiers(req)}`
       );
       return throwConflictError(res, result.message);
     }
 
     // ── Return success response ───────────────────────────────────────
-    logWithTime(`✅ [linkScopeToHlfController] Scope linked to HLF successfully | ${getLogIdentifiers(req)}`);
-    return sendScopeLinkedSuccess(res, result.scope);
+    logWithTime(`✅ [unlinkScopeToHlfController] Scope unlinked from HLF successfully | ${getLogIdentifiers(req)}`);
+    return sendScopeUnlinkedSuccess(res, result.scope);
 
   } catch (error) {
-    logWithTime(`❌ [linkScopeToHlfController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
+    logWithTime(`❌ [unlinkScopeToHlfController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
     return throwInternalServerError(res, error);
   }
 };
 
-module.exports = { linkScopeToHlfController };
+module.exports = { unlinkScopeToHlfController };

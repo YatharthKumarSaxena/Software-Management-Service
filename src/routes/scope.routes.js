@@ -9,7 +9,7 @@ const { scopeControllers } = require("@controllers/scopes");
 const { scopeMiddlewares } = require("@/middlewares/scopes");
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { hlfMiddlewares } = require("@/middlewares/high-level-features");
-const { createScopeRateLimiter, updateScopeRateLimiter, deleteScopeRateLimiter, getScopeRateLimiter, listScopesRateLimiter, linkScopeToHlfRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
+const { createScopeRateLimiter, updateScopeRateLimiter, deleteScopeRateLimiter, getScopeRateLimiter, listScopesRateLimiter, linkScopeToHlfRateLimiter, unlinkScopeToHlfRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
 const { commonMiddlewares } = require("@/middlewares/common");
 
 const {
@@ -18,7 +18,8 @@ const {
   DELETE_SCOPE,
   GET_SCOPE,
   LIST_SCOPES,
-  LINK_SCOPE_TO_HLF
+  LINK_SCOPE_TO_HLF,
+  UNLINK_SCOPE_TO_HLF
 } = SCOPE_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -148,6 +149,26 @@ scopeRouter.patch(
     commonMiddlewares.checkUserIsStakeholder,
   ],
   scopeControllers.linkScopeToHlfController
+);
+
+/**
+ * PATCH /software-management-service/api/v1/scope/unlink/:scopeId
+ * Unlink a scope from a high-level feature.
+ * Allowed roles: CEO, Business Analyst, Manager
+ * Requires: admin is a stakeholder of the project
+ */
+scopeRouter.patch(
+  UNLINK_SCOPE_TO_HLF,
+  [
+    ...baseAuthAdminMiddlewares,
+    unlinkScopeToHlfRateLimiter,
+    scopeMiddlewares.fetchScopeMiddleware,
+    scopeMiddlewares.fetchInceptionFromProjectMiddleware,
+    commonMiddlewares.checkInceptionNotFrozen,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    commonMiddlewares.checkUserIsStakeholder,
+  ],
+  scopeControllers.unlinkScopeToHlfController
 );
 
 module.exports = { scopeRouter };
