@@ -52,7 +52,7 @@ const createInceptionService = async ({
     
     const updatedProject = await ProjectModel.findByIdAndUpdate(
       projectId,
-      { currentPhase: Phases.INCEPTION },
+      { $addToSet: { currentPhase: Phases.INCEPTION } },
       { new: true }
     );
 

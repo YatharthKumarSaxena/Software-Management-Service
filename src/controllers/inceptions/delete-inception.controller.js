@@ -6,8 +6,10 @@ const {
   throwInternalServerError,
   getLogIdentifiers,
   throwSpecificInternalServerError,
-  throwBadRequestError
+  throwBadRequestError,
+  throwConflictError
 } = require("@/responses/common/error-handler.response");
+const { CONFLICT } = require("@configs/http-status.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
@@ -55,6 +57,10 @@ const deleteInceptionController = async (req, res) => {
     });
 
     if (!result.success) {
+      if (result.errorCode === CONFLICT) {
+        logWithTime(`⚠️ [deleteInceptionController] Deletion blocked due to conflict: ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwConflictError(res, result.message);
+      }
       if (result.message === "Inception cannot be deleted for Project Development type.") {
         logWithTime(`⚠️ [deleteInceptionController] Deletion blocked due to project type: ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message);

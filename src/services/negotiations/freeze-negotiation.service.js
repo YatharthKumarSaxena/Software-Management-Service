@@ -2,6 +2,7 @@
 
 const { ProjectModel } = require("../../models");
 const { NegotiationModel } = require("../../models");
+const { Phases } = require("@configs/enums.config");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
@@ -35,6 +36,13 @@ const freezeNegotiationService = async ({
     negotiation.frozenBy = frozenBy;
 
     await negotiation.save();
+
+    // ── Remove phase from project currentPhase array  ────────────────
+    await ProjectModel.findByIdAndUpdate(
+      projectId,
+      { $pull: { currentPhase: Phases.NEGOTIATION } },
+      { new: true }
+    );
 
     // Log activity
     const { user, device, requestId } = auditContext || {};

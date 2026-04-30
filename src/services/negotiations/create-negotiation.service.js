@@ -52,7 +52,7 @@ const createNegotiationService = async ({
     const updatedProject = await ProjectModel.findByIdAndUpdate(
       projectId,
       {
-        currentPhase: Phases.NEGOTIATION
+        $addToSet: { currentPhase: Phases.NEGOTIATION }
       },
       { new: true }
     );

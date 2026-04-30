@@ -1,6 +1,8 @@
 // services/validations/freeze-validation.service.js
 
+const { ProjectModel } = require("../../models");
 const { ValidationModel } = require("../../models");
+const { Phases } = require("@configs/enums.config");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
@@ -34,6 +36,13 @@ const freezeValidationService = async ({
     validation.frozenBy = frozenBy;
 
     await validation.save();
+
+    // ── Remove phase from project currentPhase array  ────────────────
+    await ProjectModel.findByIdAndUpdate(
+      projectId,
+      { $pull: { currentPhase: Phases.VALIDATION } },
+      { new: true }
+    );
 
     // Log activity
     const { user, device, requestId } = auditContext || {};

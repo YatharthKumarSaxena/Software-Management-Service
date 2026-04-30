@@ -32,6 +32,9 @@ const deleteSpecificationController = async (req, res) => {
       const resource = result.message.includes("Project") ? "Project" : "Specification";
       return throwDBResourceNotFoundError(res, resource);
     }
+    if (result.errorCode === CONFLICT) {
+      return throwConflictError(res, result.message);
+    }
     return throwInternalServerError(res, new Error(result.message));
   }
 

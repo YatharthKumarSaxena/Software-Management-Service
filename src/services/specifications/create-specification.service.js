@@ -52,7 +52,7 @@ const createSpecificationService = async ({
     const updatedProject = await ProjectModel.findByIdAndUpdate(
       projectId,
       {
-        currentPhase: Phases.SPECIFICATION
+        $addToSet: { currentPhase: Phases.SPECIFICATION }
       },
       { new: true }
     );

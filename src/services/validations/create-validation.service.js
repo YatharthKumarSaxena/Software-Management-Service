@@ -52,7 +52,7 @@ const createValidationService = async ({
     const updatedProject = await ProjectModel.findByIdAndUpdate(
       projectId,
       {
-        currentPhase: Phases.VALIDATION
+        $addToSet: { currentPhase: Phases.VALIDATION }
       },
       { new: true }
     );

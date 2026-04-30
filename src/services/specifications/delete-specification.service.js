@@ -2,11 +2,12 @@
 
 const { ProjectModel } = require("../../models");
 const { SpecificationModel } = require("../../models");
+const { Phases } = require("@configs/enums.config");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 const deleteSpecificationService = async ({
   projectId,
@@ -40,6 +41,15 @@ const deleteSpecificationService = async ({
       };
     }
 
+    // Check phase version - cannot delete if updated (version !== 0)
+    if (specification.version && specification.version.major !== 0) {
+      return {
+        success: false,
+        message: "Cannot delete phase. Phase has been updated and cannot be deleted.",
+        errorCode: CONFLICT
+      };
+    }
+
     // Soft delete specification
     specification.isDeleted = true;
     specification.deletedAt = new Date();
@@ -48,6 +58,13 @@ const deleteSpecificationService = async ({
     specification.deletionReasonDescription = deletionReasonDescription;
 
     await specification.save();
+
+    // Remove phase from project currentPhase array
+    await ProjectModel.findByIdAndUpdate(
+      projectId,
+      { $pull: { currentPhase: Phases.SPECIFICATION } },
+      { new: true }
+    );
 
     // Log activity
     const { user, device, requestId } = auditContext || {};

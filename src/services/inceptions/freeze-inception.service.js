@@ -1,8 +1,10 @@
 // services/inceptions/freeze-inception.service.js
 
 const { InceptionModel } = require("@models/inception.model");
+const { ProjectModel } = require("@models/project.model");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
+const { Phases } = require("@configs/enums.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
 
@@ -46,7 +48,16 @@ const freezeInceptionService = async (
       { new: true }
     );
 
-    // ── 3. Log activity tracker event ────────────────────────────────
+    // ── 3. Remove phase from project currentPhase array ───────────────
+    if (frozenInception) {
+      await ProjectModel.findByIdAndUpdate(
+        inception.projectId,
+        { $pull: { currentPhase: Phases.INCEPTION } },
+        { new: true }
+      );
+    }
+
+    // ── 4. Log activity tracker event ────────────────────────────────
     if (frozenInception) {
       const { user, device, requestId } = auditContext || {};
       const { oldData, newData } = prepareAuditData(inception, frozenInception);

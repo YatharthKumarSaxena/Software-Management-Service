@@ -1,10 +1,12 @@
 // services/inceptions/delete-inception.service.js
 
 const { InceptionModel } = require("@models/inception.model");
-const { ProjectTypes, ProjectStatus, PriorityLevels } = require("@configs/enums.config");
+const { ProjectModel } = require("@models/project.model");
+const { ProjectTypes, ProjectStatus, PriorityLevels, Phases } = require("@configs/enums.config");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
+const { CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 /**
  * Soft-deletes an inception (sets isDeleted = true).
@@ -65,7 +67,17 @@ const deleteInceptionService = async (inception, params) => {
       };
     }
 
-    // ── 5. Soft-delete the inception ────────────────────────────────
+    // ── 5. Check phase version - cannot delete if updated (version !== 0) ───
+    const phaseRecord = await InceptionModel.findById(inception._id);
+    if (phaseRecord && phaseRecord.version && phaseRecord.version.major !== 0) {
+      return {
+        success: false,
+        message: "Cannot delete phase. Phase has been updated and cannot be deleted.",
+        errorCode: CONFLICT
+      };
+    }
+
+    // ── 6. Soft-delete the inception ────────────────────────────────
     const updatePayload = {
       isDeleted: true,
       deletedAt: new Date(),
@@ -80,7 +92,14 @@ const deleteInceptionService = async (inception, params) => {
       { new: true, runValidators: true }
     );
 
-    // ── 6. Activity tracking ────────────────────────────────────────
+    // ── 7. Remove phase from project currentPhase array ────────────────
+    await ProjectModel.findByIdAndUpdate(
+      project._id,
+      { $pull: { currentPhase: Phases.INCEPTION } },
+      { new: true }
+    );
+
+    // ── 8. Activity tracking ────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(inception, updatedInception);
 
@@ -99,15 +118,17 @@ const deleteInceptionService = async (inception, params) => {
       return {
         success: false,
         message: "Validation error",
-        error: error.message
+        error: error.message,
+        errorCode: INTERNAL_ERROR
       };
     }
     return {
       success: false,
       message: "Internal error while deleting inception",
-      error: error.message
+      error: error.message,
+      errorCode: INTERNAL_ERROR
     };
-  }
+    };
 };
 
 module.exports = { deleteInceptionService };

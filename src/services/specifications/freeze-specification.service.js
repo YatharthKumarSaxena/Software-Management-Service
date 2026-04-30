@@ -1,6 +1,8 @@
 // services/specifications/freeze-specification.service.js
 
+const { ProjectModel } = require("../../models");
 const { SpecificationModel } = require("../../models");
+const { Phases } = require("@configs/enums.config");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
@@ -34,6 +36,13 @@ const freezeSpecificationService = async ({
     specification.frozenBy = frozenBy;
 
     await specification.save();
+
+    // ── Remove phase from project currentPhase array  ────────────────
+    await ProjectModel.findByIdAndUpdate(
+      projectId,
+      { $pull: { currentPhase: Phases.SPECIFICATION } },
+      { new: true }
+    );
 
     // Log activity
     const { user, device, requestId } = auditContext || {};
