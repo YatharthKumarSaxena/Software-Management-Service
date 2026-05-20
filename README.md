@@ -4,7 +4,112 @@ A **process-aware Requirement Engineering (RE) lifecycle management system** tha
 
 ---
 
-## Repository Short Description (for GitHub “About” section)
+## Quick Start
+
+### Prerequisites
+- **Node.js** (v14+)
+- **MongoDB** (local or cloud instance)
+- **Redis** (for session management and rate limiting)
+- **npm** (Node Package Manager)
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd Software_Management_Service
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables:**
+   - Copy `.env.example` to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Update the `.env` file with your configuration (see **[Environment Configuration](#environment-configuration)** section below)
+
+4. **Start the Server:**
+   ```bash
+   npm start
+   ```
+   The server will run on the port specified in your `.env` file (default: `8082`)
+
+---
+
+## Environment Configuration
+
+### Required Variables
+
+Create a `.env` file in the root directory. Copy from `.env.example` and update the following key variables:
+
+#### Database Configuration
+```env
+DB_NAME=software_management_service_db
+DB_URL=mongodb://localhost/software_management_service_db
+```
+- Update `DB_URL` with your MongoDB connection string (local or Atlas)
+
+#### Server Configuration
+```env
+PORT_NUMBER=8082
+NODE_ENV=development      # Use 'production' for production deployments
+```
+
+#### Redis Configuration
+```env
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=            # Leave blank if no password
+REDIS_DB=0                 # Default DB index
+```
+
+#### Service Integration
+```env
+ADMIN_PANEL_SERVICE_URI=http://localhost:8081
+CUSTOM_AUTH_SERVICE_URI=http://localhost:8080
+FRONTEND_URL=http://localhost:5500
+```
+
+#### Microservice Tokens
+```env
+CUSTOM_AUTH_SERVICE_TOKEN_SECRET=<strong-random-string>
+SOFTWARE_MANAGEMENT_SERVICE_TOKEN_SECRET=<strong-random-string>
+ADMIN_PANEL_SERVICE_TOKEN_SECRET=<strong-random-string>
+```
+- Generate strong random strings for production (min 32 characters)
+
+#### JWT Configuration
+```env
+ACCESS_TOKEN_SECRET_CODE=<strong-random-string>
+REFRESH_TOKEN_SECRET_CODE=<strong-random-string>
+ACCESS_TOKEN_EXPIRY=6000          # seconds
+REFRESH_TOKEN_EXPIRY=604800       # seconds
+```
+
+#### Email Configuration (Gmail SMTP)
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASSWORD=<gmail-app-password>  # Use Gmail App Password, not your regular password
+EMAIL_FROM=your-email@gmail.com
+EMAIL_FROM_NAME=Admin Panel Service
+```
+- [Get Gmail App Password](https://myaccount.google.com/apppasswords)
+
+For detailed configuration options, see [`.env.example`](.env.example)
+
+---
+
+## Repository Structure
+
+This repository follows a modular architecture. For detailed information about the source code structure and main components, see **[src/README.md](src/README.md)**.
+
+### Repository Short Description (for GitHub "About" section)
 
 **Minor Project:** Process-aware Requirement Engineering Management System supporting QFD/FAST, negotiation workflow, traceability, and automated SRS generation.
 
