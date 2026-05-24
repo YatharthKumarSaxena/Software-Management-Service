@@ -2,6 +2,7 @@
 
 const mongoose = require("mongoose");
 const { Phases } = require("@configs/enums.config");
+const { ProjectModel } = require("@models/project.model");
 const { InceptionModel } = require("@models/inception.model");
 const { ElicitationModel } = require("@models/elicitation.model");
 const { ElaborationModel } = require("@models/elaboration.model");
@@ -77,33 +78,14 @@ const fetchLatestPhaseDocument = async (phase, projectId) => {
   }
 
   const latestDoc = await PhaseModel
-    .findOne({ projectId, isDeleted: false })
-    .sort({ "version.major": -1 })
+    .findOne({ projectId })
+    .sort({
+      "version.major": -1,
+      "version.minor": -1
+    })
     .lean();
 
   return latestDoc || null;
-};
-
-/**
- * Finds the active (non-frozen) phase for a project
- *
- * @param {string} projectId - Project MongoDB ObjectId
- * @returns {Object|null} Object with { phase, document } or null if no active phase
- */
-const findActivePhase = async (projectId) => {
-  for (const [phase] of Object.entries(PHASE_MODEL_MAP)) {
-    const PhaseModel = PHASE_MODEL_MAP[phase];
-
-    const activeDoc = await PhaseModel
-      .findOne({ projectId, isDeleted: false, isFrozen: false })
-      .lean();
-
-    if (activeDoc) {
-      return { phase, document: activeDoc };
-    }
-  }
-
-  return null;
 };
 
 /**
@@ -125,8 +107,22 @@ const freezePhase = async (phaseDocument, phase, params = {}) => {
 
     const updatedDoc = await PhaseModel.findByIdAndUpdate(
       phaseDocument._id,
-      { isFrozen: true },
+      {
+        $set: {
+          isFrozen: true,
+          updatedBy: params.createdBy
+        }
+      },
       { new: true }
+    );
+
+    await ProjectModel.findByIdAndUpdate(
+      phaseDocument.projectId,
+      {
+        $pull: {
+          currentPhase: phase
+        }
+      }
     );
 
     logWithTime(`✅ [freezePhase] ${phase} frozen with majorVersion: ${phaseDocument.version.major}`);
@@ -205,12 +201,12 @@ const createPhaseDocument = async ({
 
 const createPhaseWithVersionManagement = async ({
   project,
+  targetPhase,
   createdBy,
   auditContext = {},
   additionalData = {}
 }) => {
   try {
-    const targetPhase = project.currentPhase;
     const projectId = project._id.toString();
 
     // ── Validation ────────────────────────────────────────────────────
@@ -235,10 +231,10 @@ const createPhaseWithVersionManagement = async ({
 
     if (existingActiveTarget) {
       logWithTime(`⚠️ [createPhase] ${targetPhase} is already active. Cannot create a new one.`);
-      return { 
-        success: false, 
-        message: `An active ${targetPhase} phase already exists. Please freeze it before creating a new one.`, 
-        errorCode: CONFLICT 
+      return {
+        success: false,
+        message: `An active ${targetPhase} phase already exists. Please freeze it before creating a new one.`,
+        errorCode: CONFLICT
       };
     }
 
@@ -246,40 +242,94 @@ const createPhaseWithVersionManagement = async ({
     let highestMajor = 0;
     let targetPhaseHighestMajor = 0;
 
+    // Track latest workflow position in the highest cycle
+    let latestWorkflowPhase = null;
+    let latestWorkflowOrder = 0;
+
     // Poori list traverse karke max version find kar rahe hain
     for (const [phase, PhaseModel] of Object.entries(PHASE_MODEL_MAP)) {
       const latestDoc = await PhaseModel
-        .findOne({ projectId, isDeleted: false })
-        .sort({ "version.major": -1 })
+        .findOne({ projectId })
+        .sort({
+          "version.major": -1,
+          "version.minor": -1
+        })
         .lean();
 
       if (latestDoc) {
         const docMajor = latestDoc.version.major;
-        
+        const phaseOrder = PHASE_ORDER[phase];
+
         // Track overall highest major version in the project
         if (docMajor > highestMajor) {
           highestMajor = docMajor;
+
+          // Reset workflow tracking for this newer cycle
+          latestWorkflowPhase = phase;
+          latestWorkflowOrder = phaseOrder;
         }
-        
-        // Track highest version specifically for our target phase
+
+        // If same major version, track furthest workflow phase
+        else if (
+          docMajor === highestMajor &&
+          phaseOrder > latestWorkflowOrder
+        ) {
+          latestWorkflowPhase = phase;
+          latestWorkflowOrder = phaseOrder;
+        }
+
+        // Track highest version specifically for target phase
         if (phase === targetPhase && docMajor > targetPhaseHighestMajor) {
           targetPhaseHighestMajor = docMajor;
         }
       }
     }
 
+    const latestTargetDoc = await fetchLatestPhaseDocument(
+      targetPhase,
+      projectId
+    );
+
     // ── Step 3: Determine New Major Version ───────────────────────────
     let newMajorVersion = 1; // Default for brand new projects
 
     if (highestMajor > 0) {
-      if (targetPhaseHighestMajor === highestMajor) {
-        // Target phase already exists with the current highest cycle's version.
-        // Ise dobara create kar rahe hain, iska matlab naya cycle start hoga.
-        newMajorVersion = highestMajor + 1;
-      } else {
-        // Target phase pichle phases (e.g., Inception) ke aage badh raha hai,
-        // toh version same cycle wala hi rahega.
+
+      // Reuse deleted untouched draft version
+      if (
+        latestTargetDoc &&
+        latestTargetDoc.isDeleted &&
+        latestTargetDoc.version?.minor === 0 &&
+        latestTargetDoc.version?.major === highestMajor
+      ) {
+
         newMajorVersion = highestMajor;
+
+      }
+
+      // Backward workflow movement detected
+      else if (
+        PHASE_ORDER[targetPhase] < latestWorkflowOrder
+      ) {
+
+        newMajorVersion = highestMajor + 1;
+
+      }
+
+      // Same phase recreated in current cycle
+      else if (
+        targetPhaseHighestMajor === highestMajor
+      ) {
+
+        newMajorVersion = highestMajor + 1;
+
+      }
+
+      // Forward workflow progression
+      else {
+
+        newMajorVersion = highestMajor;
+
       }
     }
 
@@ -293,6 +343,15 @@ const createPhaseWithVersionManagement = async ({
       createdBy,
       additionalData
     });
+
+    await ProjectModel.findByIdAndUpdate(
+      projectId,
+      {
+        $addToSet: {
+          currentPhase: targetPhase
+        }
+      }
+    );
 
     // ── Step 5: Log activity tracker ──────────────────────────────────
     const { oldData, newData } = prepareAuditData(null, createdPhase);
@@ -352,7 +411,6 @@ module.exports = {
   createPhaseWithVersionManagement,
 
   // Utilities
-  findActivePhase,
   fetchLatestPhaseDocument,
   freezePhase,
   createPhaseDocument,

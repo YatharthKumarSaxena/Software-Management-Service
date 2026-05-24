@@ -17,16 +17,18 @@ const PHASE_MODEL_MAP = {
   [Phases.ELABORATION]: ElaborationModel,
   [Phases.NEGOTIATION]: NegotiationModel,
   [Phases.SPECIFICATION]: SpecificationModel,
-  [Phases.VALIDATION]: ValidationModel,
-  [Phases.MANAGEMENT]: null,
+  [Phases.VALIDATION]: ValidationModel
 };
 
 const determineNextVersion = async (project, PhaseModel) => {
   const projectId = project._id;
 
   const existingPhaseDoc = await PhaseModel
-    .findOne({ projectId, isDeleted: false })
-    .sort({ "version.major": -1 })
+    .findOne({ projectId, isDeleted: false, isFrozen: false })
+    .sort({
+      "version.major": -1,
+      "version.minor": -1
+    })
     .lean();
 
   let version;
@@ -59,6 +61,13 @@ const applyVersionUpdate = async ({
 
   let result;
 
+  if (!existingDoc) {
+    return {
+      success: false,
+      message: "No active phase found"
+    };
+  }
+
   if (existingDoc) {
     result = await PhaseModel.findByIdAndUpdate(
       existingDoc._id,
@@ -70,12 +79,6 @@ const applyVersionUpdate = async ({
       },
       { returnDocument: 'after', runValidators: true }
     );
-  } else {
-    result = await PhaseModel.create({
-      projectId,
-      version,
-      createdBy: performedBy
-    });
   }
 
   // ✅ Tracker AFTER DB operation (for both create & update)
@@ -98,16 +101,16 @@ const applyVersionUpdate = async ({
 
   return result;
 };
- 
+
 const versionControlService = async (project, action, performedBy, auditContext, options = {}) => {
 
   // Handle both old (single string) and new (array) currentPhase format
   let currentPhase;
   const { targetPhase } = options;
   const phasesArray = Array.isArray(project.currentPhase) ? project.currentPhase : [project.currentPhase];
-  
+
   if (phasesArray.length === 0) {
-    return { success: true, message: "No active phases" };
+    return { success: false, message: "No active phases" };
   } else if (phasesArray.length === 1) {
     // Single phase - use it
     currentPhase = phasesArray[0];
@@ -117,15 +120,22 @@ const versionControlService = async (project, action, performedBy, auditContext,
   }
 
   const PhaseModel = PHASE_MODEL_MAP[currentPhase];
-  if (!PhaseModel) return { success: true };
+  if (!PhaseModel) return { success: false, message: "Invalid phase specified" };
 
   const { version: nextVersion, existingPhaseDoc } =
     await determineNextVersion(project, PhaseModel);
 
+  if (!existingPhaseDoc) {
+    logWithTime(
+      `⚠️ [versionControlService] No active document found for phase "${currentPhase}" and project ${project._id}. Version update skipped.`
+    );
+    return { success: false, message: "No active phase document found. Version update skipped." };
+  }
+
   await applyVersionUpdate({
     PhaseModel,
     projectId: project._id,
-    version: nextVersion,   
+    version: nextVersion,
     performedBy,
     existingDoc: existingPhaseDoc,
     currentPhase,
@@ -133,7 +143,7 @@ const versionControlService = async (project, action, performedBy, auditContext,
     auditContext
   });
 
-  logWithTime(`✅ Version updated → v${nextVersion.major}.${nextVersion.minor}`); 
+  logWithTime(`✅ Version updated → v${nextVersion.major}.${nextVersion.minor}`);
 
   return {
     success: true,
@@ -150,11 +160,11 @@ const manualVersionControlService = async ({
 }) => {
 
   // currentPhase should be a specific phase (string), not an array
-  if (!currentPhase) return { success: true, message: "No phase specified" };
+  if (!currentPhase) return { success: false, message: "No phase specified" };
 
   const PhaseModel = PHASE_MODEL_MAP[currentPhase];
-  if (!PhaseModel) return { success: true };
-  
+  if (!PhaseModel) return { success: false, message: "Invalid phase specified" };
+
   // fake minimal project object (reuse existing flow)
   const project = { _id: projectId };
 
