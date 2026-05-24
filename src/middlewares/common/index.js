@@ -10,14 +10,6 @@ const { apiAuthorizationMiddleware } = require("../admins/admin-api-authorizatio
 const { checkUserIsStakeholder } = require("../stakeholders/check-user-is-stakeholder.middleware");
 const { fetchAuthUserMiddleware } = require("./fetch-auth-user.middleware");
 const { corsMiddleware } = require('./cors.middleware');
-const {
-  checkInceptionNotFrozen,
-  checkElicitationNotFrozen,
-  checkElaborationNotFrozen,
-  checkNegotiationNotFrozen,
-  checkSpecificationNotFrozen,
-  checkValidationNotFrozen
-} = require("./check-phase-frozen.middleware");
 
 const commonMiddlewares = {
     corsMiddleware,
@@ -31,13 +23,7 @@ const commonMiddlewares = {
     isUserAccountActive,
     apiAuthorizationMiddleware,
     checkUserIsStakeholder,
-    fetchAuthUserMiddleware,
-    checkInceptionNotFrozen,
-    checkElicitationNotFrozen,
-    checkElaborationNotFrozen,
-    checkNegotiationNotFrozen,
-    checkSpecificationNotFrozen,
-    checkValidationNotFrozen
+    fetchAuthUserMiddleware
 }
 
 module.exports = {
