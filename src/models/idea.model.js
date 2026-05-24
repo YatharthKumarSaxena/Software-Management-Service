@@ -23,6 +23,13 @@ const ideaSchema = new mongoose.Schema({
         maxlength: descriptionLength.max
     },
 
+    projectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: DB_COLLECTIONS.PROJECTS,
+        required: true,
+        index: true
+    },
+
     status: {
         type: String,
         enum: Object.values(IdeaStatuses),
@@ -98,7 +105,7 @@ const ideaSchema = new mongoose.Schema({
 
 // Avoid duplicate ideas (same title in active records)
 ideaSchema.index(
-    { title: 1, isDeleted: 1 },
+    { title: 1, projectId: 1, isDeleted: 1 },
     { unique: true, partialFilterExpression: { isDeleted: false } }
 );
 

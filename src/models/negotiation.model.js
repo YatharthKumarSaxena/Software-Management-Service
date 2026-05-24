@@ -113,6 +113,14 @@ const negotiationSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
+negotiationSchema.index({
+  projectId: 1,
+  "version.major": 1,
+  "version.minor": 1
+}, { unique: true, partialFilterExpression: { isDeleted: false } });
+
+negotiationSchema.index({ projectId: 1, isDeleted: 1 });
+
 const NegotiationModel = mongoose.model(DB_COLLECTIONS.NEGOTIATIONS, negotiationSchema);
 
 module.exports = {

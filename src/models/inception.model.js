@@ -92,8 +92,17 @@ const inceptionSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 inceptionSchema.index(
-  { projectId: 1, "version.major": 1 },
-  { unique: true, partialFilterExpression: { isDeleted: false } }
+  {
+    projectId: 1,
+    "version.major": 1,
+    "version.minor": 1
+  },
+  {
+    unique: true,
+    partialFilterExpression: {
+      isDeleted: false
+    }
+  }
 );
 inceptionSchema.index({ projectId: 1, isDeleted: 1 });
 

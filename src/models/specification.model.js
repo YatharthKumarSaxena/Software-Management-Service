@@ -80,6 +80,13 @@ const specificationSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
+specificationSchema.index({ projectId: 1, isDeleted: 1 });
+specificationSchema.index({
+  projectId: 1,
+  "version.major": 1,
+  "version.minor": 1
+}, { unique: true, partialFilterExpression: { isDeleted: false } });
+
 const SpecificationModel = mongoose.model(DB_COLLECTIONS.SPECIFICATIONS, specificationSchema);
 
 module.exports = {

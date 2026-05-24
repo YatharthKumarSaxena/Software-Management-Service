@@ -116,7 +116,17 @@ const elicitationSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 elicitationSchema.index({ projectId: 1, isDeleted: 1 });
-elicitationSchema.index({ projectId: 1, "version.major": -1, isDeleted: 1 });
+elicitationSchema.index({
+  projectId: 1,
+  "version.major": 1,
+  "version.minor": 1
+},
+  {
+    unique: true,
+    partialFilterExpression: {
+      isDeleted: false
+    }
+  });
 
 const ElicitationModel = mongoose.model(DB_COLLECTIONS.ELICITATIONS, elicitationSchema);
 
