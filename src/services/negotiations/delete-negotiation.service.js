@@ -8,6 +8,7 @@ const {
 } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { logWithTime } = require("@/utils/time-stamps.util");
 
 const deleteNegotiationService = async ({
   projectId,
@@ -28,12 +29,15 @@ const deleteNegotiationService = async ({
     }
 
     // Check negotiation exists and is not already deleted
-    const negotiation = await NegotiationModel.findOne({
+    const latestNegotiation = await NegotiationModel.findOne({
       projectId,
-      isDeleted: false,
-      isFrozen: false // Ensure we only delete if not frozen
+      isDeleted: false
+    }).sort({
+      "version.major": -1,
+      "version.minor": -1
     });
-    if (!negotiation) {
+
+    if (!latestNegotiation) {
       return {
         success: false,
         message: "Negotiation not found or already deleted",
@@ -41,23 +45,31 @@ const deleteNegotiationService = async ({
       };
     }
 
-    // Check phase version - cannot delete if updated (version !== 0)
-    if (negotiation.version && negotiation.version.major !== 0) {
+    if (latestNegotiation.isFrozen) {
       return {
         success: false,
-        message: "Cannot delete phase. Phase has been updated and cannot be deleted.",
+        message: "Frozen phases cannot be deleted.",
+        errorCode: CONFLICT
+      };
+    }
+
+    // Check phase version - cannot delete if updated (version !== 0)
+    if (latestNegotiation.version?.minor !== 0) {
+      return {
+        success: false,
+        message: "Updated phases cannot be deleted.",
         errorCode: CONFLICT
       };
     }
 
     // Soft delete negotiation
-    negotiation.isDeleted = true;
-    negotiation.deletedAt = new Date();
-    negotiation.deletedBy = deletedBy;
-    negotiation.deletionReasonType = deletionReasonType;
-    negotiation.deletionReasonDescription = deletionReasonDescription;
+    latestNegotiation.isDeleted = true;
+    latestNegotiation.deletedAt = new Date();
+    latestNegotiation.deletedBy = deletedBy;
+    latestNegotiation.deletionReasonType = deletionReasonType;
+    latestNegotiation.deletionReasonDescription = deletionReasonDescription;
 
-    await negotiation.save();
+    await latestNegotiation.save();
 
     // Remove phase from project currentPhase array
     await ProjectModel.findByIdAndUpdate(
@@ -80,10 +92,10 @@ const deleteNegotiationService = async ({
     return {
       success: true,
       message: "Negotiation deleted successfully",
-      negotiation,
+      negotiation: latestNegotiation,
     };
   } catch (error) {
-    console.error("[deleteNegotiationService] Error:", error);
+    logWithTime(`❌ [deleteNegotiationService] Error: ${error.message}`);
     return {
       success: false,
       message: error.message || "Failed to delete negotiation",

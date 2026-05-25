@@ -8,13 +8,14 @@ const {
 } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { logWithTime } = require("@/utils/time-stamps.util");
 
 const deleteElaborationService = async ({
   projectId,
   deletionReasonType,
   deletionReasonDescription,
   deletedBy,
-  auditContext,
+  auditContext
 }) => {
   try {
     // Check project exists
@@ -28,12 +29,15 @@ const deleteElaborationService = async ({
     }
 
     // Check elaboration exists and is not already deleted
-    const elaboration = await ElaborationModel.findOne({
+    const latestElaboration = await ElaborationModel.findOne({
       projectId,
-      isDeleted: false,
-      isFrozen: false // Ensure we only delete if not frozen
+      isDeleted: false
+    }).sort({
+      "version.major": -1,
+      "version.minor": -1
     });
-    if (!elaboration) {
+
+    if (!latestElaboration) {
       return {
         success: false,
         message: "Elaboration not found or already deleted",
@@ -41,23 +45,31 @@ const deleteElaborationService = async ({
       };
     }
 
-    // Check phase version - cannot delete if updated (version !== 0)
-    if (elaboration.version && elaboration.version.major !== 0) {
+    if (latestElaboration.isFrozen) {
       return {
         success: false,
-        message: "Cannot delete phase. Phase has been updated and cannot be deleted.",
+        message: "Frozen phases cannot be deleted.",
+        errorCode: CONFLICT
+      };
+    }
+
+    // Check phase version - cannot delete if updated (version !== 0)
+    if (latestElaboration.version?.minor !== 0) {
+      return {
+        success: false,
+        message: "Updated phases cannot be deleted.",
         errorCode: CONFLICT
       };
     }
 
     // Soft delete elaboration
-    elaboration.isDeleted = true;
-    elaboration.deletedAt = new Date();
-    elaboration.deletedBy = deletedBy;
-    elaboration.deletionReasonType = deletionReasonType;
-    elaboration.deletionReasonDescription = deletionReasonDescription;
+    latestElaboration.isDeleted = true;
+    latestElaboration.deletedAt = new Date();
+    latestElaboration.deletedBy = deletedBy;
+    latestElaboration.deletionReasonType = deletionReasonType;
+    latestElaboration.deletionReasonDescription = deletionReasonDescription;
 
-    await elaboration.save();
+    await latestElaboration.save();
 
     // Remove phase from project currentPhase array
     await ProjectModel.findByIdAndUpdate(
@@ -80,10 +92,10 @@ const deleteElaborationService = async ({
     return {
       success: true,
       message: "Elaboration deleted successfully",
-      elaboration,
+      elaboration: latestElaboration,
     };
   } catch (error) {
-    console.error("[deleteElaborationService] Error:", error);
+    logWithTime(`❌ [deleteElaborationService] Error: ${error.message}`);
     return {
       success: false,
       message: error.message || "Failed to delete elaboration",

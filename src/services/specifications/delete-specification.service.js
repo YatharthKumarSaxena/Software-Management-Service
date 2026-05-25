@@ -8,6 +8,7 @@ const {
 } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { logWithTime } = require("@/utils/time-stamps.util");
 
 const deleteSpecificationService = async ({
   projectId,
@@ -28,12 +29,15 @@ const deleteSpecificationService = async ({
     }
 
     // Check specification exists and is not already deleted
-    const specification = await SpecificationModel.findOne({
+    const latestSpecification = await SpecificationModel.findOne({
       projectId,
-      isDeleted: false,
-      isFrozen: false // Ensure we only delete if not frozen
+      isDeleted: false
+    }).sort({
+      "version.major": -1,
+      "version.minor": -1
     });
-    if (!specification) {
+
+    if (!latestSpecification) {
       return {
         success: false,
         message: "Specification not found or already deleted",
@@ -41,23 +45,31 @@ const deleteSpecificationService = async ({
       };
     }
 
-    // Check phase version - cannot delete if updated (version !== 0)
-    if (specification.version && specification.version.major !== 0) {
+    if (latestSpecification.isFrozen) {
       return {
         success: false,
-        message: "Cannot delete phase. Phase has been updated and cannot be deleted.",
+        message: "Frozen phases cannot be deleted.",
+        errorCode: CONFLICT
+      };
+    }
+
+    // Check phase version - cannot delete if updated (version !== 0)
+    if (latestSpecification.version?.minor !== 0) {
+      return {
+        success: false,
+        message: "Updated phases cannot be deleted.",
         errorCode: CONFLICT
       };
     }
 
     // Soft delete specification
-    specification.isDeleted = true;
-    specification.deletedAt = new Date();
-    specification.deletedBy = deletedBy;
-    specification.deletionReasonType = deletionReasonType;
-    specification.deletionReasonDescription = deletionReasonDescription;
+    latestSpecification.isDeleted = true;
+    latestSpecification.deletedAt = new Date();
+    latestSpecification.deletedBy = deletedBy;
+    latestSpecification.deletionReasonType = deletionReasonType;
+    latestSpecification.deletionReasonDescription = deletionReasonDescription;
 
-    await specification.save();
+    await latestSpecification.save();
 
     // Remove phase from project currentPhase array
     await ProjectModel.findByIdAndUpdate(
@@ -80,10 +92,10 @@ const deleteSpecificationService = async ({
     return {
       success: true,
       message: "Specification deleted successfully",
-      specification,
+      specification: latestSpecification,
     };
   } catch (error) {
-    console.error("[deleteSpecificationService] Error:", error);
+    logWithTime(`❌ [deleteSpecificationService] Error: ${error.message}`);
     return {
       success: false,
       message: error.message || "Failed to delete specification",

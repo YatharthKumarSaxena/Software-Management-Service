@@ -6,7 +6,7 @@ const { ProjectTypes, ProjectStatus, PriorityLevels, Phases } = require("@config
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { CONFLICT, INTERNAL_ERROR, NOT_FOUND, BAD_REQUEST } = require("@configs/http-status.config");
 
 /**
  * Soft-deletes an inception (sets isDeleted = true).
@@ -44,16 +44,44 @@ const deleteInceptionService = async (inception, params) => {
     }
 
     // ── 2. Check if FROZEN inception exists for this project ──────────
-    const frozenInception = await InceptionModel.findOne({
+    const latestInception = await InceptionModel.findOne({
       projectId: project._id,
-      isFrozen: false, // Ensure we only delete if not frozen
       isDeleted: false
+    }).sort({
+      "version.major": -1,
+      "version.minor": -1
     }).lean();
+
+    if (!latestInception) {
+      return {
+        errorCode: NOT_FOUND,
+        success: false,
+        message: "No inception found for this project."
+      };
+    }
+
+    if (latestInception.isFrozen) {
+      return {
+        errorCode: CONFLICT,
+        success: false,
+        message: "Inception cannot be deleted because a frozen inception exists for this project."
+      };
+    }
+
+
+    if (latestInception && latestInception.version && latestInception.version.minor !== 0) {
+      return {
+        success: false,
+        message: "Cannot delete phase. Phase has been updated and cannot be deleted.",
+        errorCode: CONFLICT
+      };
+    }
 
     // ── 3. Guard: If NO frozen inception AND project type is DEVELOPMENT ──
     // (Only block if no frozen doc exists)
-    if (!frozenInception && project.projectType === ProjectTypes.DEVELOPMENT) {
+    if (!latestInception.isFrozen && project.projectType === ProjectTypes.DEVELOPMENT && latestInception.version.major === 1) {
       return {
+        errorCode: BAD_REQUEST,
         success: false,
         message: "Inception cannot be deleted for Project Development type."
       };
@@ -62,18 +90,9 @@ const deleteInceptionService = async (inception, params) => {
     // ── 4. Check criticality and description ────────────────────────
     if (project.projectCriticality === PriorityLevels.CRITICAL && !deletionReasonDescription) {
       return {
+        errorCode: BAD_REQUEST,
         success: false,
         message: "Inception cannot be deleted for high-criticality projects without a reason description."
-      };
-    }
-
-    // ── 5. Check phase version - cannot delete if updated (version !== 0) ───
-    const phaseRecord = await InceptionModel.findById(inception._id);
-    if (phaseRecord && phaseRecord.version && phaseRecord.version.major !== 0) {
-      return {
-        success: false,
-        message: "Cannot delete phase. Phase has been updated and cannot be deleted.",
-        errorCode: CONFLICT
       };
     }
 
