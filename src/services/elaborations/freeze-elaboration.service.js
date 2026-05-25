@@ -1,73 +1,51 @@
 // services/elaborations/freeze-elaboration.service.js
 
-const { ProjectModel } = require("../../models");
-const { ElaborationModel } = require("../../models");
 const { Phases } = require("@configs/enums.config");
-const {
-  logActivityTrackerEvent,
-} = require("@services/audit/activity-tracker.service");
-const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { freezePhase } = require("@services/common/phase-management.service");
 
-const freezeElaborationService = async ({
-  projectId,
-  frozenBy,
-  auditContext,
-}) => {
-  try {
+/**
+ * Freezes an elaboration (marks isFrozen = true).
+ *
+ * @param {Object} elaboration - Elaboration document
+ * @param {string} elaboration._id
+ * @param {Object} params - Optional parameters
+ * @param {string} params.frozenBy - Admin USR ID
+ * @param {Object} params.auditContext - Audit context {user, device, requestId}
+ *
+ * @returns {Object} { success: true } | { success: false, message }
+ */
+const freezeElaborationService = async (
+  elaboration,
+  { frozenBy, auditContext } = {}
+) => {
 
-    // Check elaboration exists and is not already frozen
-    const elaboration = await ElaborationModel.findOne({
-      projectId,
-      isDeleted: false,
-      isFrozen: false
-    });
-    if (!elaboration) {
-      return {
-        success: false,
-        message: "Elaboration not found",
-        errorCode: NOT_FOUND,
-      };
-    }
-
-    // Freeze elaboration
-    elaboration.isFrozen = true;
-    elaboration.frozenAt = new Date();
-    elaboration.frozenBy = frozenBy;
-
-    await elaboration.save();
-
-    // ── Remove phase from project currentPhase array  ────────────────
-    await ProjectModel.findByIdAndUpdate(
-      projectId,
-      { $pull: { currentPhase: Phases.ELABORATION } },
-      { new: true }
-    );
-
-    // Log activity
-    const { user, device, requestId } = auditContext || {};
-    logActivityTrackerEvent(
-      user,
-      device,
-      requestId,
-      ACTIVITY_TRACKER_EVENTS.FREEZE_ELABORATION,
-      `Elaboration frozen - version ${elaboration.version.major}.${elaboration.version.minor}`,
-      { adminActions: { targetId: projectId } }
-    );
-
+  if (elaboration.isFrozen) {
     return {
       success: true,
-      message: "Elaboration frozen successfully",
-      elaboration,
-    };
-  } catch (error) {
-    console.error("[freezeElaborationService] Error:", error);
-    return {
-      success: false,
-      message: error.message || "Failed to freeze elaboration",
-      errorCode: INTERNAL_ERROR,
+      message: "Elaboration phase is already frozen"
     };
   }
+
+  const success = await freezePhase(
+    elaboration,
+    Phases.ELABORATION,
+    {
+      ...auditContext,
+      createdBy: frozenBy
+    }
+  );
+
+  if (!success) {
+    return {
+      success: false,
+      message: "Failed to freeze elaboration"
+    };
+  }
+
+  return {
+    success: true,
+    message: "Elaboration Phase frozen successfully"
+  };
 };
 
 module.exports = { freezeElaborationService };

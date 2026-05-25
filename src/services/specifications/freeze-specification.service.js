@@ -1,73 +1,51 @@
 // services/specifications/freeze-specification.service.js
 
-const { ProjectModel } = require("../../models");
-const { SpecificationModel } = require("../../models");
 const { Phases } = require("@configs/enums.config");
-const {
-  logActivityTrackerEvent,
-} = require("@services/audit/activity-tracker.service");
-const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { freezePhase } = require("@services/common/phase-management.service");
 
-const freezeSpecificationService = async ({
-  projectId,
-  frozenBy,
-  auditContext,
-}) => {
-  try {
+/**
+ * Freezes a specification (marks isFrozen = true).
+ *
+ * @param {Object} specification - Specification document
+ * @param {string} specification._id
+ * @param {Object} params - Optional parameters
+ * @param {string} params.frozenBy - Admin USR ID
+ * @param {Object} params.auditContext - Audit context {user, device, requestId}
+ *
+ * @returns {Object} { success: true } | { success: false, message }
+ */
+const freezeSpecificationService = async (
+  specification,
+  { frozenBy, auditContext } = {}
+) => {
 
-    // Check specification exists and is not already frozen
-    const specification = await SpecificationModel.findOne({
-      projectId,
-      isDeleted: false,
-      isFrozen: false
-    });
-    if (!specification) {
-      return {
-        success: false,
-        message: "Specification not found",
-        errorCode: NOT_FOUND,
-      };
-    }
-
-    // Freeze specification
-    specification.isFrozen = true;
-    specification.frozenAt = new Date();
-    specification.frozenBy = frozenBy;
-
-    await specification.save();
-
-    // ── Remove phase from project currentPhase array  ────────────────
-    await ProjectModel.findByIdAndUpdate(
-      projectId,
-      { $pull: { currentPhase: Phases.SPECIFICATION } },
-      { new: true }
-    );
-
-    // Log activity
-    const { user, device, requestId } = auditContext || {};
-    logActivityTrackerEvent(
-      user,
-      device,
-      requestId,
-      ACTIVITY_TRACKER_EVENTS.FREEZE_SPECIFICATION,
-      `Specification frozen - version ${specification.version.major}.${specification.version.minor}`,
-      { adminActions: { targetId: projectId } }
-    );
-
+  if (specification.isFrozen) {
     return {
       success: true,
-      message: "Specification frozen successfully",
-      specification,
-    };
-  } catch (error) {
-    console.error("[freezeSpecificationService] Error:", error);
-    return {
-      success: false,
-      message: error.message || "Failed to freeze specification",
-      errorCode: INTERNAL_ERROR,
+      message: "Specification phase is already frozen"
     };
   }
+
+  const success = await freezePhase(
+    specification,
+    Phases.SPECIFICATION,
+    {
+      ...auditContext,
+      createdBy: frozenBy
+    }
+  );
+
+  if (!success) {
+    return {
+      success: false,
+      message: "Failed to freeze specification"
+    };
+  }
+
+  return {
+    success: true,
+    message: "Specification Phase frozen successfully"
+  };
 };
 
 module.exports = { freezeSpecificationService };
