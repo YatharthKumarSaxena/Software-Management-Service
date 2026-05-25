@@ -1,8 +1,6 @@
 // services/specifications/get-specification.service.js
 
-const { ProjectModel } = require("../../models");
-const { SpecificationModel } = require("../../models");
-const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { INTERNAL_ERROR } = require("@configs/http-status.config");
 
 const getSpecificationService = async (specification) => {
   try {

@@ -20,7 +20,10 @@ const getLatestNegotiationService = async ({ projectId }) => {
     const negotiation = await NegotiationModel.findOne({
       projectId,
       isDeleted: false,
-    }).sort({ version: -1 });
+    }).sort({
+      "version.major": -1,
+      "version.minor": -1
+    });
 
     if (!negotiation) {
       return {

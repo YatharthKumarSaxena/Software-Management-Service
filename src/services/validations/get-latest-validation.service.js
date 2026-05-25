@@ -20,7 +20,10 @@ const getLatestValidationService = async ({ projectId }) => {
     const validation = await ValidationModel.findOne({
       projectId,
       isDeleted: false,
-    }).sort({ version: -1 });
+    }).sort({
+      "version.major": -1,
+      "version.minor": -1
+    });
 
     if (!validation) {
       return {

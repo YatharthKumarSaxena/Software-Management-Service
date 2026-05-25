@@ -1,7 +1,5 @@
 // services/elaborations/get-elaboration.service.js
 
-const { ProjectModel } = require("../../models");
-const { ElaborationModel } = require("../../models");
 const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 const getElaborationService = async (elaboration) => {

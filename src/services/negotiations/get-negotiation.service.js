@@ -1,7 +1,6 @@
 // services/negotiations/get-negotiation.service.js
 
-const { NegotiationModel } = require("../../models");
-const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { INTERNAL_ERROR } = require("@configs/http-status.config");
 
 const getNegotiationService = async (negotiation) => {
   try {
