@@ -133,6 +133,7 @@ const createProjectService = async ({
         _id: project._id,
         currentPhase: Phases.INCEPTION
       },
+      targetPhase: Phases.INCEPTION,
       createdBy,
       auditContext: { user, device, requestId }
     });

@@ -1,13 +1,9 @@
 // services/elicitations/create-elicitation.service.js
 
-const mongoose = require("mongoose");
 const { ProjectModel } = require("@models/project.model");
 const { ElicitationModel } = require("@models/elicitation.model");
 const { Phases } = require("@configs/enums.config");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
-const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
-const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
 
@@ -52,38 +48,14 @@ const createElicitationService = async ({
 
     // ── Step 3: Update project's currentPhase to ELICITATION ─────────
     logWithTime(`[createElicitationService] Updating project phase to ELICITATION for ${projectId}`);
-    
-    const oldProjectData = { ...project.toObject ? project.toObject() : project };
-    
-    const updatedProject = await ProjectModel.findByIdAndUpdate(
-      projectId,
-      {
-        $addToSet: { currentPhase: Phases.ELICITATION }
-        // Agar project level minorVersion increment karni hai, toh yahan: $inc: { minorVersion: 1 } add karo
-      },
-      { new: true }
-    );
-
-    if (!updatedProject) {
-      logWithTime(`❌ [createElicitationService] Failed to update project phase`);
-      return { success: false, message: "Failed to update project phase", errorCode: INTERNAL_ERROR };
-    }
-
-    // Log project update activity
-    const { user, device, requestId } = auditContext || {};
-    const { oldData, newData } = prepareAuditData(oldProjectData, updatedProject);
-    logActivityTrackerEvent(
-      user, device, requestId, ACTIVITY_TRACKER_EVENTS.UPDATE_PROJECT,
-      `Project phase transitioned to ELICITATION`, // Removed the fake minorVersion log
-      { oldData, newData, adminActions: { targetId: projectId } }
-    );
 
     // ── Step 4: Create phase WITH version management AND additional data ─
     logWithTime(`[createElicitationService] Creating ELICITATION phase document`);
     
     // Pass both mode and allowParallelMeetings to the phase management service
     const phaseResult = await createPhaseWithVersionManagement({
-      project: updatedProject,
+      project,
+      targetPhase: Phases.ELICITATION,
       createdBy,
       auditContext,
       additionalData: { 

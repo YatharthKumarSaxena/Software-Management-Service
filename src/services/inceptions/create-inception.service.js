@@ -47,28 +47,16 @@ const createInceptionService = async ({
     // ── Step 3: Ensure project is in INCEPTION phase ──────────────────
     // Inception is the starting phase, so project should stay at INCEPTION
     logWithTime(`[createInceptionService] Ensuring project phase is INCEPTION for ${projectId}`);
-    
-    const oldProjectData = { ...project.toObject ? project.toObject() : project };
-    
-    const updatedProject = await ProjectModel.findByIdAndUpdate(
-      projectId,
-      { $addToSet: { currentPhase: Phases.INCEPTION } },
-      { new: true }
-    );
-
-    if (!updatedProject) {
-      logWithTime(`❌ [createInceptionService] Failed to update project phase`);
-      return { success: false, message: "Failed to update project phase", errorCode: INTERNAL_ERROR };
-    }
 
     // ── Step 4: Create phase with version management ──────────────────
     // This handles version management and activity tracking automatically
     logWithTime(`[createInceptionService] Creating INCEPTION phase with version management`);
     const phaseResult = await createPhaseWithVersionManagement({
-      project: updatedProject,
-      allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
+      project,
+      targetPhase: Phases.INCEPTION,
       createdBy,
-      auditContext
+      auditContext,
+      additionalData: {allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false}
     });
 
     if (!phaseResult.success) {

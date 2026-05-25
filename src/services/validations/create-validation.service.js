@@ -46,27 +46,13 @@ const createValidationService = async ({
 
     // ── Step 3: Update project's currentPhase to VALIDATION ─────────
     logWithTime(`[createValidationService] Updating project phase to VALIDATION for ${projectId}`);
-    
-    const oldProjectData = { ...project.toObject ? project.toObject() : project };
-    
-    const updatedProject = await ProjectModel.findByIdAndUpdate(
-      projectId,
-      {
-        $addToSet: { currentPhase: Phases.VALIDATION }
-      },
-      { new: true }
-    );
-
-    if (!updatedProject) {
-      logWithTime(`❌ [createValidationService] Failed to update project phase`);
-      return { success: false, message: "Failed to update project phase", errorCode: INTERNAL_ERROR };
-    }
 
     // ── Step 4: Create phase WITH version management AND additional data ─
     logWithTime(`[createValidationService] Creating VALIDATION phase document`);
     
     const phaseResult = await createPhaseWithVersionManagement({
-      project: updatedProject,
+      project,
+      targetPhase: Phases.VALIDATION,
       createdBy,
       auditContext,
       additionalData: { 

@@ -46,30 +46,13 @@ const createSpecificationService = async ({
 
     // ── Step 3: Update project's currentPhase to SPECIFICATION ─────────
     logWithTime(`[createSpecificationService] Updating project phase to SPECIFICATION for ${projectId}`);
-    
-    const oldProjectData = { ...project.toObject ? project.toObject() : project };
-    
-    const updatedProject = await ProjectModel.findByIdAndUpdate(
-      projectId,
-      {
-        $addToSet: { currentPhase: Phases.SPECIFICATION }
-      },
-      { new: true }
-    );
-
-    if (!updatedProject) {
-      logWithTime(`❌ [createSpecificationService] Failed to update project phase`);
-      return { success: false, message: "Failed to update project phase", errorCode: INTERNAL_ERROR };
-    }
-
-    // Log project update activity
-    const { user, device, requestId } = auditContext || {};
 
     // ── Step 4: Create phase WITH version management AND additional data ─
     logWithTime(`[createSpecificationService] Creating SPECIFICATION phase document`);
     
     const phaseResult = await createPhaseWithVersionManagement({
-      project: updatedProject,
+      project,
+      targetPhase: Phases.SPECIFICATION,
       createdBy,
       auditContext,
       additionalData: { 

@@ -46,27 +46,13 @@ const createNegotiationService = async ({
 
     // ── Step 3: Update project's currentPhase to NEGOTIATION ─────────
     logWithTime(`[createNegotiationService] Updating project phase to NEGOTIATION for ${projectId}`);
-    
-    const oldProjectData = { ...project.toObject ? project.toObject() : project };
-    
-    const updatedProject = await ProjectModel.findByIdAndUpdate(
-      projectId,
-      {
-        $addToSet: { currentPhase: Phases.NEGOTIATION }
-      },
-      { new: true }
-    );
-
-    if (!updatedProject) {
-      logWithTime(`❌ [createNegotiationService] Failed to update project phase`);
-      return { success: false, message: "Failed to update project phase", errorCode: INTERNAL_ERROR };
-    }
 
     // ── Step 4: Create phase WITH version management AND additional data ─
     logWithTime(`[createNegotiationService] Creating NEGOTIATION phase document`);
     
     const phaseResult = await createPhaseWithVersionManagement({
-      project: updatedProject,
+      project,
+      targetPhase: Phases.NEGOTIATION,
       createdBy,
       auditContext,
       additionalData: { 

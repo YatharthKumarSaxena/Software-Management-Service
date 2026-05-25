@@ -4,9 +4,6 @@ const { ProjectModel } = require("@models/project.model");
 const { ElaborationModel } = require("@models/elaboration.model");
 const { Phases } = require("@configs/enums.config");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
-const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
-const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
 
@@ -49,27 +46,13 @@ const createElaborationService = async ({
 
     // ── Step 3: Update project's currentPhase to ELABORATION ─────────
     logWithTime(`[createElaborationService] Updating project phase to ELABORATION for ${projectId}`);
-    
-    const oldProjectData = { ...project.toObject ? project.toObject() : project };
-    
-    const updatedProject = await ProjectModel.findByIdAndUpdate(
-      projectId,
-      {
-        $addToSet: { currentPhase: Phases.ELABORATION }
-      },
-      { new: true }
-    );
-
-    if (!updatedProject) {
-      logWithTime(`❌ [createElaborationService] Failed to update project phase`);
-      return { success: false, message: "Failed to update project phase", errorCode: INTERNAL_ERROR };
-    }
 
     // ── Step 4: Create phase WITH version management AND additional data ─
     logWithTime(`[createElaborationService] Creating ELABORATION phase document`);
     
     const phaseResult = await createPhaseWithVersionManagement({
-      project: updatedProject,
+      project,
+      targetPhase: Phases.ELABORATION,
       createdBy,
       auditContext,
       additionalData: { 
