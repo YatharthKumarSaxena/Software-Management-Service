@@ -92,13 +92,12 @@ const sendElicitationsListSuccess = (res, elicitations) => {
  * Sends a 200 response after an elicitation is successfully frozen.
  *
  * @param {Object} res - Express response object
- * @param {Object} elicitation - Frozen elicitation document
+ * @param {string} message - Success message
  */
-const sendElicitationFrozenSuccess = (res, elicitation) => {
+const sendElicitationFrozenSuccess = (res, message) => {
   return res.status(OK).json({
     success: true,
-    message: "Elicitation frozen successfully.",
-    data: { elicitation },
+    message: message || "Elicitation frozen successfully."
   });
 };
 

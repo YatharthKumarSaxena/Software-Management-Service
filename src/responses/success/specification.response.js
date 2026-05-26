@@ -79,13 +79,12 @@ const sendSpecificationsListSuccess = (res, specifications, totalCount) => {
  * Sends a 200 response after a specification is successfully frozen.
  *
  * @param {Object} res - Express response object
- * @param {Object} specification - Frozen specification document
+ * @param {string} message - Success message
  */
-const sendSpecificationFrozenSuccess = (res, specification) => {
+const sendSpecificationFrozenSuccess = (res, message) => {
   return res.status(OK).json({
     success: true,
-    message: "Specification frozen successfully.",
-    data: { specification },
+    message: message || "Specification frozen successfully."
   });
 };
 

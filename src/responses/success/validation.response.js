@@ -79,13 +79,12 @@ const sendValidationsListSuccess = (res, validations, totalCount) => {
  * Sends a 200 response after a validation is successfully frozen.
  *
  * @param {Object} res - Express response object
- * @param {Object} validation - Frozen validation document
+ * @param {string} message - Success message
  */
-const sendValidationFrozenSuccess = (res, validation) => {
+const sendValidationFrozenSuccess = (res, message) => {
   return res.status(OK).json({
     success: true,
-    message: "Validation frozen successfully.",
-    data: { validation },
+    message: message || "Validation frozen successfully."
   });
 };
 

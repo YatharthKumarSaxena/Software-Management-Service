@@ -76,11 +76,10 @@ const sendInceptionDeletedSuccess = (res) => {
  * @param {Object} res - Express response object
  * @param {Object} inception - Frozen inception document
  */
-const sendInceptionFrozenSuccess = (res, inception) => {
+const sendInceptionFrozenSuccess = (res, message) => {
   return res.status(OK).json({
     success: true,
-    message: "Inception frozen successfully.",
-    data: { inception }
+    message: message
   });
 };
 

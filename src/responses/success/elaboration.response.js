@@ -79,13 +79,12 @@ const sendElaborationsListSuccess = (res, elaborations, totalCount) => {
  * Sends a 200 response after an elaboration is successfully frozen.
  *
  * @param {Object} res - Express response object
- * @param {Object} elaboration - Frozen elaboration document
+ * @param {string} message - Success message
  */
-const sendElaborationFrozenSuccess = (res, elaboration) => {
+const sendElaborationFrozenSuccess = (res, message) => {
   return res.status(OK).json({
     success: true,
-    message: "Elaboration frozen successfully.",
-    data: { elaboration },
+    message: message || "Elaboration frozen successfully."
   });
 };
 

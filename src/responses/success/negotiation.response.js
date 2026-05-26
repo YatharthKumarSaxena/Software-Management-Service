@@ -79,13 +79,12 @@ const sendNegotiationsListSuccess = (res, negotiations, totalCount) => {
  * Sends a 200 response after a negotiation is successfully frozen.
  *
  * @param {Object} res - Express response object
- * @param {Object} negotiation - Frozen negotiation document
+ * @param {string} message - Success message
  */
-const sendNegotiationFrozenSuccess = (res, negotiation) => {
+const sendNegotiationFrozenSuccess = (res, message) => {
   return res.status(OK).json({
     success: true,
-    message: "Negotiation frozen successfully.",
-    data: { negotiation },
+    message: message || "Negotiation frozen successfully."
   });
 };
 
