@@ -1,13 +1,13 @@
 // middlewares/inceptions/index.js
 
-const { fetchInceptionMiddleware } = require("./fetch-inception.middleware");
-const { fetchLatestInceptionMiddleware } = require("./fetch-latest-inception.middleware");
+const { fetchInceptionMiddleware, fetchLatestFrozenInceptionMiddleware, fetchLatestInceptionMiddleware } = require("./fetch-inception.middleware");
 const { validationMiddlewares } = require("./field-validation.middleware");
 const { presenceMiddlewares } = require("./validate-request-body.middleware");
 
 const inceptionMiddlewares = {
     fetchInceptionMiddleware,
     fetchLatestInceptionMiddleware,
+    fetchLatestFrozenInceptionMiddleware,
     ...validationMiddlewares,
     ...presenceMiddlewares
 }

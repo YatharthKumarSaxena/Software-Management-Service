@@ -1,13 +1,13 @@
 // middlewares/elicitations/index.js
 
-const { fetchElicitationMiddleware } = require("./fetch-elicitation.middleware");
-const { fetchLatestElicitationMiddleware } = require("./fetch-latest-elicitation.middleware");
+const { fetchElicitationMiddleware, fetchLatestElicitationMiddleware, fetchLatestFrozenElicitationMiddleware } = require("./fetch-elicitation.middleware");
 const { validationMiddlewares } = require("./field-validation.middleware");
 const { presenceMiddlewares } = require("./validate-request-body.middleware");
 
 const elicitationMiddlewares = {
   fetchElicitationMiddleware,
   fetchLatestElicitationMiddleware,
+  fetchLatestFrozenElicitationMiddleware,
   ...validationMiddlewares,
   ...presenceMiddlewares
 };
