@@ -2,76 +2,66 @@
 
 const { elicitationServices } = require("@services/elicitations");
 const {
-  throwBadRequestError,
-  throwInternalServerError,
   throwConflictError,
+  throwInternalServerError,
+  throwDBResourceNotFoundError,
   getLogIdentifiers,
+  throwSpecificInternalServerError,
 } = require("@/responses/common/error-handler.response");
 const { sendElicitationDeletedSuccess } = require("@/responses/success/elicitation.response");
+const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { PriorityLevels } = require("@configs/enums.config");
-const { CONFLICT } = require("@configs/http-status.config");
 
-/**
- * DELETE /projects/:projectId/elicitations/:elicitationId
- * Delete (soft delete) an elicitation.
- * 
- * If project criticality is HIGH, description is mandatory.
- */
 const deleteElicitationController = async (req, res) => {
   try {
+    const { projectId } = req.params;
     const { deletionReasonType, deletionReasonDescription } = req.body;
-    const { elicitation, project, stakeholder, auditContext } = req;
 
     logWithTime(
-      `📍 [deleteElicitationController] Deleting elicitation: ${elicitation._id} | ${getLogIdentifiers(req)}`
+      `📍 [deleteElicitationController] Deleting elicitation for project: ${projectId} | ${getLogIdentifiers(req)}`
     );
 
-    // ── Conditional validation: description mandatory for HIGH criticality ─
-    if (project.projectCriticality === PriorityLevels.HIGH) {
-      if (!deletionReasonDescription || deletionReasonDescription.trim().length === 0) {
-        logWithTime(
-          `❌ [deleteElicitationController] Description required for HIGH criticality project | ${getLogIdentifiers(req)}`
-        );
-        return throwBadRequestError(
-          res,
-          "Description is mandatory for HIGH criticality projects",
-          "When project criticality is HIGH, description field is required"
-        );
-      }
-    }
+    const result = await elicitationServices.deleteElicitationService({
+      projectId,
+      deletionReasonType,
+      deletionReasonDescription,
+      deletedBy: req.admin.adminId,
+      auditContext: {
+        user: req.admin,
+        device: req.device,
+        requestId: req.requestId
+      },
+    });
 
-    // ── Call service ──────────────────────────────────────────────────
-    const result = await elicitationServices.deleteElicitationService(
-      elicitation,
-      {
-        deletionReasonType,
-        deletionReasonDescription: deletionReasonDescription || null,
-        deletedBy: req.admin.adminId,
-        auditContext: {
-          user: req.admin,
-          device: req.device,
-          requestId: req.requestId
-        }
-      }
-    );
-
-    // ── Handle error response ─────────────────────────────────────────
     if (!result.success) {
+      if (result.errorCode === NOT_FOUND) {
+        const resource = result.message.includes("Project") ? "Project" : "Elicitation";
+        logWithTime(
+          `⚠️ [deleteElicitationController] Resource not found: ${result.message} | ${getLogIdentifiers(req)}`
+        );
+        return throwDBResourceNotFoundError(res, resource);
+      }
       if (result.errorCode === CONFLICT) {
-        logWithTime(`⚠️ [deleteElicitationController] Deletion blocked due to conflict: ${result.message} | ${getLogIdentifiers(req)}`);
+        logWithTime(
+          `⚠️ [deleteElicitationController] Deletion blocked due to conflict: ${result.message} | ${getLogIdentifiers(req)}`
+        );
         return throwConflictError(res, result.message);
       }
-      logWithTime(`❌ [deleteElicitationController] ${result.message} | ${getLogIdentifiers(req)}`);
-      return throwBadRequestError(res, result.message);
+      logWithTime(
+        `⚠️ [deleteElicitationController] Deletion blocked: ${result.message} | ${getLogIdentifiers(req)}`
+      );
+      return throwSpecificInternalServerError(res, result.message);
     }
 
-    // ── Return success response ───────────────────────────────────────
-    logWithTime(`✅ [deleteElicitationController] Elicitation deleted successfully | ${getLogIdentifiers(req)}`);
+    logWithTime(
+      `✅ [deleteElicitationController] Elicitation deleted successfully | ${getLogIdentifiers(req)}`
+    );
     return sendElicitationDeletedSuccess(res, result.elicitation);
 
   } catch (error) {
-    logWithTime(`❌ [deleteElicitationController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
+    logWithTime(
+      `❌ [deleteElicitationController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`
+    );
     return throwInternalServerError(res, error);
   }
 };

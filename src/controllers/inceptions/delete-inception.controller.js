@@ -7,9 +7,10 @@ const {
   getLogIdentifiers,
   throwSpecificInternalServerError,
   throwBadRequestError,
-  throwConflictError
+  throwConflictError,
+  throwDBResourceNotFoundError
 } = require("@/responses/common/error-handler.response");
-const { CONFLICT } = require("@configs/http-status.config");
+const { CONFLICT, NOT_FOUND } = require("@configs/http-status.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
@@ -57,6 +58,10 @@ const deleteInceptionController = async (req, res) => {
     });
 
     if (!result.success) {
+      if (result.errorCode === NOT_FOUND) {
+        logWithTime(`⚠️ [deleteInceptionController] Inception not found: ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwDBResourceNotFoundError(res, "Inception");
+      }
       if (result.errorCode === CONFLICT) {
         logWithTime(`⚠️ [deleteInceptionController] Deletion blocked due to conflict: ${result.message} | ${getLogIdentifiers(req)}`);
         return throwConflictError(res, result.message);
