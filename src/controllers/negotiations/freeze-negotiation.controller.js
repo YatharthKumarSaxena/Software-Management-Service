@@ -5,34 +5,38 @@ const {
   sendNegotiationFrozenSuccess,
 } = require("../../responses/success/negotiation.response");
 const {
-  throwConflictError,
   throwInternalServerError,
-  throwDBResourceNotFoundError,
+  throwSpecificInternalServerError,
+  getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
-const { NOT_FOUND } = require("@configs/http-status.config");
+const { logWithTime } = require("@/utils/time-stamps.util");
 
 const freezeNegotiationController = async (req, res) => {
-  const { projectId } = req.params;
+  try {
+    const { negotiation } = req;
 
-  const result = await freezeNegotiationService({
-    projectId,
-    frozenBy: req.admin.adminId,
-    auditContext: {
-      user: req.admin,
-      device: req.device,
-      requestId: req.requestId
-    },
-  });
+    const result = await freezeNegotiationService(
+      negotiation,
+      {
+        frozenBy: req.admin.adminId,
+        auditContext: {
+          user: req.admin,
+          device: req.device,
+          requestId: req.requestId
+        }
+      }
+    );
 
-  if (!result.success) {
-    if (result.errorCode === NOT_FOUND) {
-      const resource = result.message.includes("Project") ? "Project" : "Negotiation";
-      return throwDBResourceNotFoundError(res, resource);
+    if (!result.success) {
+      return throwSpecificInternalServerError(res, result.message);
     }
-    return throwInternalServerError(res, new Error(result.message));
-  }
 
-  return sendNegotiationFrozenSuccess(res, result.negotiation);
+    logWithTime(`✅ [freezeNegotiationController] Negotiation frozen successfully | ${getLogIdentifiers(req)}`);
+    return sendNegotiationFrozenSuccess(res, result.message);
+  } catch (error) {
+    logWithTime(`❌ [freezeNegotiationController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
+    return throwInternalServerError(res, error);
+  }
 };
 
 module.exports = { freezeNegotiationController };

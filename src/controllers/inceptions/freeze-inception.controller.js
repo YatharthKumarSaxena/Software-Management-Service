@@ -43,7 +43,7 @@ const freezeInceptionController = async (req, res) => {
 
     // ── Return success response ───────────────────────────────────────
     logWithTime(`✅ [freezeInceptionController] Inception frozen successfully | ${getLogIdentifiers(req)}`);
-    return sendInceptionFrozenSuccess(res, result.inception);
+    return sendInceptionFrozenSuccess(res,result.message);
 
   } catch (error) {
     logWithTime(`❌ [freezeInceptionController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);

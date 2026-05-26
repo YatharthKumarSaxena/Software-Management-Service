@@ -6,32 +6,36 @@ const {
 } = require("../../responses/success/validation.response");
 const {
   throwInternalServerError,
-  throwDBResourceNotFoundError,
+  throwSpecificInternalServerError,
+  getLogIdentifiers
 } = require("@/responses/common/error-handler.response");
-const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { logWithTime } = require("@/utils/time-stamps.util");
 
 const freezeValidationController = async (req, res) => {
-  const { projectId } = req.params;
+  try {
+    const { validation } = req;
 
-  const result = await freezeValidationService({
-    projectId,
-    frozenBy: req.admin.adminId,
-    auditContext: {
-      user: req.admin,
-      device: req.device,
-      requestId: req.requestId
-    },
-  });
+    const result = await freezeValidationService(
+      validation,
+      {
+        frozenBy: req.admin.adminId,
+        auditContext: {
+          user: req.admin,
+          device: req.device,
+          requestId: req.requestId
+        }
+      }
+    );
 
-  if (!result.success) {
-    if (result.errorCode === NOT_FOUND) {
-      const resource = result.message.includes("Project") ? "Project" : "Validation";
-      return throwDBResourceNotFoundError(res, resource);
+    if (!result.success) {
+      return throwSpecificInternalServerError(res, result.message);
     }
-    return throwInternalServerError(res, new Error(result.message));
+    logWithTime(`✅ [freezeValidationController] Validation frozen successfully | ${getLogIdentifiers(req)}`);
+    return sendValidationFrozenSuccess(res, result.message);
+  } catch (error) {
+    logWithTime(`❌ [freezeValidationController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
+    return throwInternalServerError(res, error);
   }
-
-  return sendValidationFrozenSuccess(res, result.validation);
 };
 
 module.exports = { freezeValidationController };

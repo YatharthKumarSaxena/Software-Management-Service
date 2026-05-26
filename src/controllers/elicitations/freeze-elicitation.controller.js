@@ -43,7 +43,7 @@ const freezeElicitationController = async (req, res) => {
 
     // ── Return success response ───────────────────────────────────────
     logWithTime(`✅ [freezeElicitationController] Elicitation frozen successfully | ${getLogIdentifiers(req)}`);
-    return sendElicitationFrozenSuccess(res, result.elicitation);
+    return sendElicitationFrozenSuccess(res, result.message);
 
   } catch (error) {
     logWithTime(`❌ [freezeElicitationController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);

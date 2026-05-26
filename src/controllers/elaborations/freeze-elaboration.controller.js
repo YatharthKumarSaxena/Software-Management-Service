@@ -6,32 +6,36 @@ const {
 } = require("../../responses/success/elaboration.response");
 const {
   throwInternalServerError,
-  throwDBResourceNotFoundError,
+  throwSpecificInternalServerError,
+  getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
-const { NOT_FOUND } = require("@configs/http-status.config");
+const { logWithTime } = require("@/utils/time-stamps.util");
 
 const freezeElaborationController = async (req, res) => {
-  const { projectId } = req.params;
+  try { 
+    const { elaboration } = req;
 
-  const result = await freezeElaborationService({
-    projectId,
-    frozenBy: req.admin.adminId,
-    auditContext: {
-      user: req.admin,
-      device: req.device,
-      requestId: req.requestId
-    },
-  });
+    const result = await freezeElaborationService(
+      elaboration,
+      {
+        frozenBy: req.admin.adminId,
+        auditContext: {
+          user: req.admin,
+          device: req.device,
+          requestId: req.requestId
+        }
+      }
+    );
 
-  if (!result.success) {
-    if (result.errorCode === NOT_FOUND) {
-      const resource = result.message.includes("Project") ? "Project" : "Elaboration";
-      return throwDBResourceNotFoundError(res, resource);
+    if (!result.success) {
+      return throwSpecificInternalServerError(res, result.message);
     }
-    return throwInternalServerError(res, new Error(result.message));
+    logWithTime(`✅ [freezeElaborationController] Elaboration frozen successfully | ${getLogIdentifiers(req)}`);
+    return sendElaborationFrozenSuccess(res, result.message);
+  } catch (error) {
+    logWithTime(`❌ [freezeElaborationController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
+    return throwInternalServerError(res, "An error occurred while freezing the elaboration phase.");
   }
-
-  return sendElaborationFrozenSuccess(res, result.elaboration);
 };
 
 module.exports = { freezeElaborationController };
