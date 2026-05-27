@@ -1,7 +1,6 @@
 // middlewares/high-level-features/fetch-hlf.middleware.js
 
 const { HighLevelFeatureModel } = require("@models/high-level-feature.model");
-const { InceptionModel } = require("@models/inception.model");
 const { ProjectModel } = require("@models/project.model");
 const { logMiddlewareError } = require("@utils/log-error.util");
 const { throwDBResourceNotFoundError, throwInternalServerError } = require("@responses/common/error-handler.response");
@@ -33,34 +32,22 @@ const fetchHlfMiddleware = async (req, res, next) => {
       return throwDBResourceNotFoundError(res, `High-level feature with ID ${hlfId}`);
     }
 
-    // Fetch associated inception
-    const inception = await InceptionModel.findOne({
-      _id: hlf.inceptionId,
-      isDeleted: false
-    });
-
-    if (!inception) {
-      logMiddlewareError("fetchHlf", `Inception ${hlf.inceptionId} not found for HLF ${hlfId}`, req);
-      return throwDBResourceNotFoundError(res, `Associated Inception for HLF ${hlfId}`);
-    }
-
     // Fetch associated project
     const project = await ProjectModel.findOne({
-      _id: inception.projectId,
+      _id: hlf.projectId,
       isDeleted: false
     });
 
     if (!project) {
-      logMiddlewareError("fetchHlf", `Project ${inception.projectId} not found for inception ${inception._id}`, req);
+      logMiddlewareError("fetchHlf", `Project ${hlf.projectId} not found for HLF ${hlfId}`, req);
       return throwDBResourceNotFoundError(res, `Associated Project for HLF ${hlfId}`);
     }
 
     // Attach to request
     req.hlf = hlf;
-    req.inception = inception;
     req.project = project;
 
-    logWithTime(`✅ HLF ${hlfId} fetched successfully with associated inception and project`);
+    logWithTime(`✅ HLF ${hlfId} fetched successfully with associated project`);
     return next();
   } catch (err) {
     logMiddlewareError("fetchHlf", `Unexpected error: ${err.message}`, req);
