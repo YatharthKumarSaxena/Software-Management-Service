@@ -18,7 +18,7 @@ const getValidationController = async (req, res) => {
     return throwInternalServerError(res, new Error(result.message));
   }
 
-  logWithTime(`✅ Validation retrieved successfully for validationId: ${validation.validationId}`);
+  logWithTime(`✅ Validation retrieved successfully for validationId: ${validation._id}`);
   return sendValidationRetrievedSuccess(res, result.validation);
 };
 
