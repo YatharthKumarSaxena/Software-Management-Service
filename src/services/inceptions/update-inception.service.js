@@ -1,10 +1,12 @@
 // services/inceptions/update-inception.service.js
 
-const { InceptionModel } = require("@models/inception.model");
+const { manualVersionControlService } = require("@services/common/version.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { Phases } = require("@configs/enums.config");
+const { InceptionModel } = require("@/models");
 
 /**
  * Updates an inception's mode and/or allowParallelMeetings.
@@ -29,7 +31,7 @@ const updateInceptionService = async (
   inception,
   { allowParallelMeetings, updatedBy, auditContext }
 ) => {
-  try {
+  try { 
     const { MeetingModel } = require("@models/meeting.model");
     const { MeetingStatuses } = require("@configs/enums.config");
 
@@ -111,6 +113,15 @@ const updateInceptionService = async (
       logWithTime(
         `✅ [updateInceptionService] Inception updated: ${inception._id}`
       );
+
+      // ── 6. Manual version control (increment minor version) ────────────────────
+      await manualVersionControlService({
+        projectId: inception.projectId,
+        currentPhase: Phases.INCEPTION,
+        action: `Inception updated: ${changeDesc.join(', ')} — version bump`,
+        performedBy: updatedBy,
+        auditContext
+      });
     }
 
     return {

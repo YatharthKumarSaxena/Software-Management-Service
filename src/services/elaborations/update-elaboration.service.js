@@ -2,11 +2,14 @@
 
 const { ProjectModel } = require("../../models");
 const { ElaborationModel } = require("../../models");
+const { manualVersionControlService } = require("@services/common/version.service");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { logWithTime } = require("@utils/time-stamps.util");
+const { Phases } = require("@configs/enums.config");
 
 const updateElaborationService = async ({
   projectId,
@@ -29,7 +32,11 @@ const updateElaborationService = async ({
     const elaboration = await ElaborationModel.findOne({
       projectId,
       isDeleted: false,
+    }).sort({
+      "version.major": -1,
+      "version.minor": -1
     });
+
     if (!elaboration) {
       return {
         success: false,
@@ -84,7 +91,7 @@ const updateElaborationService = async ({
 
     await elaboration.save();
 
-    // Log activity
+    // ── 4. Log activity ──────────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
     logActivityTrackerEvent(
       user,
@@ -94,6 +101,18 @@ const updateElaborationService = async ({
       `Elaboration updated - allowParallelMeetings toggled`,
       { adminActions: { targetId: projectId } }
     );
+
+    // ── 5. Manual version control (increment minor version) ──────────────
+    logWithTime(`[updateElaborationService] Incrementing version for elaboration`);
+    await manualVersionControlService({
+      projectId,
+      currentPhase: Phases.ELABORATION,
+      action: `Elaboration updated - allowParallelMeetings toggled — version bump`,
+      performedBy: updatedBy,
+      auditContext
+    });
+
+    logWithTime(`✅ [updateElaborationService] Elaboration updated with version control`);
 
     return {
       success: true,

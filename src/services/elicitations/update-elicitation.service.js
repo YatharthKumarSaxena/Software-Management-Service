@@ -1,10 +1,12 @@
 // services/elicitations/update-elicitation.service.js
 
 const { ElicitationModel } = require("@models/elicitation.model");
+const { manualVersionControlService } = require("@services/common/version.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { Phases } = require("@configs/enums.config");
 
 /**
  * Updates an elicitation's mode and/or allowParallelMeetings.
@@ -117,6 +119,15 @@ const updateElicitationService = async (
       logWithTime(
         `✅ [updateElicitationService] Elicitation updated: ${elicitation._id}`
       );
+
+      // ── 6. Manual version control (increment minor version) ──────────────
+      await manualVersionControlService({
+        projectId: elicitation.projectId,
+        currentPhase: Phases.ELICITATION,
+        action: `Elicitation updated: ${changeDesc.join(', ')} — version bump`,
+        performedBy: updatedBy,
+        auditContext
+      });
     }
 
     return {

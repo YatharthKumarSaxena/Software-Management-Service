@@ -2,11 +2,14 @@
 
 const { ProjectModel } = require("../../models");
 const { ValidationModel } = require("../../models");
+const { manualVersionControlService } = require("@services/common/version.service");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { logWithTime } = require("@utils/time-stamps.util");
+const { Phases } = require("@configs/enums.config");
 
 const updateValidationService = async ({
   projectId,
@@ -29,7 +32,8 @@ const updateValidationService = async ({
     const validation = await ValidationModel.findOne({
       projectId,
       isDeleted: false,
-    });
+    }).sort({ "version.major": -1, "version.minor": -1 });
+
     if (!validation) {
       return {
         success: false,
@@ -84,7 +88,7 @@ const updateValidationService = async ({
 
     await validation.save();
 
-    // Log activity
+    // ── 4. Log activity ──────────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
     logActivityTrackerEvent(
       user,
@@ -94,6 +98,18 @@ const updateValidationService = async ({
       `Validation updated - allowParallelMeetings toggled`,
       { adminActions: { targetId: projectId } }
     );
+
+    // ── 5. Manual version control (increment minor version) ──────────────
+    logWithTime(`[updateValidationService] Incrementing version for validation`);
+    await manualVersionControlService({
+      projectId,
+      currentPhase: Phases.VALIDATION,
+      action: `Validation updated - allowParallelMeetings toggled — version bump`,
+      performedBy: updatedBy,
+      auditContext
+    });
+
+    logWithTime(`✅ [updateValidationService] Validation updated with version control`);
 
     return {
       success: true,

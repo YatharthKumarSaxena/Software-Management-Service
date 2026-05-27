@@ -2,11 +2,14 @@
 
 const { ProjectModel } = require("../../models");
 const { SpecificationModel } = require("../../models");
+const { manualVersionControlService } = require("@services/common/version.service");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { logWithTime } = require("@utils/time-stamps.util");
+const { Phases } = require("@configs/enums.config");
 
 const updateSpecificationService = async ({
   projectId,
@@ -29,7 +32,8 @@ const updateSpecificationService = async ({
     const specification = await SpecificationModel.findOne({
       projectId,
       isDeleted: false,
-    });
+    }).sort({ "version.major": -1, "version.minor": -1 });
+
     if (!specification) {
       return {
         success: false,
@@ -84,7 +88,7 @@ const updateSpecificationService = async ({
 
     await specification.save();
 
-    // Log activity
+    // ── 4. Log activity ──────────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
     logActivityTrackerEvent(
       user,
@@ -94,6 +98,18 @@ const updateSpecificationService = async ({
       `Specification updated - allowParallelMeetings toggled`,
       { adminActions: { targetId: projectId } }
     );
+
+    // ── 5. Manual version control (increment minor version) ──────────────
+    logWithTime(`[updateSpecificationService] Incrementing version for specification`);
+    await manualVersionControlService({
+      projectId,
+      currentPhase: Phases.SPECIFICATION,
+      action: `Specification updated - allowParallelMeetings toggled — version bump`,
+      performedBy: updatedBy,
+      auditContext
+    });
+
+    logWithTime(`✅ [updateSpecificationService] Specification updated with version control`);
 
     return {
       success: true,
