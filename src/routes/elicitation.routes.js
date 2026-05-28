@@ -59,8 +59,8 @@ elicitationRouter.post(
     ...baseAuthAdminMiddlewares,
     createElicitationRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
     checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.createElicitationStakeholderRoleAccessMiddleware,
     elicitationMiddlewares.createElicitationPresenceMiddleware,
     elicitationMiddlewares.createElicitationValidationMiddleware
@@ -79,10 +79,9 @@ elicitationRouter.patch(
     ...baseAuthAdminMiddlewares,
     updateElicitationRateLimiter,
     elicitationMiddlewares.fetchLatestElicitationMiddleware,
-    commonMiddlewares.checkElicitationNotFrozen,
     projectMiddlewares.fetchProjectMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
     checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.updateElicitationStakeholderRoleAccessMiddleware,
     elicitationMiddlewares.updateElicitationPresenceMiddleware,
     elicitationMiddlewares.updateElicitationValidationMiddleware
@@ -101,10 +100,9 @@ elicitationRouter.delete(
     ...baseAuthAdminMiddlewares,
     deleteElicitationRateLimiter,
     elicitationMiddlewares.fetchLatestElicitationMiddleware,
-    commonMiddlewares.checkElicitationNotFrozen,
     projectMiddlewares.fetchProjectMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
     checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.deleteElicitationStakeholderRoleAccessMiddleware,
     elicitationMiddlewares.deleteElicitationPresenceMiddleware,
     elicitationMiddlewares.deleteElicitationValidationMiddleware
@@ -123,7 +121,8 @@ elicitationRouter.get(
     ...baseAuthAdminMiddlewares,
     getElicitationRateLimiter,
     elicitationMiddlewares.fetchElicitationMiddleware,
-    projectMiddlewares.fetchProjectMiddleware
+    projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder
   ],
   elicitationControllers.getElicitationController
 );
@@ -138,8 +137,9 @@ elicitationRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getLatestElicitationRateLimiter,
-    elicitationMiddlewares.fetchLatestElicitationMiddleware,
-    projectMiddlewares.fetchProjectMiddleware
+    elicitationMiddlewares.fetchLatestFrozenElicitationMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder
   ],
   elicitationControllers.getLatestElicitationController
 );
@@ -154,7 +154,8 @@ elicitationRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     listElicitationsRateLimiter,
-    projectMiddlewares.fetchProjectMiddleware
+    projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder
   ],
   elicitationControllers.listElicitationsController
 );
@@ -173,8 +174,7 @@ elicitationRouter.patch(
     checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.freezeElicitationStakeholderRoleAccessMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
-    elicitationMiddlewares.fetchLatestElicitationMiddleware,
-    commonMiddlewares.checkElicitationNotFrozen
+    elicitationMiddlewares.fetchLatestFrozenElicitationMiddleware
   ],
   elicitationControllers.freezeElicitationController
 );

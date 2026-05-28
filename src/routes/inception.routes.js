@@ -63,8 +63,8 @@ inceptionRouter.get(
     ...baseAuthAdminMiddlewares,
     getLatestInceptionRateLimiter,
     projectMiddlewares.fetchProjectMiddleware, // Validates projectId, fetches project document for controller
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
-    checkUserIsStakeholder
+    checkUserIsStakeholder,
+    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
   ],
   inceptionControllers.getLatestInceptionController
 );
@@ -115,10 +115,9 @@ inceptionRouter.delete(
     deleteInceptionRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
-    stakeholderRoleAccessMiddlewares.createInceptionStakeholderRoleAccessMiddleware,
+    stakeholderRoleAccessMiddlewares.deleteInceptionStakeholderRoleAccessMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
+    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware,
     inceptionMiddlewares.deleteInceptionPresenceMiddleware,
     inceptionMiddlewares.deleteInceptionValidationMiddleware
   ],
@@ -131,8 +130,8 @@ inceptionRouter.post(
     ...baseAuthAdminMiddlewares,
     createInceptionRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
     checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.createInceptionStakeholderRoleAccessMiddleware
   ],
   inceptionControllers.createInceptionController
@@ -152,8 +151,7 @@ inceptionRouter.patch(
     checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.freezeInceptionStakeholderRoleAccessMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen
+    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
   ],
   inceptionControllers.freezeInceptionController
 );
@@ -167,8 +165,7 @@ inceptionRouter.patch(
     checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.updateInceptionStakeholderRoleAccessMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen
+    inceptionMiddlewares.fetchLatestInceptionMiddleware
   ],
   inceptionControllers.updateInceptionController
 );
