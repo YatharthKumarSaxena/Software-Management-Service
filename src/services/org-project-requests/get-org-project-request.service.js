@@ -1,9 +1,6 @@
 // services/org-project-requests/get-org-project-request.service.js
 
-const { OrgProjectRequest } = require("@models/org-project-request.model");
-const StakeholderModel = require("@models/stakeholder.model");
-const ProjectModel = require("@models/project.model");
-const { NOT_FOUND, FORBIDDEN, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { FORBIDDEN, INTERNAL_ERROR } = require("@configs/http-status.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
