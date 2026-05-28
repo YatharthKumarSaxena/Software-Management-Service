@@ -48,13 +48,13 @@ meetingRouter.post(
     projectMiddlewares.fetchProjectMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
 
-    // Entity (from entityType)
-    meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
-
     // Stakeholder
     stakeholderMiddlewares.checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.createMeetingStakeholderRoleAccessMiddleware,
+
+    // Entity (from entityType)
+    meetingMiddlewares.fetchEntityIdMiddleware,
+    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
 
     // Request validation
     meetingMiddlewares.createMeetingPresenceMiddleware,
@@ -74,15 +74,13 @@ meetingRouter.patch(
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    stakeholderRoleAccessMiddlewares.cancelMeetingStakeholderRoleAccessMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
     meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
-
-    // Stakeholder
-    stakeholderMiddlewares.checkUserIsStakeholder,
-    stakeholderRoleAccessMiddlewares.cancelMeetingStakeholderRoleAccessMiddleware,
 
     // Meeting validations
     meetingMiddlewares.validateUserIsParticipantMiddleware,
@@ -105,14 +103,12 @@ meetingRouter.patch(
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
     meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
-
-    // Stakeholder
-    stakeholderMiddlewares.checkUserIsStakeholder,
 
     // Meeting validations
     meetingMiddlewares.meetingFinalizedGuardMiddleware,
@@ -138,11 +134,11 @@ meetingRouter.get(
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
 
-    // Entity (from entityType)
-    meetingMiddlewares.fetchEntityIdMiddleware,
-
     // Stakeholder
     stakeholderMiddlewares.checkUserIsStakeholder,
+
+    // Entity (from entityType)
+    meetingMiddlewares.fetchEntityIdMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware
   ],
   meetingControllers.getMeetingController
@@ -156,11 +152,11 @@ meetingRouter.get(
     // Project (from projectId)
     projectMiddlewares.fetchProjectMiddleware,
 
-    // Entity (from entityType)
-    meetingMiddlewares.fetchEntityIdMiddleware,
-
     // Stakeholder
-    stakeholderMiddlewares.checkUserIsStakeholder
+    stakeholderMiddlewares.checkUserIsStakeholder,
+
+    // Entity (from entityType)
+    meetingMiddlewares.fetchEntityIdMiddleware
 
   ],
   meetingControllers.listMeetingsController
@@ -178,14 +174,12 @@ meetingRouter.patch(
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
     meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
-
-    // Stakeholder
-    stakeholderMiddlewares.checkUserIsStakeholder,
     meetingMiddlewares.validateUserIsParticipantMiddleware,
 
     // Request validation
@@ -207,14 +201,12 @@ meetingRouter.patch(
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
     meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
-
-    // Stakeholder
-    stakeholderMiddlewares.checkUserIsStakeholder,
     meetingMiddlewares.validateUserIsParticipantMiddleware,
 
     // Request validation
@@ -236,14 +228,12 @@ meetingRouter.patch(
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
     meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
-
-    // Stakeholder
-    stakeholderMiddlewares.checkUserIsStakeholder,
     meetingMiddlewares.validateUserIsParticipantMiddleware
 
   ],
@@ -261,14 +251,12 @@ meetingRouter.patch(
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
     meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
-
-    // Stakeholder
-    stakeholderMiddlewares.checkUserIsStakeholder,
     meetingMiddlewares.validateUserIsParticipantMiddleware
 
   ],
@@ -286,15 +274,13 @@ meetingRouter.patch(
 
     // Project (derived from entity or meeting)
     projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    stakeholderRoleAccessMiddlewares.freezeMeetingStakeholderRoleAccessMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
     meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
-
-    // Stakeholder
-    stakeholderMiddlewares.checkUserIsStakeholder,
-    stakeholderRoleAccessMiddlewares.freezeMeetingStakeholderRoleAccessMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware
 
   ],

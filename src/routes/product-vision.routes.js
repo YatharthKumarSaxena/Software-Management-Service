@@ -10,6 +10,7 @@ const { productVisionMiddlewares } = require("@/middlewares/product-vision");
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { commonMiddlewares } = require("@/middlewares/common");
 const { createProductVisionRateLimiter, deleteProductVisionRateLimiter, updateProductVisionRateLimiter, getProductVisionRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
+const { inceptionMiddlewares } = require("@/middlewares/inceptions");
 
 const {
   CREATE_PRODUCT_VISION,
@@ -42,10 +43,9 @@ productVisionRouter.post(
     ...baseAuthAdminMiddlewares,
     createProductVisionRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
-    productVisionMiddlewares.fetchInceptionFromProjectMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
     commonMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    inceptionMiddlewares.fetchLatestInceptionMiddleware,
     productVisionMiddlewares.createProductVisionPresenceMiddleware,
     productVisionMiddlewares.createProductVisionValidationMiddleware,
   ],
@@ -64,10 +64,9 @@ productVisionRouter.patch(
     ...baseAuthAdminMiddlewares,
     updateProductVisionRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
-    productVisionMiddlewares.fetchInceptionFromProjectMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
     commonMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    inceptionMiddlewares.fetchLatestInceptionMiddleware,
     productVisionMiddlewares.updateProductVisionPresenceMiddleware,
     productVisionMiddlewares.updateProductVisionValidationMiddleware,
   ],
@@ -86,11 +85,11 @@ productVisionRouter.delete(
     ...baseAuthAdminMiddlewares,
     deleteProductVisionRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
-    productVisionMiddlewares.fetchInceptionFromProjectMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
     commonMiddlewares.checkUserIsStakeholder,
-    productVisionMiddlewares.deleteProductVisionValidationMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    productVisionMiddlewares.deleteProductVisionPresenceMiddleware,
+    productVisionMiddlewares.deleteProductVisionValidationMiddleware
   ],
   productVisionControllers.deleteProductVisionController
 );
@@ -105,8 +104,8 @@ productVisionRouter.get(
     ...baseAuthClientOrAdminMiddlewares,
     getProductVisionRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
-    productVisionMiddlewares.fetchInceptionFromProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
+    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
   ],
   productVisionControllers.getProductVisionController
 );

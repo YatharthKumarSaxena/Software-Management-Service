@@ -9,7 +9,7 @@ const { commentControllers } = require("@controllers/comments");
 const { commentMiddlewares } = require("@/middlewares/comments");
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { getCommentRateLimiter, updateCommentRateLimiter, deleteCommentRateLimiter, createCommentRateLimiter, listCommentsRateLimiter, listHierarchicalCommentsRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
-
+const { checkUserIsStakeholder } = require("@/middlewares/stakeholders/check-user-is-stakeholder.middleware");
 const {
   CREATE_COMMENT,
   GET_COMMENT,
@@ -52,7 +52,8 @@ commentRouter.post(
     commentMiddlewares.createCommentValidationMiddleware,
     commentMiddlewares.validateEntityTypeMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware
+    projectMiddlewares.activeProjectGuardMiddleware,
+    checkUserIsStakeholder
   ],
   commentControllers.createCommentController
 );
@@ -68,7 +69,8 @@ commentRouter.get(
     ...baseAuthClientOrAdminMiddlewares,
     getCommentRateLimiter,
     commentMiddlewares.fetchCommentMiddleware,
-    projectMiddlewares.fetchProjectMiddleware
+    projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder
   ],
   commentControllers.getCommentController
 );
@@ -129,6 +131,7 @@ commentRouter.patch(
     commentMiddlewares.updateCommentValidationMiddleware,
     commentMiddlewares.fetchCommentMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware
   ],
   commentControllers.updateCommentController
@@ -158,6 +161,7 @@ commentRouter.delete(
     commentMiddlewares.deleteCommentValidationMiddleware,
     commentMiddlewares.fetchCommentMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
   ],
   commentControllers.deleteCommentController

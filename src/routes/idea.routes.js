@@ -20,6 +20,7 @@ const { ideaControllers } = require("@controllers/ideas");
 const { ideaMiddlewares } = require("@middlewares/ideas");
 const { projectMiddlewares } = require("@middlewares/projects");
 const { baseAuthAdminMiddlewares ,baseAuthClientOrAdminMiddlewares } = require("./middleware.gateway.routes");
+const { checkUserIsStakeholder } = require("@/middlewares/stakeholders/check-user-is-stakeholder.middleware");
 
 const {
   CREATE_IDEA,
@@ -61,6 +62,7 @@ ideaRouter.post(
     ...baseAuthClientOrAdminMiddlewares,
     createIdeaRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
     ideaMiddlewares.createIdeaPresenceMiddleware,
     ideaMiddlewares.createIdeaValidationMiddleware
@@ -79,6 +81,7 @@ ideaRouter.patch(
     updateIdeaRateLimiter,
     ideaMiddlewares.fetchIdeaMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
     ideaMiddlewares.updateIdeaPresenceMiddleware,
     ideaMiddlewares.updateIdeaValidationMiddleware
@@ -97,6 +100,7 @@ ideaRouter.delete(
     deleteIdeaRateLimiter,
     ideaMiddlewares.fetchIdeaMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware
   ],
   ideaControllers.deleteIdeaController
@@ -113,6 +117,7 @@ ideaRouter.patch(
     acceptIdeaRateLimiter,
     ideaMiddlewares.fetchIdeaMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware
   ],
   ideaControllers.acceptIdeaController
@@ -129,6 +134,7 @@ ideaRouter.patch(
     rejectIdeaRateLimiter,
     ideaMiddlewares.fetchIdeaMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
     ideaMiddlewares.rejectIdeaPresenceMiddleware,
     ideaMiddlewares.rejectIdeaValidationMiddleware
@@ -147,6 +153,7 @@ ideaRouter.patch(
     deferIdeaRateLimiter,
     ideaMiddlewares.fetchIdeaMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
     ideaMiddlewares.deferIdeaPresenceMiddleware,
     ideaMiddlewares.deferIdeaValidationMiddleware
@@ -165,6 +172,7 @@ ideaRouter.patch(
     reopenIdeaRateLimiter,
     ideaMiddlewares.fetchIdeaMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware
   ],
   ideaControllers.reopenIdeaController
@@ -180,7 +188,8 @@ ideaRouter.get(
     ...baseAuthClientOrAdminMiddlewares,
     getIdeaRateLimiter,
     ideaMiddlewares.fetchIdeaMiddleware,
-    projectMiddlewares.fetchProjectMiddleware
+    projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder
   ],
   ideaControllers.getIdeaController
 );
@@ -194,7 +203,8 @@ ideaRouter.get(
   [
     ...baseAuthClientOrAdminMiddlewares,
     listIdeasRateLimiter,
-    projectMiddlewares.fetchProjectMiddleware
+    projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder
   ],
   ideaControllers.listIdeasController
 );

@@ -17,7 +17,7 @@ const {
 
 const { orgProjectRequestControllers } = require("@controllers/org-project-requests");
 const { orgProjectRequestValidationMiddlewares, presenceMiddlewares, fetchOrgProjectRequestMiddleware } = require("@middlewares/org-project-requests");
-const { baseAuthClientMiddlewares } = require("./middleware.gateway.routes");
+const { baseAuthClientMiddlewares, baseAuthAdminMiddlewares, baseAuthClientOrAdminMiddlewares } = require("./middleware.gateway.routes");
 
 const {
   CREATE_ORG_PROJECT_REQUEST,
@@ -69,7 +69,7 @@ orgProjectRequestsRouter.post(
 orgProjectRequestsRouter.get(
   GET_ORG_PROJECT_REQUEST,
   [
-    ...baseAuthClientMiddlewares,
+    ...baseAuthClientOrAdminMiddlewares,
     getOrgProjectRequestRateLimiter,
     fetchOrgProjectRequestMiddleware
   ],
@@ -130,7 +130,7 @@ orgProjectRequestsRouter.patch(
 orgProjectRequestsRouter.patch(
   APPROVE_ORG_PROJECT_REQUEST,
   [
-    ...baseAuthClientMiddlewares,
+    ...baseAuthAdminMiddlewares,
     approveOrgProjectRequestRateLimiter,
     fetchOrgProjectRequestMiddleware,
     presenceMiddlewares.approveOrgProjectRequestPresenceMiddleware,
@@ -147,7 +147,7 @@ orgProjectRequestsRouter.patch(
 orgProjectRequestsRouter.patch(
   REJECT_ORG_PROJECT_REQUEST,
   [
-    ...baseAuthClientMiddlewares,
+    ...baseAuthAdminMiddlewares,
     rejectOrgProjectRequestRateLimiter,
     fetchOrgProjectRequestMiddleware,
     presenceMiddlewares.rejectOrgProjectRequestPresenceMiddleware,
@@ -164,7 +164,7 @@ orgProjectRequestsRouter.patch(
 orgProjectRequestsRouter.get(
   LIST_PROJECT_ORG_REQUESTS,
   [
-    ...baseAuthClientMiddlewares,
+    ...baseAuthAdminMiddlewares,
     listProjectOrgRequestsRateLimiter
   ],
   orgProjectRequestControllers.listProjectOrgRequestsController

@@ -11,6 +11,7 @@ const { projectMiddlewares } = require("@/middlewares/projects");
 const { hlfMiddlewares } = require("@/middlewares/high-level-features");
 const { createScopeRateLimiter, updateScopeRateLimiter, deleteScopeRateLimiter, getScopeRateLimiter, listScopesRateLimiter, linkScopeToHlfRateLimiter, unlinkScopeToHlfRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
 const { commonMiddlewares } = require("@/middlewares/common");
+const { inceptionMiddlewares } = require("@/middlewares/inceptions");
 
 const {
   CREATE_SCOPE,
@@ -48,10 +49,9 @@ scopeRouter.post(
     ...baseAuthAdminMiddlewares,
     createScopeRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
-    scopeMiddlewares.fetchInceptionFromProjectMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
     commonMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    inceptionMiddlewares.fetchLatestInceptionMiddleware,
     scopeMiddlewares.createScopePresenceMiddleware,
     scopeMiddlewares.createScopeValidationMiddleware,
   ],
@@ -70,9 +70,9 @@ scopeRouter.patch(
     ...baseAuthAdminMiddlewares,
     updateScopeRateLimiter,
     scopeMiddlewares.fetchScopeMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
-    projectMiddlewares.activeProjectGuardMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    inceptionMiddlewares.fetchLatestInceptionMiddleware,
     scopeMiddlewares.updateScopePresenceMiddleware,
     scopeMiddlewares.updateScopeValidationMiddleware,
   ],
@@ -91,10 +91,11 @@ scopeRouter.delete(
     ...baseAuthAdminMiddlewares,
     deleteScopeRateLimiter,
     scopeMiddlewares.fetchScopeMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
     projectMiddlewares.activeProjectGuardMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
-    scopeMiddlewares.deleteScopeValidationMiddleware,
+    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    scopeMiddlewares.deleteScopePresenceMiddleware,
+    scopeMiddlewares.deleteScopeValidationMiddleware
   ],
   scopeControllers.deleteScopeController
 );
@@ -109,7 +110,7 @@ scopeRouter.get(
     ...baseAuthClientOrAdminMiddlewares,
     getScopeRateLimiter,
     scopeMiddlewares.fetchScopeMiddleware,
-    commonMiddlewares.checkUserIsStakeholder,
+    commonMiddlewares.checkUserIsStakeholder
   ],
   scopeControllers.getScopeController
 );
@@ -124,8 +125,8 @@ scopeRouter.get(
     ...baseAuthClientOrAdminMiddlewares,
     listScopesRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
-    scopeMiddlewares.fetchInceptionFromProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
+    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
   ],
   scopeControllers.listScopesController
 );
@@ -142,11 +143,10 @@ scopeRouter.patch(
     ...baseAuthAdminMiddlewares,
     linkScopeToHlfRateLimiter,
     scopeMiddlewares.fetchScopeMiddleware,
-    hlfMiddlewares.fetchHlfMiddleware,
-    scopeMiddlewares.fetchInceptionFromProjectMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
-    projectMiddlewares.activeProjectGuardMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
+    hlfMiddlewares.fetchHlfMiddleware,
+    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware
   ],
   scopeControllers.linkScopeToHlfController
 );
@@ -163,10 +163,9 @@ scopeRouter.patch(
     ...baseAuthAdminMiddlewares,
     unlinkScopeToHlfRateLimiter,
     scopeMiddlewares.fetchScopeMiddleware,
-    scopeMiddlewares.fetchInceptionFromProjectMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
-    projectMiddlewares.activeProjectGuardMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
+    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware
   ],
   scopeControllers.unlinkScopeToHlfController
 );

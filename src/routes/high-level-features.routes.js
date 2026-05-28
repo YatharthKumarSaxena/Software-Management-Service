@@ -11,6 +11,7 @@ const { projectMiddlewares } = require("@/middlewares/projects");
 const { commonMiddlewares } = require("@/middlewares/common");
 const { createHLFRateLimiter, updateHLFRateLimiter, deleteHLFRateLimiter, getHLFRateLimiter, listHLFsRateLimiter, linkHLFtoIdeaRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
 const { ideaMiddlewares } = require("@/middlewares/ideas");
+const { inceptionMiddlewares } = require("@/middlewares/inceptions");
 
 const {
   CREATE_HLF,
@@ -46,10 +47,9 @@ hlfRouter.post(
     ...baseAuthAdminMiddlewares,
     createHLFRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
-    hlfMiddlewares.fetchInceptionFromProjectMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
     commonMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    inceptionMiddlewares.fetchLatestInceptionMiddleware,
     hlfMiddlewares.createHlfPresenceMiddleware,
     hlfMiddlewares.createHlfValidationMiddleware,
   ],
@@ -68,9 +68,9 @@ hlfRouter.patch(
     ...baseAuthAdminMiddlewares,
     updateHLFRateLimiter,
     hlfMiddlewares.fetchHlfMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
-    projectMiddlewares.activeProjectGuardMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
+    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
     hlfMiddlewares.updateHlfPresenceMiddleware,
     hlfMiddlewares.updateHlfValidationMiddleware,
   ],
@@ -89,9 +89,10 @@ hlfRouter.delete(
     ...baseAuthAdminMiddlewares,
     deleteHLFRateLimiter,
     hlfMiddlewares.fetchHlfMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
-    projectMiddlewares.activeProjectGuardMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware,
+    hlfMiddlewares.deleteHlfPresenceMiddleware,
     hlfMiddlewares.deleteHlfValidationMiddleware,
   ],
   hlfControllers.deleteHlfController
@@ -122,8 +123,8 @@ hlfRouter.get(
     ...baseAuthClientOrAdminMiddlewares,
     listHLFsRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
-    hlfMiddlewares.fetchInceptionFromProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
+    inceptionMiddlewares.fetchLatestInceptionMiddleware
   ],
   hlfControllers.listHlfController
 );
@@ -140,10 +141,10 @@ hlfRouter.patch(
     ...baseAuthAdminMiddlewares,
     linkHLFtoIdeaRateLimiter,
     hlfMiddlewares.fetchHlfMiddleware,
-    commonMiddlewares.checkInceptionNotFrozen,
-    ideaMiddlewares.fetchIdeaMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware,
+    ideaMiddlewares.fetchIdeaMiddleware
   ],
   hlfControllers.linkHlfToIdeaController
 );
