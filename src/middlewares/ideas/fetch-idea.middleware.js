@@ -33,6 +33,7 @@ const fetchIdeaMiddleware = async (req, res, next) => {
 
     // Attach to request
     req.idea = idea;
+    req.projectId = idea.projectId; // For potential use in downstream middleware/services
 
     logWithTime(`✅ Idea ${ideaId} fetched successfully`);
     return next();

@@ -9,7 +9,8 @@ const validationMiddlewares = {
   acceptIdeaValidationMiddleware: validateBody("acceptIdea", validationSets.acceptIdeaValidationSet),
   rejectIdeaValidationMiddleware: validateBody("rejectIdea", validationSets.rejectIdeaValidationSet),
   deferIdeaValidationMiddleware: validateBody("deferIdea", validationSets.deferIdeaValidationSet),
-  reopenIdeaValidationMiddleware: validateBody("reopenIdea", validationSets.reopenIdeaValidationSet)
+  reopenIdeaValidationMiddleware: validateBody("reopenIdea", validationSets.reopenIdeaValidationSet),
+  revokeIdeaValidationMiddleware: validateBody("revokeIdea", validationSets.revokeIdeaValidationSet)
 };
 
 module.exports = { validationMiddlewares };

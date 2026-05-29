@@ -11,7 +11,8 @@ const presenceMiddlewares = {
   acceptIdeaPresenceMiddleware: checkBodyPresence("acceptIdeaPresence", requiredFields.acceptIdeaField),
   rejectIdeaPresenceMiddleware: checkBodyPresence("rejectIdeaPresence", requiredFields.rejectIdeaField),
   deferIdeaPresenceMiddleware: checkBodyPresence("deferIdeaPresence", requiredFields.deferIdeaField),
-  reopenIdeaPresenceMiddleware: checkBodyPresence("reopenIdeaPresence", requiredFields.reopenIdeaField)
+  reopenIdeaPresenceMiddleware: checkBodyPresence("reopenIdeaPresence", requiredFields.reopenIdeaField),
+  revokeIdeaPresenceMiddleware: checkBodyPresence("revokeIdeaPresence", requiredFields.revokeIdeaField)
 };
 
 module.exports = { presenceMiddlewares };
