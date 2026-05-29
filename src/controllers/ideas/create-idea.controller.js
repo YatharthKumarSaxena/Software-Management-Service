@@ -2,13 +2,15 @@
 
 const { ideaServices } = require("@services/ideas");
 const {
+  throwBadRequestError,
   throwInternalServerError,
   throwConflictError,
   getLogIdentifiers,
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { sendIdeaCreatedSuccess } = require("@/responses/success/idea.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CONFLICT, NOT_FOUND } = require("@configs/http-status.config");
+const { CONFLICT, NOT_FOUND, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 /**
  * POST /projects/:projectId/ideas
@@ -46,8 +48,14 @@ const createIdeaController = async (req, res) => {
       if (result.errorCode === CONFLICT) {
         return throwConflictError(res, result.message);
       }
+      if (result.errorCode === BAD_REQUEST) {
+        return throwBadRequestError(res, result.message);
+      }
       if (result.errorCode === NOT_FOUND) {
         return throwInternalServerError(res, new Error(result.message));
+      }
+      if (result.errorCode === INTERNAL_ERROR) {
+        return throwSpecificInternalServerError(res, result.message);
       }
 
       return throwInternalServerError(res, new Error(result.message));

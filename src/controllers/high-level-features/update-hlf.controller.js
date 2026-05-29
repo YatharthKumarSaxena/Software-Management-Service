@@ -50,10 +50,6 @@ const updateHlfController = async (req, res) => {
         logWithTime(`❌ [updateHlfController] Idea not found | ${getLogIdentifiers(req)}`);
         return throwDBResourceNotFoundError(res, result.message);
       }
-      if (result.message === "No changes detected") {
-        logWithTime(`⚠️ [updateHlfController] No changes detected | ${getLogIdentifiers(req)}`);
-        return sendHlfUpdatedSuccess(res, result.hlf);
-      }
 
       if (result.message === "Validation error") {
         logWithTime(`❌ [updateHlfController] Validation error: ${result.error} | ${getLogIdentifiers(req)}`);
@@ -64,8 +60,9 @@ const updateHlfController = async (req, res) => {
       return throwSpecificInternalServerError(res, result.message);
     }
 
+    // ── Handle success with "No changes detected" message ──────────────
     if (result.message === "No changes detected") {
-      logWithTime(`⚠️ [updateHlfController] No changes detected | ${getLogIdentifiers(req)}`);
+      logWithTime(`ℹ️ [updateHlfController] No changes detected | ${getLogIdentifiers(req)}`);
       return res.status(OK).json({
         success: true,
         message: "No changes detected. High-level feature remains unchanged.",

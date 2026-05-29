@@ -4,6 +4,7 @@ const { ideaServices } = require("@services/ideas");
 const {
   throwInternalServerError,
   getLogIdentifiers,
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { sendIdeaFetchedSuccess } = require("@/responses/success/idea.response");
 const { logWithTime } = require("@utils/time-stamps.util");
@@ -26,7 +27,7 @@ const getIdeaController = async (req, res) => {
     // ── Handle error response ─────────────────────────────────────────
     if (!result.success) {
       logWithTime(`❌ [getIdeaController] ${result.message} | ${getLogIdentifiers(req)}`);
-      return throwInternalServerError(res, new Error(result.message));
+      return throwSpecificInternalServerError(res, result.message);
     }
 
     // ── Return success response ───────────────────────────────────────

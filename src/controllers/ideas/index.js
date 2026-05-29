@@ -7,6 +7,7 @@ const { acceptIdeaController } = require("./accept-idea.controller");
 const { rejectIdeaController } = require("./reject-idea.controller");
 const { deferIdeaController } = require("./defer-idea.controller");
 const { reopenIdeaController } = require("./reopen-idea.controller");
+const { revokeIdeaController } = require("./revoke-idea.controller");
 const { getIdeaController } = require("./get-idea.controller");
 const { listIdeasController } = require("./list-idea.controller");
 
@@ -18,6 +19,7 @@ const ideaControllers = {
   rejectIdeaController,
   deferIdeaController,
   reopenIdeaController,
+  revokeIdeaController,
   getIdeaController,
   listIdeasController
 };

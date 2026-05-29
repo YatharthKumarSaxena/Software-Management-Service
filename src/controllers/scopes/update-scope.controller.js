@@ -51,6 +51,11 @@ const updateScopeController = async (req, res) => {
         return sendScopeUpdatedSuccess(res, result.scope);
       }
 
+      if (result.message === "The specified HLF feature does not exist or is deleted.") {
+        logWithTime(`❌ [updateScopeController] Invalid HLF feature ID | ${getLogIdentifiers(req)}`);
+        return throwBadRequestError(res, result.message);
+      }
+
       if (result.message === "Validation error") {
         logWithTime(`❌ [updateScopeController] Validation error: ${result.error} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message, result.error);

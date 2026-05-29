@@ -4,13 +4,7 @@ const { createOrgProjectRequestService } = require("@services/org-project-reques
 const { logWithTime } = require("@utils/time-stamps.util");
 const { getLogIdentifiers } = require("@responses/common/error-handler.response");
 const {
-  sendOrgProjectRequestCreatedSuccess,
-  sendOrgProjectRequestUpdatedSuccess,
-  sendOrgProjectRequestApprovedSuccess,
-  sendOrgProjectRequestRejectedSuccess,
-  sendOrgProjectRequestWithdrawnSuccess,
-  sendOrgProjectRequestFetchedSuccess,
-  sendOrgProjectRequestsListSuccess
+  sendOrgProjectRequestCreatedSuccess
 } = require("@responses/success/org-project-request.response");
 const {
   throwBadRequestError,

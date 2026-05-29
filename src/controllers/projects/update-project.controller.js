@@ -7,6 +7,7 @@ const {
   throwInternalServerError,
   throwSpecificInternalServerError,
   getLogIdentifiers,
+  throwConflictError
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { OK } = require("@/configs/http-status.config");
@@ -127,6 +128,11 @@ const updateProjectController = async (req, res) => {
       if (result.message?.includes("must retain at least one organisation")) {
         logWithTime(`❌ [updateProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message);
+      }
+
+      if (result.message === "A project with this name already exists.") {
+        logWithTime(`❌ [updateProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwConflictError(res, result.message);
       }
 
       if (

@@ -7,6 +7,7 @@ const {
   throwInternalServerError,
   throwSpecificInternalServerError,
   getLogIdentifiers,
+  throwConflictError
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 
@@ -98,6 +99,16 @@ const createProjectController = async (req, res) => {
       if (result.message === "Every entry in orgIds must be a valid MongoDB ObjectId string") {
         logWithTime(`❌ [createProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message);
+      }
+
+      if (result.message === "orgIds[0] must be a valid MongoDB ObjectId string") {
+        logWithTime(`❌ [createProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwBadRequestError(res, result.message);
+      }
+
+      if (result.message === "A project with this name already exists.") {
+        logWithTime(`❌ [createProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwConflictError(res, result.message);
       }
 
       if (

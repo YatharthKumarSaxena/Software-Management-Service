@@ -4,13 +4,14 @@ const { updateProductRequestService } = require("@services/product-requests");
 const { sendProductRequestUpdatedSuccess } = require("@/responses/success/product-request.response");
 const {
   throwBadRequestError,
+  throwConflictError,
   throwAccessDeniedError,
   throwInternalServerError,
   getLogIdentifiers,
   throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { BAD_REQUEST, FORBIDDEN, OK } = require("@configs/http-status.config");
+const { BAD_REQUEST, FORBIDDEN, CONFLICT, OK } = require("@configs/http-status.config");
 
 /**
  * Controller: Update Product Request
@@ -56,6 +57,11 @@ const updateProductRequestController = async (req, res) => {
       if (result.errorCode === FORBIDDEN) {
         logWithTime(`❌ [updateProductRequestController] Forbidden: ${result.description} | ${getLogIdentifiers(req)}`);
         return throwAccessDeniedError(res, result.description);
+      }
+
+      if (result.errorCode === CONFLICT) {
+        logWithTime(`❌ [updateProductRequestController] Conflict: ${result.description} | ${getLogIdentifiers(req)}`);
+        return throwConflictError(res, result.description);
       }
 
       logWithTime(`❌ [updateProductRequestController] Internal error: ${result.description} | ${getLogIdentifiers(req)}`);

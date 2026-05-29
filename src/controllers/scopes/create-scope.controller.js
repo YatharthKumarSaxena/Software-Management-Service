@@ -44,6 +44,11 @@ const createScopeController = async (req, res) => {
         return throwConflictError(res, result.message);
       }
 
+      if (result.message === "The specified HLF feature does not exist or is deleted.") {
+        logWithTime(`❌ [createScopeController] Invalid HLF feature ID | ${getLogIdentifiers(req)}`);
+        return throwBadRequestError(res, result.message);
+      }
+
       if (result.message === "Validation error") {
         logWithTime(`❌ [createScopeController] Validation error: ${result.error} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message, result.error);

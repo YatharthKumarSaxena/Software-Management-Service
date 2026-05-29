@@ -7,10 +7,11 @@ const {
   throwAccessDeniedError,
   throwInternalServerError,
   getLogIdentifiers,
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { sendIdeaUpdatedSuccess } = require("@/responses/success/idea.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CONFLICT, UNAUTHORIZED } = require("@configs/http-status.config");
+const { CONFLICT, UNAUTHORIZED, BAD_REQUEST, OK } = require("@configs/http-status.config");
 
 /**
  * PATCH /ideas/:ideaId
@@ -50,8 +51,21 @@ const updateIdeaController = async (req, res) => {
       if (result.errorCode === CONFLICT) {
         return throwConflictError(res, result.message);
       }
+      if (result.errorCode === BAD_REQUEST) {
+        return throwBadRequestError(res, result.message);
+      }
       
-      return throwBadRequestError(res, result.message);
+      return throwSpecificInternalServerError(res, result.message);
+    }
+
+    // ── Handle success with "No changes detected" message ──────────────
+    if (result.message === "No changes detected") {
+      logWithTime(`ℹ️ [updateIdeaController] No changes detected | ${getLogIdentifiers(req)}`);
+      return res.status(OK).json({
+        success: true,
+        message: "No changes detected. Idea remains unchanged.",
+        idea: result.idea
+      });
     }
 
     // ── Return success response ───────────────────────────────────────

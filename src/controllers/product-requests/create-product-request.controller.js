@@ -4,12 +4,13 @@ const { createProductRequestService } = require("@services/product-requests");
 const { sendProductRequestCreatedSuccess } = require("@/responses/success/product-request.response");
 const {
   throwBadRequestError,
+  throwConflictError,
   throwInternalServerError,
   getLogIdentifiers,
   throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { BAD_REQUEST } = require("@configs/http-status.config");
+const { BAD_REQUEST, CONFLICT } = require("@configs/http-status.config");
 
 /**
  * Controller: Create Product Request
@@ -66,6 +67,11 @@ const createProductRequestController = async (req, res) => {
       if (result.errorCode === BAD_REQUEST) {
         logWithTime(`❌ [createProductRequestController] Bad request: ${result.description} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.description);
+      }
+
+      if (result.errorCode === CONFLICT) {
+        logWithTime(`❌ [createProductRequestController] Conflict: ${result.description} | ${getLogIdentifiers(req)}`);
+        return throwConflictError(res, result.description);
       }
 
       logWithTime(`❌ [createProductRequestController] Internal error: ${result.description} | ${getLogIdentifiers(req)}`);
