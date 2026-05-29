@@ -12,6 +12,7 @@ const {
   rejectIdeaRateLimiter,
   deferIdeaRateLimiter,
   reopenIdeaRateLimiter,
+  revokeIdeaRateLimiter,
   getIdeaRateLimiter,
   listIdeasRateLimiter
 } = require("@rate-limiters/general-api.rate-limiter");
@@ -31,7 +32,8 @@ const {
   ACCEPT_IDEA,
   REJECT_IDEA,
   DEFER_IDEA,
-  REOPEN_IDEA
+  REOPEN_IDEA,
+  REVOKE_IDEA
 } = IDEAS_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -177,6 +179,25 @@ ideaRouter.patch(
   ],
   ideaControllers.reopenIdeaController
 );
+/**
+ * GET /ideas/get/:ideaId
+ * Retrieve a single idea by ID.
+ */
+ideaRouter.patch(
+  REVOKE_IDEA,
+  [
+    ...baseAuthAdminMiddlewares,
+    revokeIdeaRateLimiter,
+    ideaMiddlewares.fetchIdeaMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
+    checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    ideaMiddlewares.revokeIdeaPresenceMiddleware,
+    ideaMiddlewares.revokeIdeaValidationMiddleware
+  ],
+  ideaControllers.revokeIdeaController
+)
+
 
 /**
  * GET /ideas/get/:ideaId
