@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { customIdRegex } = require("@/configs/regex.config");
 const { titleLength, descriptionLength } = require("@/configs/fields-length.config");
-const { IdeaStatuses, RejectedIdeaReasonTypes, DeferredIdeaReasonTypes } = require("@/configs/enums.config");
+const { IdeaStatuses, RejectedIdeaReasonTypes, DeferredIdeaReasonTypes, RevokeIdeaReasonTypes } = require("@/configs/enums.config");
 
 const ideaSchema = new mongoose.Schema({
 
@@ -63,6 +63,31 @@ const ideaSchema = new mongoose.Schema({
     },
 
     decidedAt: {
+        type: Date,
+        default: null
+    },
+
+    revokeReasonType: {
+        type: String,
+        enum: Object.values(RevokeIdeaReasonTypes),
+        default: null
+    },
+
+    revokeReasonDescription: {
+        type: String,
+        trim: true,
+        default: null,
+        minlength: descriptionLength.min,
+        maxlength: descriptionLength.max
+    },
+
+    revokedBy: {
+        type: String,
+        match: customIdRegex,
+        default: null
+    },
+
+    revokedAt: {
         type: Date,
         default: null
     },
@@ -133,6 +158,12 @@ ideaSchema.pre("validate", function () {
     if (this.status === IdeaStatuses.ACCEPTED) {
         if (this.rejectedReasonType || this.deferredReasonType || this.notAcceptedReasonDescription) {
             throw new Error("No rejection/deferred fields allowed when idea is ACCEPTED.");
+        }
+    }
+
+    if (this.status === IdeaStatuses.REVOKED) {
+        if (!this.revokeReasonType || !this.revokedBy || !this.revokedAt) {
+            throw new Error("revokeReasonType, revokedBy, and revokedAt are required when idea is REVOKED.");
         }
     }
 
