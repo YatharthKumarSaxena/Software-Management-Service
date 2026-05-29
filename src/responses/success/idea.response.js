@@ -103,6 +103,20 @@ const sendIdeaReopenedSuccess = (res, idea) => {
 };
 
 /**
+ * Sends a 200 response after an idea is successfully revoked.
+ *
+ * @param {Object} res - Express response object
+ * @param {Object} idea - Revoked idea document
+ */
+const sendIdeaRevokedSuccess = (res, idea) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Idea revoked successfully.",
+    data: { idea },
+  });
+};
+
+/**
  * Sends a 200 response with a single idea's details.
  *
  * @param {Object} res - Express response object
@@ -155,6 +169,7 @@ module.exports = {
   sendIdeaRejectedSuccess,
   sendIdeaDeferredSuccess,
   sendIdeaReopenedSuccess,
+  sendIdeaRevokedSuccess,
   sendIdeaFetchedSuccess,
   sendIdeasListSuccess,
 };
