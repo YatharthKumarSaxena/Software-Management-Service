@@ -9,6 +9,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
+const { CONFLICT, NOT_FOUND, BAD_REQUEST, INTERNAL_ERROR, OK } = require("@configs/http-status.config");
 
 /**
  * Updates an existing high-level feature with change detection.
@@ -52,7 +53,7 @@ const updateHlfService = async ({
     }
 
     if (title !== null) {
-      const normalizedTitle = title.trim();
+      const normalizedTitle = title.trim().replace(/\s+/g, " ");
 
       if (normalizedTitle !== hlf.title) {
 
@@ -66,7 +67,8 @@ const updateHlfService = async ({
         if (existing) {
           return {
             success: false,
-            message: "High-level feature with this title already exists in this inception."
+            message: "High-level feature with this title already exists in this inception.",
+            errorCode: CONFLICT
           };
         }
 
@@ -83,7 +85,7 @@ const updateHlfService = async ({
       });
 
       if (!idea) {
-        return { success: false, message: "Idea with the provided ID does not exist or is deleted." };
+        return { success: false, message: "Idea with the provided ID does not exist or is deleted.", errorCode: NOT_FOUND };
       }
 
       const hlfCurrentIdeaId = hlf.ideaId?.toString();
@@ -95,7 +97,7 @@ const updateHlfService = async ({
 
     // ── If no changes, return early ──────────────────────────────────────────
     if (!hasChanges) {
-      return { success: true, message: "No changes detected", hlf };
+      return { success: true, message: "No changes detected", hlf, errorCode: OK };
     }
 
     // ── Update timestamp and updatedBy ──────────────────────────────────────
@@ -137,16 +139,17 @@ const updateHlfService = async ({
     if (error.code === 11000) {
       return {
         success: false,
-        message: "High-level feature with this title already exists in this inception."
+        message: "High-level feature with this title already exists in this inception.",
+        errorCode: CONFLICT
       };
     }
     if (error.name === "ValidationError") {
       logWithTime(`[updateHlfService] Validation Error Details: ${JSON.stringify(error.errors)}`);
-      return { success: false, message: "Validation error", error: error.message };
+      return { success: false, message: "Validation error", error: error.message, errorCode: BAD_REQUEST };
     }
 
     logWithTime(`[updateHlfService] Full error: ${error.toString()}`);
-    return { success: false, message: "Internal error while updating high-level feature", error: error.message };
+    return { success: false, message: "Internal error while updating high-level feature", error: error.message, errorCode: INTERNAL_ERROR };
   }
 };
 

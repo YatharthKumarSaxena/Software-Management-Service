@@ -1,8 +1,7 @@
 // services/org-project-requests/update-org-project-request.service.js
 
-const { OrgProjectRequest } = require("@models/org-project-request.model");
 const { RequestStatus } = require("@configs/enums.config");
-const { NOT_FOUND, BAD_REQUEST, INTERNAL_ERROR, FORBIDDEN } = require("@configs/http-status.config");
+const { BAD_REQUEST, INTERNAL_ERROR, FORBIDDEN } = require("@configs/http-status.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
@@ -44,33 +43,43 @@ const updateOrgProjectRequestService = async ({
     const oldData = { ...request.toObject ? request.toObject() : request };
 
     /* ── Update request fields - only if actually changed ──────────── */
+    const normalizedDescription =
+      requestDescription?.trim() || null;
+
     let hasChanges = false;
-    if (requestDescription && requestDescription !== request.requestDescription) {
-      request.requestDescription = requestDescription;
+
+    if (normalizedDescription !== request.requestDescription) {
+      request.requestDescription = normalizedDescription;
       hasChanges = true;
+    }
+
+    if (!hasChanges) {
+      return {
+        success: true,
+        message: "No changes detected",
+        request: request.toObject()
+      };
     }
 
     const updatedRequest = await request.save();
     logWithTime(`✅ [updateOrgProjectRequestService] Request updated: ${request._id}`);
 
     /* ── Log activity tracker event only if changes detected ──────────── */
-    if (hasChanges) {
-      try {
-        const { user, device, requestId: auditRequestId } = auditContext || {};
-        const { oldData: auditOldData, newData: auditNewData } = prepareAuditData(oldData, updatedRequest);
+    try {
+      const { user, device, requestId: auditRequestId } = auditContext || {};
+      const { oldData: auditOldData, newData: auditNewData } = prepareAuditData(oldData, updatedRequest);
 
-        logActivityTrackerEvent(
-          user,
-          device,
-          auditRequestId,
-          ACTIVITY_TRACKER_EVENTS.UPDATE_ORG_PROJECT_REQUEST,
-          "Organization project request updated by client",
-          { oldData: auditOldData, newData: auditNewData, adminActions: { targetId: request._id } }
-        );
-      } catch (trackerError) {
-        logWithTime(`⚠️  [updateOrgProjectRequestService] Activity tracker logging failed: ${trackerError.message}`);
-        // Continue - tracking failure doesn't fail the operation
-      }
+      logActivityTrackerEvent(
+        user,
+        device,
+        auditRequestId,
+        ACTIVITY_TRACKER_EVENTS.UPDATE_ORG_PROJECT_REQUEST,
+        "Organization project request updated by client",
+        { oldData: auditOldData, newData: auditNewData, adminActions: { targetId: request._id } }
+      );
+    } catch (trackerError) {
+      logWithTime(`⚠️  [updateOrgProjectRequestService] Activity tracker logging failed: ${trackerError.message}`);
+      // Continue - tracking failure doesn't fail the operation
     }
 
     return {

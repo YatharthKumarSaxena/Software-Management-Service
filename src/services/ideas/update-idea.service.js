@@ -6,7 +6,7 @@ const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.se
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CONFLICT, BAD_REQUEST, UNAUTHORIZED } = require("@configs/http-status.config");
+const { CONFLICT, BAD_REQUEST, UNAUTHORIZED, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 /**
  * Updates an idea's title and/or description.
@@ -51,8 +51,23 @@ const updateIdeaService = async (
     }
 
     // ── Step 3: Check if any changes are being made ────────────────────
-    const titleChanged = title !== undefined && idea.title !== title;
-    const descriptionChanged = description !== undefined && idea.description !== description;
+    const normalizedTitle =
+      title !== undefined
+        ? title.trim().replace(/\s+/g, " ")
+        : undefined;
+
+    const normalizedDescription =
+      description !== undefined
+        ? description?.trim() || null
+        : undefined;
+
+    const titleChanged =
+      normalizedTitle !== undefined &&
+      normalizedTitle !== idea.title;
+
+    const descriptionChanged =
+      normalizedDescription !== undefined &&
+      normalizedDescription !== idea.description;
 
     if (!titleChanged && !descriptionChanged) {
       logWithTime(
@@ -67,7 +82,6 @@ const updateIdeaService = async (
 
     // ── Step 4: Check if title is being changed and if it's unique ────
     if (titleChanged) {
-      const normalizedTitle = title.trim();
       const existingIdea = await IdeaModel.findOne({
         projectId: idea.projectId,
         title: normalizedTitle,
@@ -89,18 +103,18 @@ const updateIdeaService = async (
 
     // ── Step 5: Build update payload ────────────────────────────────────
     const updatePayload = { updatedBy, updatedAt: new Date() };
-    
+
     if (titleChanged) {
       updatePayload.title = title.trim();
     }
-    
+
     if (descriptionChanged) {
       updatePayload.description = description;
     }
 
     // ── Step 6: Update via atomic findByIdAndUpdate ──────────────────────
     const oldIdeaData = { ...idea.toObject ? idea.toObject() : idea };
-    
+
     const updatedIdea = await IdeaModel.findByIdAndUpdate(
       idea._id,
       { $set: updatePayload },
@@ -126,15 +140,15 @@ const updateIdeaService = async (
     );
 
     logWithTime(`✅ [updateIdeaService] Idea updated successfully: ${idea._id}`);
-    
+
     return { success: true, idea: updatedIdea };
 
   } catch (error) {
     logWithTime(`❌ [updateIdeaService] Error: ${error.message}`);
     if (error.name === "ValidationError") {
-      return { success: false, message: "Validation error", error: error.message };
+      return { success: false, message: "Validation error", error: error.message, errorCode: BAD_REQUEST };
     }
-    return { success: false, message: "Internal error while updating idea", error: error.message };
+    return { success: false, message: "Internal error while updating idea", error: error.message, errorCode: INTERNAL_ERROR };
   }
 };
 

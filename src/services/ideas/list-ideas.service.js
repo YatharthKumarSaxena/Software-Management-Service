@@ -2,7 +2,6 @@
 
 const { IdeaModel } = require("@models/idea.model");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { NOT_FOUND } = require("@configs/http-status.config");
 
 /**
  * Lists all ideas for a project with pagination.

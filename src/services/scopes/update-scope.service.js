@@ -52,33 +52,45 @@ const updateScopeService = async ({
         hasChanges = true;
       }
     }
+    
+    const normalizedTitle =
+      title !== null
+        ? title.trim().replace(/\s+/g, " ")
+        : scope.title;
 
-    if (type !== null && type !== scope.type) {
-      scope.type = type;
-      hasChanges = true;
-    }
+    const finalType =
+      type !== null
+        ? type
+        : scope.type;
 
-    if (title !== null) {
-      const normalizedTitle = title.trim();
+    // Duplicate check only if title or type is changing
+    if (
+      normalizedTitle !== scope.title ||
+      finalType !== scope.type
+    ) {
+
+      const existing = await ScopeModel.findOne({
+        inceptionId: scope.inceptionId,
+        title: normalizedTitle,
+        type: finalType,
+        isDeleted: false,
+        _id: { $ne: scope._id }
+      }).collation({ locale: "en", strength: 2 });
+
+      if (existing) {
+        return {
+          success: false,
+          message: "Scope with this title already exists in this inception."
+        };
+      }
 
       if (normalizedTitle !== scope.title) {
-
-        const existing = await ScopeModel.findOne({
-          inceptionId: scope.inceptionId,
-          title: normalizedTitle,
-          type: type !== null ? type : scope.type,
-          isDeleted: false,
-          _id: { $ne: scope._id }
-        }).collation({ locale: "en", strength: 2 });
-
-        if (existing) {
-          return {
-            success: false,
-            message: "Scope with this title already exists in this inception."
-          };
-        }
-
         scope.title = normalizedTitle;
+        hasChanges = true;
+      }
+
+      if (finalType !== scope.type) {
+        scope.type = finalType;
         hasChanges = true;
       }
     }

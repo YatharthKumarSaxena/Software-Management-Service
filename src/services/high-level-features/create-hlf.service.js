@@ -9,6 +9,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
+const { CONFLICT, NOT_FOUND, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 /**
  * Creates a new high-level feature for an inception document.
@@ -36,7 +37,7 @@ const createHlfService = async ({
     const inceptionId = inception._id.toString();
 
     // ── Guard: prevent duplicate HLF title per inception ──────────────────
-    const normalizedTitle = title.trim();
+    const normalizedTitle = title.trim().replace(/\s+/g, " ");
     const normalizedDescription = description?.trim() || null;
 
     const existing = await HighLevelFeatureModel.findOne({
@@ -46,7 +47,7 @@ const createHlfService = async ({
     }).collation({ locale: "en", strength: 2 });
 
     if (existing) {
-      return { success: false, message: "High-level feature with this title already exists in this inception." };
+      return { success: false, message: "High-level feature with this title already exists in this inception.", errorCode: CONFLICT };
     }
 
     // ── Validate linkedIdeaId if provided ────────────────────────────────────
@@ -58,7 +59,7 @@ const createHlfService = async ({
       });
 
       if (!idea) {
-        return { success: false, message: "Idea with the provided ID does not exist or is deleted." };
+        return { success: false, message: "Idea with the provided ID does not exist or is deleted.", errorCode: NOT_FOUND };
       }
 
       ideaId = linkedIdeaId;
@@ -107,16 +108,17 @@ const createHlfService = async ({
     if (error.code === 11000) {
       return {
         success: false,
-        message: "High-level feature with this title already exists in this inception."
+        message: "High-level feature with this title already exists in this inception.",
+        errorCode: CONFLICT
       };
     }
     if (error.name === "ValidationError") {
       logWithTime(`[createHlfService] Validation Error Details: ${JSON.stringify(error.errors)}`);
-      return { success: false, message: "Validation error", error: error.message };
+      return { success: false, message: "Validation error", error: error.message, errorCode: BAD_REQUEST };
     }
 
     logWithTime(`[createHlfService] Full error: ${error.toString()}`);
-    return { success: false, message: "Internal error while creating high-level feature", error: error.message };
+    return { success: false, message: "Internal error while creating high-level feature", error: error.message, errorCode: INTERNAL_ERROR };
   }
 };
 

@@ -45,6 +45,14 @@ const updateProjectService = async (existingProject, updates) => {
       }
     });
 
+    if (updatePayload.name !== undefined) {
+      updatePayload.name = updatePayload.name.trim().replace(/\s+/g, " ");
+    }
+
+    if (updatePayload.description !== undefined) {
+      updatePayload.description = updatePayload.description.trim();
+    }
+
     /* ───────── Organization Handling ───────── */
 
     let hasOrgChanges = false;
@@ -104,6 +112,22 @@ const updateProjectService = async (existingProject, updates) => {
       if (finalAdded.length || finalRemoved.length) {
         updatePayload.orgIds = finalOrgIds;
         hasOrgChanges = true;
+      }
+    }
+
+    if (updatePayload.name !== undefined) {
+
+      const existingProjectWithSameName = await ProjectModel.findOne({
+        _id: { $ne: existingProject._id },
+        name: updatePayload.name,
+        isDeleted: false
+      }).collation({ locale: "en", strength: 2 });
+
+      if (existingProjectWithSameName) {
+        return {
+          success: false,
+          message: "A project with this name already exists."
+        };
       }
     }
 

@@ -7,6 +7,7 @@ const { acceptIdeaService } = require("./accept-idea.service");
 const { rejectIdeaService } = require("./reject-idea.service");
 const { deferIdeaService } = require("./defer-idea.service");
 const { reopenIdeaService } = require("./reopen-idea.service");
+const { revokeIdeaService } = require("./revoke-idea.service");
 const { getIdeaService } = require("./get-idea.service");
 const { listIdeasService } = require("./list-ideas.service");
 
@@ -18,6 +19,7 @@ const ideaServices = {
   rejectIdeaService,
   deferIdeaService,
   reopenIdeaService,
+  revokeIdeaService,
   getIdeaService,
   listIdeasService
 };

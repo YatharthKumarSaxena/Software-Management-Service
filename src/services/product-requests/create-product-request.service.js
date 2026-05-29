@@ -6,7 +6,7 @@ const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.se
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { RequestStatus } = require("@configs/enums.config");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CREATED, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { CREATED, BAD_REQUEST, INTERNAL_ERROR, CONFLICT } = require("@configs/http-status.config");
 
 /**
  * Creates a new product request document in the database.
@@ -38,6 +38,26 @@ const createProductRequestService = async ({
   auditContext
 }) => {
   try {
+    const normalizedTitle = title.trim().replace(/\s+/g, " ");
+    const normalizedDescription = description?.trim() || null;
+
+    const requesterId = requestedBy._id;
+    const clientId = requestedBy.clientId;
+    
+    const existingRequest = await ProductRequestModel.findOne({
+      requestedBy: requesterId,
+      title: normalizedTitle,
+      isDeleted: false
+    }).collation({ locale: "en", strength: 2 });
+
+    if (existingRequest) {
+      logWithTime(`❌ [createProductRequestService] Product request with this title already exists for this requester`);
+      return {
+        errorCode: CONFLICT,
+        isSuccess: false,
+        description: "A product request with this title already exists for this requester"
+      };
+    }
 
     if (expectedTimelineInDays !== undefined) {
       if (typeof expectedTimelineInDays !== "number" || isNaN(expectedTimelineInDays)) {
@@ -79,16 +99,13 @@ const createProductRequestService = async ({
       }
     }
 
-    const requesterId = requestedBy._id;
-    const clientId = requestedBy.clientId;
-
     // ── Create the product request ────────────────────────────────────
     const productRequestId = new mongoose.Types.ObjectId();
 
     const productRequest = await ProductRequestModel.create({
       _id: productRequestId,
-      title,
-      description,
+      title: normalizedTitle,
+      description: normalizedDescription,
       projectType,
       projectCategory,
       requestedBy: requesterId,
@@ -101,7 +118,7 @@ const createProductRequestService = async ({
 
     // ── Fire-and-forget: activity tracking ────────────────────────────
     const { user, device, requestId } = auditContext || {};
-    
+
     logActivityTrackerEvent(
       user,
       device,

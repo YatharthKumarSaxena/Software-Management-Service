@@ -38,7 +38,8 @@ const createScopeService = async ({
     const inceptionId = inception._id.toString();
 
     // ── Guard: prevent duplicate scope title per inception ──────────────────
-    const normalizedTitle = title.trim();
+    const normalizedTitle = title.trim().replace(/\s+/g, " ");
+    const normalizedDescription = description?.trim() || null;
 
     const existing = await ScopeModel.findOne({
       inceptionId,
@@ -70,7 +71,7 @@ const createScopeService = async ({
       inceptionId,
       projectId,
       title: normalizedTitle,
-      description: description || null,
+      description: normalizedDescription,
       type: type || null,
       category,
       featureId,
@@ -83,7 +84,7 @@ const createScopeService = async ({
     await manualVersionControlService({
       projectId: inception.projectId,
       currentPhase: Phases.INCEPTION,
-      action: `Scope "${title}" created with category ${category} — version bump`,
+      action: `Scope "${normalizedTitle}" created with category ${category} — version bump`,
       performedBy: createdBy,
       auditContext: auditContext
     });
@@ -95,7 +96,7 @@ const createScopeService = async ({
       device,
       requestId,
       ACTIVITY_TRACKER_EVENTS.CREATE_SCOPE,
-      `Scope "${title}" created for inception ${inceptionId} with category ${category} by ${createdBy}`,
+      `Scope "${normalizedTitle}" created for inception ${inceptionId} with category ${category} by ${createdBy}`,
       {
         newData: prepareAuditData(null, scope).newData,
         adminActions: { targetId: scope._id?.toString() },

@@ -82,6 +82,21 @@ const createProjectService = async ({
       resolvedOrgIds = [...new Set(orgIds.map(id => id.toString()))];
     }
 
+    const normalizedName = name.trim().replace(/\s+/g, " ");
+    const normalizedDescription = description?.trim() || null;
+
+    const existingProject = await ProjectModel.findOne({
+      name: normalizedName,
+      isDeleted: false
+    }).collation({ locale: "en", strength: 2 });
+
+    if (existingProject) {
+      return {
+        success: false,
+        message: "A project with this name already exists."
+      };
+    }
+
     const projectId = new mongoose.Types.ObjectId();
 
     const linkedProjectsValidation = await validateLinkedProjectIds({
@@ -99,8 +114,8 @@ const createProjectService = async ({
 
     const project = await ProjectModel.create({
       _id: projectId,
-      name,
-      description,
+      name: normalizedName,
+      description: normalizedDescription,
       problemStatement,
       goal,
       projectCategory,
@@ -125,7 +140,7 @@ const createProjectService = async ({
       `Project '${project.name}' (${project._id}) created by ${createdBy}`,
       { newData: project }
     );
-    
+
     // Auto-create Inception Phase using phase management service
     logWithTime(`[createProjectService] Creating Inception phase for project ${projectId}`);
     const phaseResult = await createPhaseWithVersionManagement({

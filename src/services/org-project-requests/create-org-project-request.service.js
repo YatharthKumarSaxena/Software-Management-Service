@@ -1,9 +1,8 @@
 // services/org-project-requests/create-org-project-request.service.js
 
 const { OrgProjectRequest } = require("@models/org-project-request.model");
-const { ProjectModel } = require("@models/project.model");
 const { ClientModel } = require("@models/client.model");
-const { RequestStatus, ProjectStatus } = require("@configs/enums.config");
+const { RequestStatus } = require("@configs/enums.config");
 const { NOT_FOUND, BAD_REQUEST, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");

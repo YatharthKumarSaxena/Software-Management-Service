@@ -1,14 +1,13 @@
 // services/ideas/create-idea.service.js
 
 const mongoose = require("mongoose");
-const { ProjectModel } = require("@models/project.model");
 const { IdeaModel } = require("@models/idea.model");
 const { IdeaStatuses } = require("@configs/enums.config");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { INTERNAL_ERROR, NOT_FOUND, CONFLICT } = require("@configs/http-status.config");
+const { INTERNAL_ERROR, CONFLICT, BAD_REQUEST } = require("@configs/http-status.config");
 
 /**
  * Creates a new idea document in the database.
@@ -31,7 +30,9 @@ const createIdeaService = async ({
 }) => {
   try {
     
-    const normalizedTitle = title.trim();
+    const normalizedTitle = title.trim().replace(/\s+/g, " ");
+    const normalizedDescription = description?.trim() || null;
+
     const existingIdea = await IdeaModel.findOne({
       projectId,
       title: normalizedTitle,
@@ -52,11 +53,11 @@ const createIdeaService = async ({
     
     const newIdea = new IdeaModel({
       title: normalizedTitle,
-      description,
+      description: normalizedDescription,
       status: IdeaStatuses.PENDING,
       createdBy,
       updatedBy: createdBy,
-      projectId: mongoose.Types.ObjectId(projectId)
+      projectId: new mongoose.Types.ObjectId(projectId)
     });
 
     const savedIdea = await newIdea.save();
@@ -81,9 +82,9 @@ const createIdeaService = async ({
   } catch (error) {
     logWithTime(`❌ [createIdeaService] Error: ${error.message}`);
     if (error.name === "ValidationError") {
-      return { success: false, message: "Validation error", error: error.message };
+      return { success: false, message: "Validation error", error: error.message, errorCode: BAD_REQUEST };
     }
-    return { success: false, message: "Internal error while creating idea", error: error.message };
+    return { success: false, message: "Internal error while creating idea", error: error.message, errorCode: INTERNAL_ERROR };
   }
 };
 

@@ -6,7 +6,7 @@ const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { RequestStatus } = require("@configs/enums.config");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { OK, BAD_REQUEST, FORBIDDEN, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { OK, BAD_REQUEST, FORBIDDEN, INTERNAL_ERROR, CONFLICT } = require("@configs/http-status.config");
 
 /**
  * Updates an existing product request.
@@ -28,7 +28,7 @@ const updateProductRequestService = async (productRequest, params) => {
     const { updateData, updatedBy, auditContext } = params;
 
     const { expectedTimelineInDays, budget } = updateData; // Destructure fields to update if needed for validation
-    
+
     if (expectedTimelineInDays !== undefined) {
       if (typeof expectedTimelineInDays !== "number" || isNaN(expectedTimelineInDays)) {
         logWithTime(`❌ [updateProductRequestService] Invalid expectedTimelineInDays type`);
@@ -98,6 +98,34 @@ const updateProductRequestService = async (productRequest, params) => {
         message: "No changes detected",
         data: { productRequest: productRequest.toObject ? productRequest.toObject() : productRequest }
       };
+    }
+
+    const normalizedTitle =
+      updateData.title?.trim().replace(/\s+/g, " ");
+
+    if (normalizedTitle !== undefined) {
+
+      const existingRequest = await ProductRequestModel.findOne({
+        _id: { $ne: productRequest._id },
+        requestedBy: productRequest.requestedBy,
+        title: normalizedTitle,
+        isDeleted: false
+      }).collation({ locale: "en", strength: 2 });
+
+      if (existingRequest) {
+        return {
+          errorCode: CONFLICT,
+          isSuccess: false,
+          description: "A product request with this title already exists for this requester."
+        };
+      }
+
+      updateData.title = normalizedTitle;
+    }
+
+    if (updateData.description !== undefined) {
+      updateData.description =
+        updateData.description?.trim() || null;
     }
 
     // ── Build update payload ──────────────────────────────────────────
