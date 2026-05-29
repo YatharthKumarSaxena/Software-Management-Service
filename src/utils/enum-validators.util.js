@@ -42,6 +42,7 @@ const {
   IdeaStatuses,
   RejectedIdeaReasonTypes,
   DeferredIdeaReasonTypes,
+  RevokeIdeaReasonTypes,
   RequirementTypes,
   RequirementDeletionReason,
   RelationTypes,
@@ -123,6 +124,7 @@ const ParticipantTypesHelper = createEnumHelper(ParticipantTypes, "ParticipantTy
 const IdeaStatusesHelper = createEnumHelper(IdeaStatuses, "IdeaStatuses");
 const RejectedIdeaReasonTypesHelper = createEnumHelper(RejectedIdeaReasonTypes, "RejectedIdeaReasonTypes");
 const DeferredIdeaReasonTypesHelper = createEnumHelper(DeferredIdeaReasonTypes, "DeferredIdeaReasonTypes");
+const RevokeIdeaReasonTypesHelper = createEnumHelper(RevokeIdeaReasonTypes, "RevokeIdeaReasonTypes");
 const RejectedReasonTypesHelper = createEnumHelper(RejectedReasonTypes, "RejectedReasonTypes");
 const DeferredReasonTypesHelper = createEnumHelper(DeferredReasonTypes, "DeferredReasonTypes");
 const IssuedReasonTypesHelper = createEnumHelper(IssuedReasonTypes, "IssuedReasonTypes");
@@ -174,6 +176,7 @@ module.exports = {
   IdeaStatusesHelper,
   RejectedIdeaReasonTypesHelper,
   DeferredIdeaReasonTypesHelper,
+  RevokeIdeaReasonTypesHelper,
   RequirementTypesHelper,
   RequirementDeletionReasonHelper,
   RejectedReasonTypesHelper,
