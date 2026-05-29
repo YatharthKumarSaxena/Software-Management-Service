@@ -648,6 +648,21 @@ const FieldDefinitions = {
     // No extra fields needed - just status change
   },
 
+  REVOKE_IDEA: {
+    REVOKE_REASON_TYPE: {
+      field: "revokeReasonType",
+      required: true,
+      validation: validationRules.revokeIdeaReasonType,
+      description: "Reason type for revocation (required enum)"
+    },
+    REVOKE_REASON_DESCRIPTION: {
+      field: "revokeReasonDescription",
+      required: false, // Will be conditional based on project criticality
+      validation: validationRules.reasonDescription,
+      description: "Detailed reason for revocation (required if project criticality is HIGH, else optional)"
+    }
+  },
+
   // ── DELETE IDEA ────────────────────────────────────────────────────────────────────────
   DELETE_IDEA: {
     DELETION_REASON_DESCRIPTION: {

@@ -35,6 +35,7 @@ const validationSets = {
     rejectIdeaValidationSet: getValidationSet(FieldDefinitions.REJECT_IDEA),
     deferIdeaValidationSet: getValidationSet(FieldDefinitions.DEFER_IDEA),
     reopenIdeaValidationSet: getValidationSet(FieldDefinitions.REOPEN_IDEA),
+    revokeIdeaValidationSet: getValidationSet(FieldDefinitions.REVOKE_IDEA),
     createProductVisionValidationSet: getValidationSet(FieldDefinitions.CREATE_PRODUCT_VISION),
     updateProductVisionValidationSet: getValidationSet(FieldDefinitions.UPDATE_PRODUCT_VISION),
     deleteProductVisionValidationSet: getValidationSet(FieldDefinitions.DELETE_PRODUCT_VISION),

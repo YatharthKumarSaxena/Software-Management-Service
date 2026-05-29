@@ -574,6 +574,7 @@ const IdeaStatuses = Object.freeze({
   PENDING: "PENDING",
   ACCEPTED: "ACCEPTED",
   REJECTED: "REJECTED",
+  REVOKED: "REVOKED",
   DEFERRED: "DEFERRED"
 });
 
@@ -591,6 +592,15 @@ const DeferredIdeaReasonTypes = Object.freeze({
   FUTURE_SCOPE: "FUTURE_SCOPE",
   DEPENDENCY_PENDING: "DEPENDENCY_PENDING",
   RESOURCE_CONSTRAINT: "RESOURCE_CONSTRAINT",
+  OTHER: "OTHER"
+});
+
+const RevokeIdeaReasonTypes = Object.freeze({
+  SCOPE_CHANGED: "SCOPE_CHANGED",
+  REQUIREMENT_CHANGED: "REQUIREMENT_CHANGED",
+  BUSINESS_DECISION: "BUSINESS_DECISION",
+  DUPLICATE_IDEA: "DUPLICATE_IDEA",
+  NO_LONGER_FEASIBLE: "NO_LONGER_FEASIBLE",
   OTHER: "OTHER"
 });
 
@@ -685,6 +695,7 @@ module.exports = {
   IdeaStatuses,
   RejectedIdeaReasonTypes,
   DeferredIdeaReasonTypes,
+  RevokeIdeaReasonTypes,
   WorkflowModes,
   MinBufferTime,
   MappingStatuses,

@@ -40,6 +40,7 @@ const {
   IdeaStatusesHelper,
   RejectedIdeaReasonTypesHelper,
   DeferredIdeaReasonTypesHelper,
+  RevokeIdeaReasonTypesHelper,
   RequirementTypesHelper,
   RequirementDeletionReasonHelper,
   RejectedReasonTypesHelper,
@@ -263,6 +264,9 @@ const validationRules = {
   },
   deferredIdeaReasonType: {
     enum: DeferredIdeaReasonTypesHelper
+  },
+  revokeIdeaReasonType: {
+    enum: RevokeIdeaReasonTypesHelper
   },
 
   // ── Requirement fields ──────────────────────────────────────────────────

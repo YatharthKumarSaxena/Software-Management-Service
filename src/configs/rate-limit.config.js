@@ -464,6 +464,13 @@ module.exports = {
       reason: "Delete idea endpoint abuse",
       message: "Too many requests to delete idea endpoint. Please try again later."
     },
+    revokeIdea: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "revoke_idea",
+      reason: "Revoke idea endpoint abuse",
+      message: "Too many requests to revoke idea endpoint. Please try again later."
+    },
     getIdea: {
       maxRequests: 30,
       windowMs: 60 * 1000,

@@ -143,7 +143,8 @@ module.exports = {
         ACCEPT_IDEA:    `/accept/:ideaId`,           // PATCH /software-management-service/api/v1/ideas/accept/:ideaId
         REJECT_IDEA:    `/reject/:ideaId`,           // PATCH /software-management-service/api/v1/ideas/reject/:ideaId
         DEFER_IDEA:     `/defer/:ideaId`,            // PATCH /software-management-service/api/v1/ideas/defer/:ideaId
-        REOPEN_IDEA:    `/reopen/:ideaId`            // PATCH /software-management-service/api/v1/ideas/reopen/:ideaId
+        REOPEN_IDEA:    `/reopen/:ideaId`,           // PATCH /software-management-service/api/v1/ideas/reopen/:ideaId
+        REVOKE_IDEA:    `/revoke/:ideaId`            // PATCH /software-management-service/api/v1/ideas/revoke/:ideaId
     },
     PRODUCT_VISION_ROUTES: {
         GET_PRODUCT_VISION:       `/get/:projectId`,         // GET /software-management-service/api/v1/product-vision/get/:projectId

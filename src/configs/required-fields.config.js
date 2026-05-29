@@ -69,6 +69,7 @@ const requiredFields = {
     rejectIdeaField:getRequiredFields(FieldDefinitions.REJECT_IDEA),
     deferIdeaField:getRequiredFields(FieldDefinitions.DEFER_IDEA),
     reopenIdeaField:getRequiredFields(FieldDefinitions.REOPEN_IDEA),
+    revokeIdeaField:getRequiredFields(FieldDefinitions.REVOKE_IDEA),
 
     // ── Inception ────────────────────────────────────────────────────────────────
     deleteInceptionField:getRequiredFields(FieldDefinitions.DELETE_INCEPTION),
