@@ -82,6 +82,7 @@ const acceptIdeaRateLimiter  = createRateLimiter(perUserAndDevice.acceptIdea);
 const rejectIdeaRateLimiter  = createRateLimiter(perUserAndDevice.rejectIdea);
 const deferIdeaRateLimiter   = createRateLimiter(perUserAndDevice.deferIdea);
 const reopenIdeaRateLimiter  = createRateLimiter(perUserAndDevice.reopenIdea);
+const revokeIdeaRateLimiter  = createRateLimiter(perUserAndDevice.revokeIdea);
 
 const createProductVisionRateLimiter = createRateLimiter(perUserAndDevice.createProductVision);
 const updateProductVisionRateLimiter = createRateLimiter(perUserAndDevice.updateProductVision);
@@ -228,6 +229,7 @@ module.exports = {
     rejectIdeaRateLimiter,
     deferIdeaRateLimiter,
     reopenIdeaRateLimiter,
+    revokeIdeaRateLimiter,
     createProductVisionRateLimiter,
     updateProductVisionRateLimiter,
     deleteProductVisionRateLimiter,
