@@ -208,7 +208,9 @@ const RequirementSchema = new mongoose.Schema({
             match: customIdRegex
         }],
         default: []
-    }
+    },
+    sequence: { type: Number, required: true, unique: true, min: 1 },
+    id: { type: String, required: true, unique: true, trim: true },
 }, {
     timestamps: true,
     optimisticConcurrency: true

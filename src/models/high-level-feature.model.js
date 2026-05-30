@@ -9,6 +9,8 @@ const HighLevelFeatureSchema = new mongoose.Schema({
   projectId: { type: mongoose.Schema.Types.ObjectId, ref: DB_COLLECTIONS.PROJECTS, required: true },
   title: { type: String, trim: true, minlength: titleLength.min, maxlength: titleLength.max, required: true },
   description: { type: String, trim: true, default: null, minlength: descriptionLength.min, maxlength: descriptionLength.max },
+  sequence: { type: Number, required: true, unique: true, min: 1 },
+  id: { type: String, required: true, unique: true, trim: true },
   createdBy: { type: String, required: true, match: customIdRegex },
   updatedBy: { type: String, match: customIdRegex, default: null  },
   isDeleted: { type: Boolean, default: false },

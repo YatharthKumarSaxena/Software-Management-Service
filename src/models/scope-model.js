@@ -13,8 +13,10 @@ const ScopeSchema = new mongoose.Schema({
   featureId: { type: mongoose.Schema.Types.ObjectId, ref: DB_COLLECTIONS.HIGH_LEVEL_FEATURES, default: null },
   title: { type: String, trim: true, minlength: titleLength.min, maxlength: titleLength.max, lowercase: false, required: true },
   description: { type: String, trim: true, default: null, minlength: descriptionLength.min, maxlength: descriptionLength.max },
+  sequence: { type: Number, required: true, unique: true, min: 1 },
+  id: { type: String, required: true, unique: true, trim: true },
   createdBy: { type: String, required: true, match: customIdRegex },
-  updatedBy: { type: String, match: customIdRegex, default: null  },
+  updatedBy: { type: String, match: customIdRegex, default: null },
   isDeleted: { type: Boolean, default: false },
   deletedAt: { type: Date, default: null },
   deletedBy: { type: String, match: customIdRegex, default: null }
@@ -37,5 +39,5 @@ ScopeSchema.index({ inceptionId: 1, createdAt: -1, isDeleted: 1 });
 const ScopeModel = mongoose.model(DB_COLLECTIONS.SCOPES, ScopeSchema);
 
 module.exports = {
-    ScopeModel
+  ScopeModel
 }

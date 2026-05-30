@@ -21,6 +21,7 @@ const { RequirementModel } = require("./requirement.model");
 const { ProductRequestModel } = require("./product-request.model");
 const { OrgProjectRequest } = require("./org-project-request.model");
 const { FeatureRequirementMapModel } = require("./feature-requirement-map.model");
+const { CounterModel } = require("./counter.model");
 
 const models = {
     ActivityTrackerModel,
@@ -45,7 +46,8 @@ const models = {
     RequirementModel,
     ProductRequestModel,
     OrgProjectRequest,
-    FeatureRequirementMapModel
+    FeatureRequirementMapModel,
+    CounterModel
 }
 
 module.exports = {
