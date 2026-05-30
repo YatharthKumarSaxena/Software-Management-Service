@@ -142,9 +142,9 @@ hlfRouter.patch(
     linkHLFtoIdeaRateLimiter,
     hlfMiddlewares.fetchHlfMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
+    ideaMiddlewares.fetchIdeaMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware,
-    ideaMiddlewares.fetchIdeaMiddleware
+    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
   ],
   hlfControllers.linkHlfToIdeaController
 );

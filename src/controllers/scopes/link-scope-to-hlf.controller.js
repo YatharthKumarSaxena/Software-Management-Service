@@ -5,9 +5,11 @@ const { sendScopeLinkedSuccess } = require("@/responses/success/scope.response")
 const {
   throwConflictError,
   throwInternalServerError,
+  throwAccessDeniedError,
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { FORBIDDEN } = require("@/configs/http-status.config");
 
 /**
  * PATCH /scopes/link/:scopeId/:hlfId
@@ -37,6 +39,13 @@ const linkScopeToHlfController = async (req, res) => {
 
     // ── Handle error response ─────────────────────────────────────────
     if (!result.success) {
+      if (result.errorCode === FORBIDDEN) {
+        logWithTime(
+          `🚫 [linkScopeToHlfController] Access denied: ${result.message} | ${getLogIdentifiers(req)}`
+        );
+        return throwAccessDeniedError(res, result.message);
+      }
+
       logWithTime(
         `❌ [linkScopeToHlfController] ${result.message} | ${getLogIdentifiers(req)}`
       );

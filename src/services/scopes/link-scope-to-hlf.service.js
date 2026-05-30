@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases, ScopeCategoryTypes } = require("@/configs/enums.config");
+const { FORBIDDEN } = require("@/configs/http-status.config");
 
 /**
  * Links a scope to a high-level feature.
@@ -36,6 +37,11 @@ const linkScopeToHlfService = async ({
     
     const hlfId = hlf._id.toString();
     const scopeCurrentFeatureId = scope.featureId?.toString();
+
+    if(scope.projectId.toString() !== hlf.projectId.toString()) {
+      logWithTime(`❌ [linkScopeToHlfService] Scope ${scope._id} and HLF ${hlf._id} belong to different projects. Cannot link.`);
+      return { success: false, message: "Scope and HLF belong to different projects.", errorCode: FORBIDDEN };
+    }
 
     // ── Check if already linked to same feature ────────────────────────────────
     if (scopeCurrentFeatureId === hlfId) {

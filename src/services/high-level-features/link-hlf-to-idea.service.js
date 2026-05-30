@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
+const { FORBIDDEN } = require("@/configs/http-status.config");
 
 /**
  * Links a high-level feature to an idea.
@@ -33,6 +34,11 @@ const linkHlfToIdeaService = async ({
     
     const ideaId = idea._id.toString();
     const hlfCurrentIdeaId = hlf.ideaId?.toString();
+
+    if(hlf.projectId.toString() !== idea.projectId.toString()) {
+      logWithTime(`❌ [linkHlfToIdeaService] HLF ${hlf._id} and Idea ${idea._id} belong to different projects. Cannot link.`);
+      return { success: false, message: "HLF and Idea belong to different projects.", errorCode: FORBIDDEN };
+    }
 
     // ── Check if already linked to same idea ─────────────────────────────────
     if (hlfCurrentIdeaId === ideaId) {

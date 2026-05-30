@@ -7,11 +7,13 @@ const {
   throwInternalServerError,
   throwSpecificInternalServerError,
   throwBadRequestError,
+  throwAccessDeniedError,
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
 
 const { logWithTime } = require("@/utils/time-stamps.util");
 const { errorMessage } = require("@/utils/log-error.util");
+const { FORBIDDEN } = require("@/configs/http-status.config");
 
 const linkHlfToIdeaController = async (req, res) => {
   try {
@@ -35,6 +37,11 @@ const linkHlfToIdeaController = async (req, res) => {
     });
 
     if (!result.success) {
+      if (result.errorCode === FORBIDDEN) {
+        logWithTime(`🚫 [linkHlfToIdeaController] Access denied: ${result.message} | ${getLogIdentifiers(req)}`);
+        return throwAccessDeniedError(res, result.message);
+      }
+
       if (result.message === "Validation error") {
         logWithTime(`❌ [linkHlfToIdeaController] Validation error: ${result.error} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message, result.error);
