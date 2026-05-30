@@ -11,6 +11,7 @@ const { INTERNAL_ERROR, BAD_REQUEST, NOT_FOUND, CONFLICT } = require("@configs/h
 const { RequirementStatuses, RequirementTypes, RequirementSources, MinBufferTime, ContributionTypes, PriorityLevels, RelationTypes, Phases } = require("@configs/enums.config");
 const { linkRequirementToHlfService } = require("../hlf-requirement/link-requirement-to-hlf.service");
 const { manualVersionControlService } = require("../common/version.service");
+const { counterServices } = require("@services/common/counter.service");
 
 const createRequirementService = async ({
   project,
@@ -117,6 +118,13 @@ const createRequirementService = async ({
     const entityType = entityTypeMap[assignedPhase];
     const createdInMode = phaseContext.workflowMode;
 
+    // ── Call counter service to get sequence and id ──────────────────────────
+    const counterResult = await counterServices.requirementCounterService();
+    if (!counterResult.success) {
+      logWithTime(`❌ [createRequirementService] Error generating Requirement sequence`);
+      return { success: false, message: "Failed to generate Requirement sequence", errorCode: INTERNAL_ERROR };
+    }
+
     // Create requirement
     const newRequirement = new RequirementModel({
       projectId: new mongoose.Types.ObjectId(projectId),
@@ -133,6 +141,8 @@ const createRequirementService = async ({
         proposedDate: proposedDate,
         expectedDeliveryDate: null
       },
+      sequence: counterResult.sequence,
+      id: counterResult.generatedId,
       createdBy,
       isDeleted: false,
       parentFeatureId: null

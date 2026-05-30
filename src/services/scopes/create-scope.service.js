@@ -9,6 +9,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases, ScopeCategoryTypes } = require("@/configs/enums.config");
+const { counterServices } = require("@services/common/counter.service");
 
 /**
  * Creates a new scope for an inception document.
@@ -66,6 +67,13 @@ const createScopeService = async ({
       featureId = feature._id;
     }
 
+    // ── Call counter service to get sequence and id ──────────────────────────
+    const counterResult = await counterServices.scopeCounterService();
+    if (!counterResult.success) {
+      logWithTime(`❌ [createScopeService] Error generating Scope sequence`);
+      return { success: false, message: "Failed to generate Scope sequence" };
+    }
+
     // ── Create scope ────────────────────────────────────────────────────────
     const scopeData = {
       inceptionId,
@@ -75,6 +83,8 @@ const createScopeService = async ({
       type: type || null,
       category,
       featureId,
+      sequence: counterResult.sequence,
+      id: counterResult.generatedId,
       createdBy,
     };
 

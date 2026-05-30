@@ -10,6 +10,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
 const { CONFLICT, NOT_FOUND, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { counterServices } = require("@services/common/counter.service");
 
 /**
  * Creates a new high-level feature for an inception document.
@@ -65,6 +66,13 @@ const createHlfService = async ({
       ideaId = linkedIdeaId;
     }
 
+    // ── Call counter service to get sequence and id ──────────────────────────
+    const counterResult = await counterServices.hlfCounterService();
+    if (!counterResult.success) {
+      logWithTime(`❌ [createHlfService] Error generating HLF sequence`);
+      return { success: false, message: "Failed to generate HLF sequence", errorCode: INTERNAL_ERROR };
+    }
+
     // ── Create HLF ────────────────────────────────────────────────────────
     const hlfData = {
       inceptionId,
@@ -72,6 +80,8 @@ const createHlfService = async ({
       title: normalizedTitle,
       description: normalizedDescription,
       ideaId,
+      sequence: counterResult.sequence,
+      id: counterResult.generatedId,
       createdBy,
     };
 
