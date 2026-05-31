@@ -6,7 +6,7 @@ const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
-const { Phases } = require("@/configs/enums.config");
+const { Phases, IdeaStatuses } = require("@/configs/enums.config");
 const { FORBIDDEN } = require("@/configs/http-status.config");
 
 /**
@@ -40,11 +40,17 @@ const linkHlfToIdeaService = async ({
       return { success: false, message: "HLF and Idea belong to different projects.", errorCode: FORBIDDEN };
     }
 
+    if(idea.status !== IdeaStatuses.ACCEPTED) {
+      logWithTime(`❌ [linkHlfToIdeaService] Idea ${idea._id} is not in ACCEPTED status. Current status: ${idea.status}. Cannot link.`);
+      return { success: false, message: "Only ideas in ACCEPTED status can be linked to high-level features.", errorCode: FORBIDDEN };
+    }
+
     // ── Check if already linked to same idea ─────────────────────────────────
     if (hlfCurrentIdeaId === ideaId) {
       logWithTime(`⚠️ [linkHlfToIdeaService] HLF ${hlf._id} is already linked to Idea ${ideaId}. No changes made.`);
       return { success: true, message: "HLF is already linked to this idea. No changes made.", hlf };
     }
+
 
     // ── Update HLF with ideaId ────────────────────────────────────────────────
     hlf.ideaId = idea._id;
@@ -78,7 +84,7 @@ const linkHlfToIdeaService = async ({
     );
 
     logWithTime(`✅ [linkHlfToIdeaService] HLF ${linkedHlf._id} successfully linked to Idea ${idea._id}`);
-    return { success: true, hlf: linkedHlf };
+    return { success: true, message: "High-level feature linked to idea successfully.", hlf: linkedHlf };
 
   } catch (error) {
     logWithTime(`❌ [linkHlfToIdeaService] Error caught while linking HLF to Idea`);

@@ -67,9 +67,9 @@ const createHlfService = async ({
     }
 
     // ── Call counter service to get sequence and id ──────────────────────────
-    const counterResult = await counterServices.hlfCounterService();
+    const counterResult = await counterServices.hlfCounterService(projectId);
     if (!counterResult.success) {
-      logWithTime(`❌ [createHlfService] Error generating HLF sequence`);
+      logWithTime(`❌ [createHlfService] Error generating HLF sequence for project: ${projectId}`);
       return { success: false, message: "Failed to generate HLF sequence", errorCode: INTERNAL_ERROR };
     }
 
