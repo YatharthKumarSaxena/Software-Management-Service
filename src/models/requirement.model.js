@@ -209,19 +209,29 @@ const RequirementSchema = new mongoose.Schema({
         }],
         default: []
     },
-    sequence: { type: Number, required: true, unique: true, min: 1 },
-    id: { type: String, required: true, unique: true, trim: true },
+    sequence: { type: Number, required: true, min: 1 },
+    id: { type: String, required: true, trim: true },
 }, {
     timestamps: true,
     optimisticConcurrency: true
 });
 
-RequirementSchema.index({ entityId: 1, title: 1 }, { partialFilterExpression: { isDeleted: false } });
+RequirementSchema.index(
+    { entityId: 1, title: 1 },
+    {
+        unique: true,
+        partialFilterExpression: { isDeleted: false }
+    }
+);
 RequirementSchema.index({ entityId: 1, isDeleted: 1 });
 RequirementSchema.index({ entityId: 1, parentFeatureId: 1, isDeleted: 1 });
 RequirementSchema.index({ entityId: 1, status: 1, isDeleted: 1 });
 RequirementSchema.index({ entityId: 1, createdAt: -1, isDeleted: 1 });
 RequirementSchema.index({ tags: 1 });
+RequirementSchema.index(
+    { projectId: 1, id: 1 },
+    { unique: true }
+);
 
 // ── Auto-add tag when created under elaboration ──────────────────────────────────────────────────────
 RequirementSchema.pre('save', function (next) {

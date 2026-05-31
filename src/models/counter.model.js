@@ -9,9 +9,14 @@ const CounterSchema = new mongoose.Schema(
         entityType: { 
             type: String,
             required: true,
-            unique: true,
             trim: true,
             enum: Object.values(ENTITY_MAPPING)
+        },
+
+        projectId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: DB_COLLECTIONS.PROJECTS
         },
 
         nextSequence: {
@@ -25,6 +30,11 @@ const CounterSchema = new mongoose.Schema(
         timestamps: true,
         versionKey: false,
     }
+);
+
+CounterSchema.index(
+    { projectId: 1, entityType: 1 },
+    { unique: true }
 );
 
 const CounterModel = mongoose.model(DB_COLLECTIONS.COUNTERS, CounterSchema);

@@ -13,8 +13,8 @@ const ScopeSchema = new mongoose.Schema({
   featureId: { type: mongoose.Schema.Types.ObjectId, ref: DB_COLLECTIONS.HIGH_LEVEL_FEATURES, default: null },
   title: { type: String, trim: true, minlength: titleLength.min, maxlength: titleLength.max, lowercase: false, required: true },
   description: { type: String, trim: true, default: null, minlength: descriptionLength.min, maxlength: descriptionLength.max },
-  sequence: { type: Number, required: true, unique: true, min: 1 },
-  id: { type: String, required: true, unique: true, trim: true },
+  sequence: { type: Number, required: true, min: 1 },
+  id: { type: String, required: true, trim: true },
   createdBy: { type: String, required: true, match: customIdRegex },
   updatedBy: { type: String, match: customIdRegex, default: null },
   isDeleted: { type: Boolean, default: false },
@@ -25,16 +25,20 @@ const ScopeSchema = new mongoose.Schema({
 });
 
 ScopeSchema.index(
-  { inceptionId: 1, title: 1, type: 1 },
+  { projectId: 1, title: 1, type: 1 },
   {
     unique: true,
     collation: { locale: "en", strength: 2 },
     partialFilterExpression: { isDeleted: false }
   }
 );
-ScopeSchema.index({ inceptionId: 1, isDeleted: 1 });
-ScopeSchema.index({ inceptionId: 1, type: 1, isDeleted: 1 });
-ScopeSchema.index({ inceptionId: 1, createdAt: -1, isDeleted: 1 });
+
+ScopeSchema.index(
+  { projectId: 1, id: 1 },
+  {
+    unique: true
+  }
+);
 
 const ScopeModel = mongoose.model(DB_COLLECTIONS.SCOPES, ScopeSchema);
 
