@@ -9,7 +9,7 @@ const { hlfControllers } = require("@controllers/high-level-features");
 const { hlfMiddlewares } = require("@/middlewares/high-level-features");
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { commonMiddlewares } = require("@/middlewares/common");
-const { createHLFRateLimiter, updateHLFRateLimiter, deleteHLFRateLimiter, getHLFRateLimiter, listHLFsRateLimiter, linkHLFtoIdeaRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
+const { createHLFRateLimiter, updateHLFRateLimiter, deleteHLFRateLimiter, getHLFRateLimiter, listHLFsRateLimiter, linkHLFtoIdeaRateLimiter, unlinkHLFFromIdeaRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
 const { ideaMiddlewares } = require("@/middlewares/ideas");
 const { inceptionMiddlewares } = require("@/middlewares/inceptions");
 
@@ -19,6 +19,7 @@ const {
   DELETE_HLF,
   GET_HLF,
   LIST_HLF,
+  UNLINK_HLF,
   LINK_HLF_TO_IDEA
 } = HLF_ROUTES;
 
@@ -147,6 +148,19 @@ hlfRouter.patch(
     inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
   ],
   hlfControllers.linkHlfToIdeaController
+);
+
+hlfRouter.patch(
+  UNLINK_HLF,
+  [
+    ...baseAuthAdminMiddlewares,
+    linkHLFtoIdeaRateLimiter,
+    hlfMiddlewares.fetchHlfMiddleware,
+    commonMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
+  ],
+  hlfControllers.unlinkHlfFromIdeaController
 );
 
 module.exports = { hlfRouter };
