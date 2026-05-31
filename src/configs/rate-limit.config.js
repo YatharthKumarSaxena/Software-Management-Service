@@ -401,6 +401,13 @@ module.exports = {
       reason: "Link scope to HLF endpoint abuse",
       message: "Too many requests to link scope to HLF endpoint. Please try again later."
     },
+    unlinkScopeFromHLF: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "unlink_scope_from_hlf",
+      reason: "Unlink scope from HLF endpoint abuse",
+      message: "Too many requests to unlink scope from HLF endpoint. Please try again later."
+    },
     createHLF: {
       maxRequests: 10,
       windowMs: 60 * 1000,
@@ -442,6 +449,13 @@ module.exports = {
       prefix: "link_hlf_to_idea",
       reason: "Link HLF to idea endpoint abuse",
       message: "Too many requests to link HLF to idea endpoint. Please try again later."
+    },
+    unlinkHLFFromIdea: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "unlink_hlf_from_idea",
+      reason: "Unlink HLF from idea endpoint abuse",
+      message: "Too many requests to unlink HLF from idea endpoint. Please try again later."
     },
     createIdea: {
       maxRequests: 10,

@@ -132,7 +132,8 @@ module.exports = {
         CREATE_HLF:    `/create/:projectId`,      // POST /software-management-service/api/v1/high-level-features/create/:projectId
         DELETE_HLF:    `/delete/:hlfId`,       // DELETE /software-management-service/api/v1/high-level-features/delete/:hlfId
         LIST_HLF:     `/list/:projectId`,        // GET /software-management-service/api/v1/high-level-features/list/:projectId
-        LINK_HLF_TO_IDEA:    `/link/:hlfId/:ideaId`       // PATCH /software-management-service/api/v1/high-level-features/link/:hlfId/:ideaId
+        LINK_HLF_TO_IDEA:    `/link/:hlfId/:ideaId`,       // PATCH /software-management-service/api/v1/high-level-features/link/:hlfId/:ideaId
+        UNLINK_HLF:  `/unlink/:hlfId`                // PATCH /software-management-service/api/v1/high-level-features/unlink/:hlfId
     },
     IDEAS_ROUTES: {
         GET_IDEA:       `/get/:ideaId`,              // GET /software-management-service/api/v1/ideas/get/:ideaId
