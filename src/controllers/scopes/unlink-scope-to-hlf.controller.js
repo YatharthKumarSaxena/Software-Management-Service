@@ -43,7 +43,7 @@ const unlinkScopeToHlfController = async (req, res) => {
 
     // ── Return success response ───────────────────────────────────────
     logWithTime(`✅ [unlinkScopeToHlfController] Scope unlinked from HLF successfully | ${getLogIdentifiers(req)}`);
-    return sendScopeUnlinkedSuccess(res, result.scope);
+    return sendScopeUnlinkedSuccess(res,result.message, result.scope);
 
   } catch (error) {
     logWithTime(`❌ [unlinkScopeToHlfController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);

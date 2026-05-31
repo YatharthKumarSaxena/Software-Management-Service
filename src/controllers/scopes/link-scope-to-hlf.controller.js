@@ -54,7 +54,7 @@ const linkScopeToHlfController = async (req, res) => {
 
     // ── Return success response ───────────────────────────────────────
     logWithTime(`✅ [linkScopeToHlfController] Scope linked to HLF successfully | ${getLogIdentifiers(req)}`);
-    return sendScopeLinkedSuccess(res, result.scope);
+    return sendScopeLinkedSuccess(res,result.message, result.scope);
 
   } catch (error) {
     logWithTime(`❌ [linkScopeToHlfController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
