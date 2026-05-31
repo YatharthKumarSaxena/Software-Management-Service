@@ -119,9 +119,9 @@ const createRequirementService = async ({
     const createdInMode = phaseContext.workflowMode;
 
     // ── Call counter service to get sequence and id ──────────────────────────
-    const counterResult = await counterServices.requirementCounterService();
+    const counterResult = await counterServices.requirementCounterService(projectId);
     if (!counterResult.success) {
-      logWithTime(`❌ [createRequirementService] Error generating Requirement sequence`);
+      logWithTime(`❌ [createRequirementService] Error generating Requirement sequence for project: ${projectId}`);
       return { success: false, message: "Failed to generate Requirement sequence", errorCode: INTERNAL_ERROR };
     }
 
