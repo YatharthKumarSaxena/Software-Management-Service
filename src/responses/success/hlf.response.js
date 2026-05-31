@@ -59,10 +59,34 @@ const sendHlfListFetchedSuccess = (res, hlfs, total, page, totalPages) => {
   });
 };
 
+/**
+ * 200 – High-level feature linked to idea successfully.
+ */
+const sendHlfLinkedSuccess = (res, message, hlf) => {
+  return res.status(OK).json({
+    success: true,
+    message: message,
+    data: { hlf },
+  });
+};
+
+/**
+ * 200 – High-level feature unlinked from idea successfully.
+ */
+const sendHlfUnlinkedSuccess = (res, message, hlf) => {
+  return res.status(OK).json({
+    success: true,
+    message: message,
+    data: { hlf },
+  });
+};
+
 module.exports = {
   sendHlfCreatedSuccess,
   sendHlfUpdatedSuccess,
   sendHlfDeletedSuccess,
   sendHlfFetchedSuccess,
   sendHlfListFetchedSuccess,
+  sendHlfLinkedSuccess,
+  sendHlfUnlinkedSuccess,
 };

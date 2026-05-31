@@ -62,10 +62,10 @@ const sendScopesListFetchedSuccess = (res, scopes, total, page, totalPages) => {
 /**
  * 200 – Scope linked to HLF successfully.
  */
-const sendScopeLinkedSuccess = (res, scope) => {
+const sendScopeLinkedSuccess = (res, message, scope) => {
   return res.status(OK).json({
     success: true,
-    message: "Scope linked to HLF successfully.",
+    message: message,
     data: { scope },
   });
 };
@@ -73,10 +73,10 @@ const sendScopeLinkedSuccess = (res, scope) => {
 /**
  * 200 – Scope unlinked from HLF successfully.
  */
-const sendScopeUnlinkedSuccess = (res, scope) => {
+const sendScopeUnlinkedSuccess = (res,message, scope) => {
   return res.status(OK).json({
     success: true,
-    message: "Scope unlinked from HLF successfully.",
+    message: message,
     data: { scope },
   });
 };
