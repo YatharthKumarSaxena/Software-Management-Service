@@ -64,7 +64,7 @@ const deleteScopeRateLimiter = createRateLimiter(perUserAndDevice.deleteScope);
 const getScopeRateLimiter    = createRateLimiter(perUserAndDevice.getScope);
 const listScopesRateLimiter  = createRateLimiter(perUserAndDevice.listScopes);
 const linkScopeToHlfRateLimiter = createRateLimiter(perUserAndDevice.linkScopeToHLF);
-const unlinkScopeToHlfRateLimiter = createRateLimiter(perUserAndDevice.linkScopeToHLF);
+const unlinkScopeToHlfRateLimiter = createRateLimiter(perUserAndDevice.unlinkScopeFromHLF);
 
 const createHLFRateLimiter = createRateLimiter(perUserAndDevice.createHLF);
 const updateHLFRateLimiter = createRateLimiter(perUserAndDevice.updateHLF);
@@ -72,6 +72,7 @@ const deleteHLFRateLimiter = createRateLimiter(perUserAndDevice.deleteHLF);
 const getHLFRateLimiter    = createRateLimiter(perUserAndDevice.getHLF);
 const listHLFsRateLimiter  = createRateLimiter(perUserAndDevice.listHLFs);
 const linkHLFtoIdeaRateLimiter = createRateLimiter(perUserAndDevice.linkHLFtoIdea);
+const unlinkHLFFromIdeaRateLimiter = createRateLimiter(perUserAndDevice.unlinkHLFFromIdea);
 
 const createIdeaRateLimiter  = createRateLimiter(perUserAndDevice.createIdea);
 const updateIdeaRateLimiter  = createRateLimiter(perUserAndDevice.updateIdea);
@@ -220,6 +221,7 @@ module.exports = {
     getHLFRateLimiter,
     listHLFsRateLimiter,
     linkHLFtoIdeaRateLimiter,
+    unlinkHLFFromIdeaRateLimiter,
     createIdeaRateLimiter,
     updateIdeaRateLimiter,
     deleteIdeaRateLimiter,
