@@ -1,7 +1,7 @@
 // controllers/high-level-features/link-hlf-to-idea.controller.js
 
 const { linkHlfToIdeaService } = require("@services/high-level-features/link-hlf-to-idea.service");
-const { sendHlfUpdatedSuccess } = require("@/responses/success/hlf.response");
+const { sendHlfLinkedSuccess } = require("@/responses/success/hlf.response");
 
 const {
   throwInternalServerError,
@@ -53,11 +53,11 @@ const linkHlfToIdeaController = async (req, res) => {
 
     if (result.message === "HLF is already linked to this idea. No changes made.") {
       logWithTime(`⚠️ [linkHlfToIdeaController] Already linked | ${getLogIdentifiers(req)}`);
-      return sendHlfUpdatedSuccess(res, result.hlf);
+      return sendHlfLinkedSuccess(res, result.message, result.hlf);
     }
 
     logWithTime(`✅ [linkHlfToIdeaController] High-level feature linked to idea successfully | ${getLogIdentifiers(req)}`);
-    return sendHlfUpdatedSuccess(res, result.hlf);
+    return sendHlfLinkedSuccess(res, result.message, result.hlf);
 
   } catch (error) {
     logWithTime(`❌ [linkHlfToIdeaController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
