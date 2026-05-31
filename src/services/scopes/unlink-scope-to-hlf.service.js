@@ -78,7 +78,7 @@ const unlinkScopeToHlfService = async ({
     logWithTime(
       `✅ [unlinkScopeToHlfService] Scope ${unlinkedScope._id} successfully unlinked from HLF`
     );
-    return { success: true, scope: unlinkedScope };
+    return { success: true, message: "Scope successfully unlinked from HLF", scope: unlinkedScope };
   } catch (error) {
     logWithTime(
       `❌ [unlinkScopeToHlfService] Error caught while unlinking Scope from HLF`

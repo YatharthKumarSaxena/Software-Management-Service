@@ -68,9 +68,9 @@ const createScopeService = async ({
     }
 
     // ── Call counter service to get sequence and id ──────────────────────────
-    const counterResult = await counterServices.scopeCounterService();
+    const counterResult = await counterServices.scopeCounterService(projectId);
     if (!counterResult.success) {
-      logWithTime(`❌ [createScopeService] Error generating Scope sequence`);
+      logWithTime(`❌ [createScopeService] Error generating Scope sequence for project: ${projectId}`);
       return { success: false, message: "Failed to generate Scope sequence" };
     }
 

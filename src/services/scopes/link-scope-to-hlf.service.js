@@ -82,7 +82,7 @@ const linkScopeToHlfService = async ({
     );
 
     logWithTime(`✅ [linkScopeToHlfService] Scope ${linkedScope._id} successfully linked to HLF ${hlf._id}`);
-    return { success: true, scope: linkedScope };
+    return { success: true, message: "Scope successfully linked to HLF", scope: linkedScope };
 
   } catch (error) {
     logWithTime(`❌ [linkScopeToHlfService] Error caught while linking Scope to HLF`);
