@@ -33,7 +33,7 @@ const createRequirementService = async ({
   try {
 
     const projectId = project._id.toString();
-    const elicitationId = elicitation ?elicitation._id.toString() : null;
+    const elicitationId = elicitation ? elicitation._id.toString() : null;
     const elaborationId = elaboration ? elaboration._id.toString() : null;
 
     const activePhases = project.currentPhase;
