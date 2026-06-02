@@ -4,7 +4,7 @@ const { RequirementModel } = require("@models/requirement.model");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@/configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CONFLICT, INTERNAL_ERROR, NOT_FOUND } = require("@configs/http-status.config");
+const { INTERNAL_ERROR, NOT_FOUND } = require("@configs/http-status.config");
 const { prepareAuditData } = require("@/utils/audit-data.util");
 
 /**

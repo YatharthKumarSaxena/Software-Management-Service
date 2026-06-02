@@ -8,10 +8,12 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@/configs/tracker.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { INTERNAL_ERROR, BAD_REQUEST, NOT_FOUND, CONFLICT } = require("@configs/http-status.config");
-const { RequirementStatuses, RequirementTypes, RequirementSources, MinBufferTime, ContributionTypes, PriorityLevels, RelationTypes, Phases } = require("@configs/enums.config");
+const { RequirementStatuses, RequirementTypes, RequirementSources, MinBufferTime, ContributionTypes, PriorityLevels, RelationTypes, Phases, WorkflowModes } = require("@configs/enums.config");
 const { linkRequirementToHlfService } = require("../hlf-requirement/link-requirement-to-hlf.service");
 const { manualVersionControlService } = require("../common/version.service");
 const { counterServices } = require("@services/common/counter.service");
+const { resolveActivePhase } = require("@services/common/phase-resolution.service");
+const { validatePhaseContext } = require("@services/common/phase-context.service");
 
 const createRequirementService = async ({
   project,
@@ -59,63 +61,54 @@ const createRequirementService = async ({
       }
     }
 
-    let assignedPhase = null;
-    if (activePhases.length === 0) {
-      return { success: false, message: "Project has no active phases", errorCode: CONFLICT };
-    } else if (activePhases.length === 1) {
-      assignedPhase = activePhases[0];
-    } else {
-      // Multiple phases - require explicit specification
-      if (!phase) {
-        return { success: false, message: "Multiple phases are active. Please specify which phase to assign this requirement to.", errorCode: CONFLICT };
+    const phaseConfigMap = {
+      [Phases.ELICITATION]: {
+        context: elicitation,
+        entityId: elicitationId,
+        entityType: DB_COLLECTIONS.ELICITATIONS
+      },
+
+      [Phases.ELABORATION]: {
+        context: elaboration,
+        entityId: elaborationId,
+        entityType: DB_COLLECTIONS.ELABORATIONS
       }
-      if (!activePhases.includes(phase)) {
-        return { success: false, message: "Specified phase is not currently active for this project", errorCode: CONFLICT };
-      }
-      assignedPhase = phase;
-    }
-
-    // ── Get phase context using phaseContextMap ──────────────────────────
-    const phaseContextMap = {
-      [Phases.ELICITATION]: elicitation,
-      [Phases.ELABORATION]: elaboration
-    };
-    const phaseContext = phaseContextMap[assignedPhase];
-
-    // ── Check if phase context exists (not frozen/missing) ────────────────
-    if (!phaseContext) {
-      return { success: false, message: `No Active ${assignedPhase} Exists`, errorCode: CONFLICT };
-    }
-
-    if (phaseContext.isFrozen) {
-      return { success: false, message: "Cannot create requirement in a frozen phase", errorCode: CONFLICT };
-    }
-
-    // ── Validate user is a collaborator ──────────────────────────────────
-    if (phaseContext.workflowMode === WorkflowModes.MODERATION && !phaseContext.contributors.includes(createdBy)) {
-      return { success: false, message: `User is not a contributor for ${assignedPhase}`, errorCode: CONFLICT };
-    }
-
-    if (parentHlfId) {
-      // Validate parentHlfId exists and belongs to the same project
-      const parentFeature = await HighLevelFeatureModel.findOne({ _id: parentHlfId, projectId, isDeleted: false });
-      if (!parentFeature) {
-        return { success: false, message: "Validation error", errorCode: NOT_FOUND, error: "Parent high-level feature not found in the project" };
-      }
-    }
-
-    // ── Map phase to entity properties ───────────────────────────────────
-    const entityIdMap = {
-      [Phases.ELICITATION]: elicitationId,
-      [Phases.ELABORATION]: elaborationId
-    };
-    const entityTypeMap = {
-      [Phases.ELICITATION]: DB_COLLECTIONS.ELICITATIONS,
-      [Phases.ELABORATION]: DB_COLLECTIONS.ELABORATIONS
     };
 
-    const entityId = entityIdMap[assignedPhase];
-    const entityType = entityTypeMap[assignedPhase];
+    const phaseResult = resolveActivePhase({
+      activePhases: project.currentPhase,
+      supportedPhases: [
+        Phases.ELICITATION,
+        Phases.ELABORATION
+      ],
+      selectedPhase: phase
+    });
+
+    if (!phaseResult.success) {
+      return phaseResult;
+    }
+
+    const assignedPhase = phaseResult.phase;
+
+    const phaseConfig = phaseConfigMap[assignedPhase];
+
+    const phaseValidation = validatePhaseContext({
+      phase: assignedPhase,
+      phaseContext: phaseConfig?.context,
+      userId: createdBy
+    });
+
+    if (!phaseValidation.success) {
+      return phaseValidation;
+    }
+
+    const phaseContext = phaseValidation.phaseContext;
+
+    const {
+      entityId,
+      entityType
+    } = phaseConfig;
+
     const createdInMode = phaseContext.workflowMode;
 
     // ── Call counter service to get sequence and id ──────────────────────────
@@ -133,7 +126,7 @@ const createRequirementService = async ({
       title: title.trim(),
       description: description ? description.trim() : null,
       priority,
-      type, 
+      type,
       source,
       status: RequirementStatuses.DRAFT,
       createdInMode,
@@ -160,14 +153,14 @@ const createRequirementService = async ({
       try {
         const linkResult = await linkRequirementToHlfService({
           requirementId: savedRequirement._id.toString(),
-          highLevelFeatureId: parentHlfId, 
+          highLevelFeatureId: parentHlfId,
           contributionTypes: ContributionTypes.PRIMARY,
           relationType,
           relationshipNotes,
           linkedBy: createdBy,
           auditContext
         });
-        
+
         if (!linkResult.success) {
           logWithTime(`⚠️ [createRequirementService] Error linking to HLF: ${linkResult.message}`);
           // Note: Requirement is created but linking failed - logging only, requirement still returned as success
@@ -185,7 +178,7 @@ const createRequirementService = async ({
       { newData: savedRequirement.toObject(), adminActions: { targetId: savedRequirement._id.toString() } }
     );
 
-    manualVersionControlService({
+    await manualVersionControlService({
       projectId,
       currentPhase: assignedPhase,
       action: `Requirement created in ${assignedPhase} phase`,
