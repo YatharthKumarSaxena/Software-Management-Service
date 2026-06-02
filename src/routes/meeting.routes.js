@@ -54,7 +54,6 @@ meetingRouter.post(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
 
     // Request validation
     meetingMiddlewares.createMeetingPresenceMiddleware,
@@ -80,7 +79,6 @@ meetingRouter.patch(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
 
     // Meeting validations
     meetingMiddlewares.validateUserIsParticipantMiddleware,
@@ -108,7 +106,6 @@ meetingRouter.patch(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
 
     // Meeting validations
     meetingMiddlewares.meetingFinalizedGuardMiddleware,
@@ -138,7 +135,6 @@ meetingRouter.get(
     stakeholderMiddlewares.checkUserIsStakeholder,
 
     // Entity (from entityType)
-    meetingMiddlewares.fetchEntityIdMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware
   ],
   meetingControllers.getMeetingController
@@ -154,9 +150,7 @@ meetingRouter.get(
 
     // Stakeholder
     stakeholderMiddlewares.checkUserIsStakeholder,
-
-    // Entity (from entityType)
-    meetingMiddlewares.fetchEntityIdMiddleware
+    meetingMiddlewares.fetchEntityIdWithoutFrozenCheckMiddleware
 
   ],
   meetingControllers.listMeetingsController
@@ -179,7 +173,6 @@ meetingRouter.patch(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware,
 
     // Request validation
@@ -206,7 +199,6 @@ meetingRouter.patch(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware,
 
     // Request validation
@@ -233,7 +225,6 @@ meetingRouter.patch(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware
 
   ],
@@ -256,7 +247,6 @@ meetingRouter.patch(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware
 
   ],
@@ -280,7 +270,6 @@ meetingRouter.patch(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware
 
   ],

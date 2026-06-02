@@ -44,7 +44,6 @@ participantRouter.post(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
 
     // Meeting validations
     meetingMiddlewares.meetingFinalizedGuardMiddleware,
@@ -72,7 +71,6 @@ participantRouter.patch(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
 
     // Meeting validations
     meetingMiddlewares.meetingFinalizedGuardMiddleware,
@@ -101,7 +99,6 @@ participantRouter.patch(
 
     // Entity (from entityType)
     meetingMiddlewares.fetchEntityIdMiddleware,
-    meetingMiddlewares.checkPhaseFrozenStatusMiddleware,
 
     // Meeting validations
     meetingMiddlewares.meetingFinalizedGuardMiddleware,
@@ -128,7 +125,6 @@ participantRouter.get(
     stakeholderMiddlewares.checkUserIsStakeholder,
 
     // Entity (from entityType)
-    meetingMiddlewares.fetchEntityIdMiddleware,
     meetingMiddlewares.validateUserIsParticipantMiddleware
 
   ],
@@ -146,10 +142,7 @@ participantRouter.get(
     // Project (from projectId)
     projectMiddlewares.fetchProjectMiddleware,
     stakeholderMiddlewares.checkUserIsStakeholder,
-
-    // Entity (from entityType)
-    meetingMiddlewares.fetchEntityIdMiddleware
-
+    meetingMiddlewares.validateUserIsParticipantMiddleware
   ],
   participantControllers.listParticipantsController
 )
