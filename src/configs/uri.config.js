@@ -28,7 +28,7 @@ const VALIDATION_BASE = `${API_PREFIX}/validations`; // /software-management-ser
 const SPECIFICATION_BASE = `${API_PREFIX}/specifications`; // /software-management-service/api/v1/specifications
 const NEGOTIATION_BASE = `${API_PREFIX}/negotiations`; // /software-management-service/api/v1/negotiations
 const HLF_REQUIREMENT_BASE = `${API_PREFIX}/requirements`; // /software-management-service/api/v1/requirements
-
+const REQUIREMENT_BASE = `${API_PREFIX}/requirements`; // /software-management-service/api/v1/requirements
 
 module.exports = {
     INTERNAL_BASE,
@@ -53,6 +53,7 @@ module.exports = {
     SPECIFICATION_BASE,
     NEGOTIATION_BASE,
     HLF_REQUIREMENT_BASE,
+    REQUIREMENT_BASE,
     INTERNAL_ROUTES: {
         CREATE_SUPER_ADMIN: `/create-super-admin`, // /software-management-service/api/v1/internal/create-super-admin
         CREATE_USER: `/create-user`, // /software-management-service/api/v1/internal/admin-panel/create-user
@@ -238,5 +239,14 @@ module.exports = {
         LIST_SPECIFICATIONS: `/list/:projectId`, // GET /api/v1/specifications/list/:projectId
         GET_LATEST_SPECIFICATION: `/latest/:projectId`, // GET /api/v1/specifications/latest/:projectId
         FREEZE_SPECIFICATION: `/freeze/:projectId` // PATCH /api/v1/specifications/freeze/:projectId
+    },
+    REQUIREMENT_ROUTES: {
+        CREATE_REQUIREMENT: `/create/:projectId`, // POST /api/v1/requirements/create/:projectId
+        UPDATE_REQUIREMENT: `/update/:requirementId`, // PATCH /api/v1/requirements/update/:requirementId
+        DELETE_REQUIREMENT: `/delete/:requirementId`, // DELETE /api/v1/requirements/delete/:requirementId
+        GET_REQUIREMENT: `/get/:requirementId`, // GET /api/v1/requirements/get/:requirementId
+        LIST_REQUIREMENTS: `/list/:projectId`, // GET /api/v1/requirements/list/:projectId
+        LINK_REQUIREMENT_TO_HLF: `/link-to-hlf/:requirementId/:hlfId`, // PATCH /api/v1/requirements/link-to-hlf/:requirementId/:hlfId
+        UNLINK_REQUIREMENT_FROM_HLF: `/unlink-from-hlf/:requirementId` // PATCH /api/v1/requirements/unlink-from-hlf/:requirementId
     }
 };

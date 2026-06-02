@@ -234,13 +234,12 @@ RequirementSchema.index(
 );
 
 // ── Auto-add tag when created under elaboration ──────────────────────────────────────────────────────
-RequirementSchema.pre('save', function (next) {
+RequirementSchema.pre('save', function () {
     if (this.entityType === DB_COLLECTIONS.ELABORATIONS) {
         if (!this.tags.includes('created_under_elaboration')) {
             this.tags.push('created_under_elaboration');
         }
     }
-    next();
 });
 
 const RequirementModel = mongoose.model(DB_COLLECTIONS.REQUIREMENTS, RequirementSchema);
