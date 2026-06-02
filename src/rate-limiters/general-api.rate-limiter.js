@@ -158,6 +158,8 @@ const startMeetingRateLimiter = createRateLimiter(perUserAndDevice.startMeeting)
 const endMeetingRateLimiter = createRateLimiter(perUserAndDevice.endMeeting);
 const freezeMeetingRateLimiter = createRateLimiter(perUserAndDevice.freezeMeeting);
 
+const createRequirementRateLimiter = createRateLimiter(perUserAndDevice.createRequirement);
+
 module.exports = {
     welcomeAdminRateLimiter,
     welcomeClientRateLimiter,
@@ -292,5 +294,6 @@ module.exports = {
     rescheduleMeetingRateLimiter,
     startMeetingRateLimiter,
     endMeetingRateLimiter,
-    freezeMeetingRateLimiter
+    freezeMeetingRateLimiter,
+    createRequirementRateLimiter
 }
