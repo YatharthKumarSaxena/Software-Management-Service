@@ -3,8 +3,7 @@ const { validateUserIsParticipantMiddleware } = require("./validate-user-is-part
 const { meetingStatusGuardMiddleware, meetingFinalizedGuardMiddleware } = require("./meeting-status-guard.middleware");
 const { validationMiddlewares } = require("./field-validation.middleware");
 const { presenceMiddlewares } = require("./validate-request-body.middleware");
-const { fetchEntityIdMiddleware } = require("./fetch-entity-id.middleware");
-const { checkPhaseFrozenStatusMiddleware } = require("./switch-freeze-entity.middleware");
+const { fetchEntityIdMiddleware, fetchEntityIdWithoutFrozenCheckMiddleware } = require("./fetch-entity-id.middleware");
 
 const meetingMiddlewares = {
   fetchMeetingMiddleware,
@@ -12,7 +11,7 @@ const meetingMiddlewares = {
   meetingStatusGuardMiddleware,
   meetingFinalizedGuardMiddleware,
   fetchEntityIdMiddleware,
-  checkPhaseFrozenStatusMiddleware,
+  fetchEntityIdWithoutFrozenCheckMiddleware,
   ...validationMiddlewares,
   ...presenceMiddlewares
 };
