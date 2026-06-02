@@ -18,7 +18,6 @@ const { filterParticipantDataByUserType } = require("@utils/data-filter.util");
  * 
  * EXPECTS from middleware:
  * - req.meeting: Meeting document
- * - req.project: Project document
  * - req.adminId: Admin ID if user is admin (for data filtering)
  * 
  * PARAMS:
@@ -27,7 +26,7 @@ const { filterParticipantDataByUserType } = require("@utils/data-filter.util");
 const getParticipantController = async (req, res) => {
   try {
     const { participantId } = req.params;
-    const { meeting, project, adminId } = req;
+    const { meeting, adminId } = req;
 
     logWithTime(
       `📍 [getParticipantController] Fetching participant ${participantId} | ${getLogIdentifiers(req)}`
