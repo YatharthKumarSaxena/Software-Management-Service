@@ -20,7 +20,6 @@ const { projectMiddlewares } = require("@middlewares/projects");
 const { stakeholderRoleAccessMiddlewares } = require("@/middlewares/stakeholders/api-stakeholder-role-access.middleware");
 const { checkUserIsStakeholder } = require("@/middlewares/stakeholders/check-user-is-stakeholder.middleware");
 const { baseAuthAdminMiddlewares } = require("./middleware.gateway.routes");
-const { commonMiddlewares } = require("@/middlewares/common");
 
 const {
   CREATE_ELICITATION,
