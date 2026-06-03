@@ -16,7 +16,7 @@ const { OK } = require("@configs/http-status.config");
  */
 const updateElicitationController = async (req, res) => {
   try {
-    const { mode, allowParallelMeetings } = req.body;
+    const { allowParallelMeetings, requirementGovernanceMode, workflowMode } = req.body;
     const { elicitation } = req;
 
     logWithTime(
@@ -27,8 +27,9 @@ const updateElicitationController = async (req, res) => {
     const result = await elicitationServices.updateElicitationService(
       elicitation,
       {
-        mode,
-        allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : undefined,
+        allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
+        requirementGovernanceMode: typeof requirementGovernanceMode === 'string' ? requirementGovernanceMode : null,
+        workflowMode: typeof workflowMode === 'string' ? workflowMode : null,
         updatedBy: req.admin.adminId,
         auditContext: {
           user: req.admin,
@@ -45,7 +46,7 @@ const updateElicitationController = async (req, res) => {
     }
 
     if (result.message === "No changes detected") {
-      
+
       return res.status(OK).json({
         success: true,
         message: "No changes detected. Elicitation mode remains unchanged."
