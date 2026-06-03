@@ -9,7 +9,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { Phases } = require("@configs/enums.config");
 
 /**
- * Updates an elicitation's mode and/or allowParallelMeetings.
+ * Updates an elicitation's mode, governance mode, and/or allowParallelMeetings.
  * 
  * For allowParallelMeetings toggle validation:
  *   - If meetingIds.length === 0: always allow toggle
@@ -20,26 +20,28 @@ const { Phases } = require("@configs/enums.config");
  *
  * @param {Object} elicitation - Elicitation document (already validated by middleware)
  * @param {Object} params
- * @param {string} [params.mode] - New elicitation mode
- * @param {boolean} [params.allowParallelMeetings] - Toggle parallel meetings
- * @param {string} params.updatedBy - User ID who updated
- * @param {Object} params.auditContext - Audit context {user, device, requestId}
+ * @param {string} [params.workflowMode]               - New workflow mode
+ * @param {string} [params.requirementGovernanceMode]  - New governance mode
+ * @param {boolean} [params.allowParallelMeetings]     - Toggle parallel meetings
+ * @param {string} params.updatedBy                    - User ID who updated
+ * @param {Object} params.auditContext                 - Audit context {user, device, requestId}
  *
  * @returns {Object} { success: true, elicitation } | { success: false, message }
  */
 const updateElicitationService = async (
   elicitation,
-  { mode, allowParallelMeetings, updatedBy, auditContext }
+  { workflowMode, requirementGovernanceMode, allowParallelMeetings, updatedBy, auditContext }
 ) => {
   try {
     const { MeetingModel } = require("@models/meeting.model");
     const { MeetingStatuses } = require("@configs/enums.config");
 
     // ── 1. Check if any changes are being made ────────────────────────
-    const modeChanged = mode !== undefined && elicitation.workflowMode !== mode;
+    const workflowModeChanged = workflowMode !== undefined && elicitation.workflowMode !== workflowMode;
+    const governanceModeChanged = requirementGovernanceMode !== undefined && elicitation.requirementGovernanceMode !== requirementGovernanceMode;
     const allowParallelChanged = allowParallelMeetings !== undefined && elicitation.allowParallelMeetings !== allowParallelMeetings;
 
-    if (!modeChanged && !allowParallelChanged) {
+    if (!workflowModeChanged && !governanceModeChanged && !allowParallelChanged) {
       logWithTime(
         `⚠️ [updateElicitationService] No changes detected.`
       );
@@ -83,8 +85,12 @@ const updateElicitationService = async (
     // ── 3. Build update payload ────────────────────────────────────────
     const updatePayload = { updatedBy, updatedAt: new Date() };
     
-    if (modeChanged) {
-      updatePayload.workflowMode = mode;
+    if (workflowModeChanged) {
+      updatePayload.workflowMode = workflowMode;
+    }
+
+    if (governanceModeChanged) {
+      updatePayload.requirementGovernanceMode = requirementGovernanceMode;
     }
     
     if (allowParallelChanged) {
@@ -104,7 +110,8 @@ const updateElicitationService = async (
       const { oldData, newData } = prepareAuditData(elicitation, updatedElicitation);
 
       let changeDesc = [];
-      if (modeChanged) changeDesc.push(`mode: '${elicitation.workflowMode}' → '${mode}'`);
+      if (workflowModeChanged) changeDesc.push(`workflowMode: '${elicitation.workflowMode}' → '${workflowMode}'`);
+      if (governanceModeChanged) changeDesc.push(`requirementGovernanceMode: '${elicitation.requirementGovernanceMode}' → '${requirementGovernanceMode}'`);
       if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${elicitation.allowParallelMeetings} → ${allowParallelMeetings}`);
 
       logActivityTrackerEvent(
