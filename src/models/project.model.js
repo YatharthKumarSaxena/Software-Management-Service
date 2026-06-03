@@ -3,7 +3,7 @@
 const mongoose = require("mongoose");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { customIdRegex, mongoIdRegex } = require("@configs/regex.config");
-const { ProjectCreationReason, ProjectUpdationReason, ProjectStatus, ProjectOnHoldReason, ProjectResumeReason, ProjectAbortReason, ProjectDeletionReason, Phases, ProjectCategoryTypes, ProjectTypes, PriorityLevels, ProjectActivationReason, ChangeProjectOwnerReasons } = require("@configs/enums.config");
+const { ProjectCreationReason, ProjectUpdationReason, ProjectStatus, ProjectOnHoldReason, ProjectResumeReason, ProjectAbortReason, ProjectDeletionReason, Phases, ProjectCategoryTypes, ProjectTypes, PriorityLevels, ProjectActivationReason, ChangeProjectOwnerReasons, RequirementGovernanceModes } = require("@configs/enums.config");
 const {
   projectNameLength,
   descriptionLength,
@@ -352,7 +352,7 @@ const projectSchema = new mongoose.Schema(
       type: [String],
       default: [Phases.INCEPTION],
       validate: {
-        validator: function(phases) {
+        validator: function (phases) {
           // Ensure all phases are valid enum values
           return Array.isArray(phases) && phases.every(p => Object.values(Phases).includes(p));
         },
@@ -410,6 +410,17 @@ const projectSchema = new mongoose.Schema(
       trim: true,
       minlength: descriptionLength.min,
       maxlength: descriptionLength.max,
+    },
+
+    requirementGovernanceMode: {
+      type: String,
+      enum: Object.values(RequirementGovernanceModes),
+      default: RequirementGovernanceModes.PHASE
+    },
+
+    enablePhaseLevelGovernance: {
+      type: Boolean,
+      default: false
     }
   },
   {
