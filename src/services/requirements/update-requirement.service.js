@@ -5,6 +5,7 @@ const { RequirementModel } = require("@models/requirement.model");
 const { FeatureRequirementMappingModel } = require("@models/feature-requirement-map.model");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@/configs/tracker.config");
+const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { CONFLICT, INTERNAL_ERROR, FORBIDDEN, BAD_REQUEST } = require("@configs/http-status.config");
@@ -12,6 +13,8 @@ const { RequirementStatuses, UserTypes, ContributionTypes, RelationTypes, Workfl
 const { linkRequirementToHlfService } = require("../hlf-requirement/link-requirement-to-hlf.service");
 const { unlinkRequirementToHlfService } = require("../hlf-requirement/unlink-requirement-to-hlf.service");
 const { manualVersionControlService } = require("../common/version.service");
+const { resolveActivePhase } = require("@services/common/phase-resolution.service");
+const { validatePhaseContext } = require("@services/common/phase-context.service");
 
 /**
  * Updates a requirement (only in DRAFT status).
@@ -23,7 +26,7 @@ const { manualVersionControlService } = require("../common/version.service");
  * @param {Object} [params.elicitation]       - Elicitation object for access check
  * @param {Object} [params.elaboration]       - Elaboration object for access check
  * @param {Object} [params.negotiation]       - Negotiation object for access check
- * @param {Object} params.updateData          - Fields to update (title, description, priority, type, tags, acceptanceCriteria, parentHlfId)
+ * @param {Object} params.updateData          - Fields to update (title, description, priority, type, proposedDate, parentHlfId, relationType, relationshipNotes)
  * @param {string} params.updatedBy           - Admin ID who modified it
  * @param {string} [params.userType]          - User type for access check (CLIENT, ADMIN, etc.)
  * @param {Object} params.auditContext        - { user, device, requestId }
@@ -52,53 +55,55 @@ const updateRequirementService = async ({
       return { success: false, message: "This requirement has been modified by an admin and can no longer be edited by clients", errorCode: FORBIDDEN };
     }
 
-    // Determine active phase - same logic as create service
-    const activePhases = project.currentPhase;
-    let assignedPhase = null;
-
-    if (activePhases.length === 0) {
-      return { success: false, message: "Project has no active phases", errorCode: CONFLICT };
-    } else if (activePhases.length === 1) {
-      assignedPhase = activePhases[0];
-    } else {
-      // Multiple phases - require explicit specification
-      if (!phase) {
-        return { success: false, message: "Multiple phases are active. Please specify which phase to update requirement in.", errorCode: CONFLICT };
+    // ── Phase resolution using utility ──────────────────────────────────────
+    const phaseConfigMap = {
+      [Phases.ELICITATION]: {
+        context: elicitation,
+        entityId: elicitation ? elicitation._id.toString() : null,
+        entityType: DB_COLLECTIONS.ELICITATIONS
+      },
+      [Phases.ELABORATION]: {
+        context: elaboration,
+        entityId: elaboration ? elaboration._id.toString() : null,
+        entityType: DB_COLLECTIONS.ELABORATIONS
+      },
+      [Phases.NEGOTIATION]: {
+        context: negotiation,
+        entityId: negotiation ? negotiation._id.toString() : null,
+        entityType: DB_COLLECTIONS.NEGOTIATIONS
       }
-      if (!activePhases.includes(phase)) {
-        return { success: false, message: "Specified phase is not currently active for this project", errorCode: CONFLICT };
-      }
-      assignedPhase = phase;
+    };
+
+    const phaseResult = resolveActivePhase({
+      activePhases: project.currentPhase,
+      supportedPhases: [Phases.ELICITATION, Phases.ELABORATION, Phases.NEGOTIATION],
+      selectedPhase: phase
+    });
+
+    if (!phaseResult.success) {
+      return phaseResult;
     }
 
-    // Get the active phase context object based on assignedPhase
-    let activePhaseContext = null;
-    if (assignedPhase === Phases.ELICITATION) {
-      activePhaseContext = elicitation;
-    } else if (assignedPhase === Phases.ELABORATION) {
-      activePhaseContext = elaboration;
-    } else if (assignedPhase === Phases.NEGOTIATION) {
-      activePhaseContext = negotiation;
+    const assignedPhase = phaseResult.phase;
+    const phaseConfig = phaseConfigMap[assignedPhase];
+    const activePhaseContext = phaseConfig?.context;
+
+    // ── Phase context validation using utility ─────────────────────────────
+    const phaseValidation = validatePhaseContext({
+      phase: assignedPhase,
+      phaseContext: activePhaseContext,
+      userId: updatedBy
+    });
+
+    if (!phaseValidation.success) {
+      return phaseValidation;
     }
 
-    if (!activePhaseContext) {
-      return { success: false, message: `No active ${assignedPhase} context provided`, errorCode: CONFLICT };
-    }
-
-    if (activePhaseContext.isFrozen) {
-      return { success: false, message: `Cannot update requirement in a frozen ${assignedPhase} phase`, errorCode: CONFLICT };
-    }
-
+    // ── Access control checks ──────────────────────────────────────────────
     // Client access check: Only createdBy can update their own requirement
     if (userType === UserTypes.CLIENT && currentRequirement.createdBy !== updatedBy) {
       logWithTime(`❌ [updateRequirementService] Access denied. Client ${updatedBy} cannot update requirement created by ${currentRequirement.createdBy}`);
       return { success: false, message: "You do not have permission to perform this action on this requirement", errorCode: FORBIDDEN };
-    } else {
-      // Admin access check: Must be contributor in MODERATION mode
-      if (currentRequirement.createdInMode === WorkflowModes.MODERATION && !activePhaseContext?.contributors.includes(updatedBy)) {
-        logWithTime(`❌ [updateRequirementService] Access denied. Admin ${updatedBy} is not a contributor on ${assignedPhase} ${activePhaseContext?._id}`);
-        return { success: false, message: "You do not have permission to perform this action on this requirement", errorCode: FORBIDDEN };
-      }
     }
 
     // Check status is DRAFT
@@ -173,7 +178,7 @@ const updateRequirementService = async ({
 
   
     // Handle parentHlfId change - if HLF ID changed, unlink old then link new
-    const { parentHlfId } = updateData;
+    const { parentHlfId, relationType, relationshipNotes } = updateData;
     const oldHlfId = currentRequirement.parentFeatureId ? String(currentRequirement.parentFeatureId) : null;
 
     if (parentHlfId !== undefined && oldHlfId !== parentHlfId) {
