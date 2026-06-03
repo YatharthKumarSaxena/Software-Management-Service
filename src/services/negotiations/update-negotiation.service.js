@@ -13,6 +13,8 @@ const { Phases } = require("@configs/enums.config");
 
 const updateNegotiationService = async ({
   projectId,
+  workflowMode,
+  requirementGovernanceMode,
   allowParallelMeetings,
   updatedBy,
   auditContext,
@@ -43,9 +45,11 @@ const updateNegotiationService = async ({
     }
 
     // ── 1. Check if any changes are being made ────────────────────────
+    const workflowModeChanged = workflowMode !== undefined && negotiation.workflowMode !== workflowMode;
+    const governanceModeChanged = requirementGovernanceMode !== undefined && negotiation.requirementGovernanceMode !== requirementGovernanceMode;
     const allowParallelChanged = allowParallelMeetings !== undefined && negotiation.allowParallelMeetings !== allowParallelMeetings;
 
-    if (!allowParallelChanged) {
+    if (!workflowModeChanged && !governanceModeChanged && !allowParallelChanged) {
       return {
         success: true,
         message: "No changes detected",
@@ -81,8 +85,16 @@ const updateNegotiationService = async ({
       }
     }
 
-    // ── 3. Update negotiation with allowParallelMeetings toggle ────────
-    negotiation.allowParallelMeetings = allowParallelMeetings;
+    // ── 3. Update negotiation with new values ────────────────────────
+    if (workflowModeChanged) {
+      negotiation.workflowMode = workflowMode;
+    }
+    if (governanceModeChanged) {
+      negotiation.requirementGovernanceMode = requirementGovernanceMode;
+    }
+    if (allowParallelChanged) {
+      negotiation.allowParallelMeetings = allowParallelMeetings;
+    }
     negotiation.updatedBy = updatedBy;
     negotiation.updatedAt = new Date();
 
@@ -90,12 +102,16 @@ const updateNegotiationService = async ({
 
     // ── 4. Log activity ──────────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
+    let changeDesc = [];
+    if (workflowModeChanged) changeDesc.push(`workflowMode: '${negotiation.workflowMode}' → '${workflowMode}'`);
+    if (governanceModeChanged) changeDesc.push(`requirementGovernanceMode: '${negotiation.requirementGovernanceMode}' → '${requirementGovernanceMode}'`);
+    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${!allowParallelMeetings} → ${allowParallelMeetings}`);
     logActivityTrackerEvent(
       user,
       device,
       requestId,
       ACTIVITY_TRACKER_EVENTS.UPDATE_NEGOTIATION,
-      `Negotiation updated - allowParallelMeetings toggled`,
+      `Negotiation updated: ${changeDesc.join(', ')}`,
       { adminActions: { targetId: projectId } }
     );
 
