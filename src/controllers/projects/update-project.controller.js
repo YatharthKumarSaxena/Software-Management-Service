@@ -50,7 +50,9 @@ const updateProjectController = async (req, res) => {
       removedLinkedProjectIds,
       projectComplexity,
       projectCriticality,
-      projectPriority
+      projectPriority,
+      enablePhaseLevelGovernance,
+      requirementGovernanceMode
     } = req.body;
 
     const hasUpdate =
@@ -66,14 +68,16 @@ const updateProjectController = async (req, res) => {
       (Array.isArray(removedLinkedProjectIds) && removedLinkedProjectIds.length) ||
       projectComplexity !== undefined ||
       projectCriticality !== undefined ||
-      projectPriority !== undefined;
+      projectPriority !== undefined ||
+      enablePhaseLevelGovernance !== undefined ||
+      requirementGovernanceMode !== undefined;
 
     if (!hasUpdate) {
       logWithTime(`❌ [updateProjectController] No updatable fields provided | ${getLogIdentifiers(req)}`);
       return throwBadRequestError(
         res,
         "No updatable fields provided",
-        "Provide at least one of: name, description, problemStatement, goal, expectedBudget, expectedTimelineInDays, addedOrgIds, removedOrgIds, addedLinkedProjectIds, removedLinkedProjectIds, projectComplexity, projectCriticality, projectPriority."
+        "Provide at least one of: name, description, problemStatement, goal, expectedBudget, expectedTimelineInDays, addedOrgIds, removedOrgIds, addedLinkedProjectIds, removedLinkedProjectIds, projectComplexity, projectCriticality, projectPriority, enablePhaseLevelGovernance, requirementGovernanceMode."
       );
     }
 
@@ -96,6 +100,8 @@ const updateProjectController = async (req, res) => {
       projectComplexity,
       projectCriticality,
       projectPriority,
+      enablePhaseLevelGovernance,
+      requirementGovernanceMode,
       auditContext: {
         user: req.admin,
         device: req.device,
