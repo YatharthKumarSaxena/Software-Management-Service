@@ -60,7 +60,9 @@ negotiationRouter.post(
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    stakeholderRoleAccessMiddlewares.createNegotiationStakeholderRoleAccessMiddleware
+    stakeholderRoleAccessMiddlewares.createNegotiationStakeholderRoleAccessMiddleware,
+    negotiationMiddlewares.createNegotiationPresenceMiddleware,
+    negotiationMiddlewares.createNegotiationValidationMiddleware
   ],
   negotiationControllers.createNegotiationController
 );
@@ -79,7 +81,9 @@ negotiationRouter.patch(
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    stakeholderRoleAccessMiddlewares.updateNegotiationStakeholderRoleAccessMiddleware
+    stakeholderRoleAccessMiddlewares.updateNegotiationStakeholderRoleAccessMiddleware,
+    negotiationMiddlewares.updateNegotiationPresenceMiddleware,
+    negotiationMiddlewares.updateNegotiationValidationMiddleware
   ],
   negotiationControllers.updateNegotiationController
 );
