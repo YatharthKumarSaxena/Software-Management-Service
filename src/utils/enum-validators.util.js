@@ -48,7 +48,8 @@ const {
   RelationTypes,
   ContributionTypes,
   RevokeRequirementTypes,
-  AllowedPhaseTypes
+  AllowedPhaseTypes,
+  RequirementGovernanceModes
 } = require("@configs/enums.config");
 
 const {
@@ -135,6 +136,7 @@ const RelationTypesHelper = createEnumHelper(RelationTypes, "RelationTypes");
 const RevokeRequirementTypesHelper = createEnumHelper(RevokeRequirementTypes, "RevokeRequirementTypes");
 const UnlinkReasonTypesHelper = createEnumHelper(UnlinkReasonTypes, "UnlinkReasonTypes");
 const AllowedPhaseTypesHelper = createEnumHelper(AllowedPhaseTypes, "AllowedPhaseTypes");
+const RequirementGovernanceModesHelper = createEnumHelper(RequirementGovernanceModes, "RequirementGovernanceModes");
 
 module.exports = {
   DeviceTypeHelper,
@@ -186,5 +188,6 @@ module.exports = {
   ContributionTypesHelper,
   RevokeRequirementTypesHelper,
   UnlinkReasonTypesHelper,
-  AllowedPhaseTypesHelper
+  AllowedPhaseTypesHelper,
+  RequirementGovernanceModesHelper
 };
