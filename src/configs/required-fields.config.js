@@ -80,12 +80,16 @@ const requiredFields = {
     deleteElicitationField:getRequiredFields(FieldDefinitions.DELETE_ELICITATION),
 
     // ── Negotiation ───────────────────────────────────────────────────────────────
+    createNegotiationField:getRequiredFields(FieldDefinitions.CREATE_NEGOTIATION),
+    updateNegotiationField:getRequiredFields(FieldDefinitions.UPDATE_NEGOTIATION),
     deleteNegotiationField:getRequiredFields(FieldDefinitions.DELETE_NEGOTIATION),
 
     // ── Specification ───────────────────────────────────────────────────────────────
     deleteSpecificationField:getRequiredFields(FieldDefinitions.DELETE_SPECIFICATION),
 
     // ── Elaboration ───────────────────────────────────────────────────────────────
+    createElaborationField:getRequiredFields(FieldDefinitions.CREATE_ELABORATION),
+    updateElaborationField:getRequiredFields(FieldDefinitions.UPDATE_ELABORATION),
     deleteElaborationField:getRequiredFields(FieldDefinitions.DELETE_ELABORATION),
 
     // ── Validation ───────────────────────────────────────────────────────────────
