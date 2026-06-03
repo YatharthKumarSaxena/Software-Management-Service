@@ -60,7 +60,9 @@ elaborationRouter.post(
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    stakeholderRoleAccessMiddlewares.createElaborationStakeholderRoleAccessMiddleware
+    stakeholderRoleAccessMiddlewares.createElaborationStakeholderRoleAccessMiddleware,
+    elaborationMiddlewares.createElaborationPresenceMiddleware,
+    elaborationMiddlewares.createElaborationValidationMiddleware
   ],
   elaborationControllers.createElaborationController
 );
@@ -79,7 +81,9 @@ elaborationRouter.patch(
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    stakeholderRoleAccessMiddlewares.updateElaborationStakeholderRoleAccessMiddleware
+    stakeholderRoleAccessMiddlewares.updateElaborationStakeholderRoleAccessMiddleware,
+    elaborationMiddlewares.updateElaborationPresenceMiddleware,
+    elaborationMiddlewares.updateElaborationValidationMiddleware
   ],
   elaborationControllers.updateElaborationController
 );
