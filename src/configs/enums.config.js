@@ -622,6 +622,12 @@ const AllowedPhaseTypes = Object.freeze({
   [Phases.NEGOTIATION]: Phases.NEGOTIATION
 });
 
+const RequirementGovernanceModes = Object.freeze({
+  PHASE: "PHASE",
+  CREATED_IN_MODE: "CREATED_IN_MODE",
+  STRICT: "STRICT"
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -700,5 +706,6 @@ module.exports = {
   MinBufferTime,
   MappingStatuses,
   ReviewNoteEntityTypes,
-  AllowedPhaseTypes
+  AllowedPhaseTypes,
+  RequirementGovernanceModes
 };
