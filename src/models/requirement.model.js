@@ -209,6 +209,45 @@ const RequirementSchema = new mongoose.Schema({
         }],
         default: []
     },
+    governance: {
+
+        isProtected: {
+            type: Boolean,
+            default: false
+        },
+
+        approverId: {
+            type: String,
+            match: customIdRegex,
+            default: null
+        },
+
+        reviewerIds: {
+            type: [{
+                type: String,
+                match: customIdRegex
+            }],
+            default: [],
+            validate: {
+                validator: function (v) {
+                    return new Set(v).size === v.length;
+                },
+                message: "Duplicate reviewers are not allowed"
+            }
+        },
+
+        assignedAt: {
+            type: Date,
+            default: null
+        },
+
+        assignedBy: {
+            type: String,
+            match: customIdRegex,
+            default: null
+        }
+
+    },
     sequence: { type: Number, required: true, min: 1 },
     id: { type: String, required: true, trim: true },
 }, {
@@ -233,12 +272,24 @@ RequirementSchema.index(
     { unique: true }
 );
 
+
+
 // ── Auto-add tag when created under elaboration ──────────────────────────────────────────────────────
 RequirementSchema.pre('save', function () {
     if (this.entityType === DB_COLLECTIONS.ELABORATIONS) {
         if (!this.tags.includes('created_under_elaboration')) {
             this.tags.push('created_under_elaboration');
         }
+    }
+    if (
+        this.governance?.approverId &&
+        this.governance?.reviewerIds?.includes(
+            this.governance.approverId
+        )
+    ) {
+        throw new Error(
+            "Approver cannot be a reviewer"
+        );
     }
 });
 
