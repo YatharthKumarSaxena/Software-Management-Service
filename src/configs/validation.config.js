@@ -27,6 +27,7 @@ const {
   WorkflowModesHelper,
   PhasesHelper,
   PhaseDeletionReasonHelper,
+  RequirementGovernanceModesHelper,
   ApproveProductRequestReasonTypeHelper,
   RejectProductRequestReasonTypeHelper,
   ApproveOrgProjectRequestReasonTypeHelper,
@@ -241,6 +242,9 @@ const validationRules = {
   // ── Workflow mode fields ────────────────────────────────
   workflowMode: {
     enum: WorkflowModesHelper
+  },
+  requirementGovernanceMode: {
+    enum: RequirementGovernanceModesHelper
   },
 
   // ── Phase fields ───────────────────────────────────────
