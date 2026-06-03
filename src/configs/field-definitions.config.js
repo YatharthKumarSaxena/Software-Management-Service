@@ -81,6 +81,18 @@ const FieldDefinitions = {
       required: false,
       validation: validationRules.priorityLevel,
       description: "Optional project priority level (enum)"
+    },
+    REQUIREMENTS_GOVERNANCE_MODE: {
+      field: "requirementGovernanceMode",
+      required: false,
+      validation: validationRules.requirementGovernanceMode,
+      description: "Optional requirements governance mode (enum)"
+    },
+    ENABLE_PHASE_GOVERNANCE: {
+      field: "enablePhaseLevelGovernance",
+      required: false,
+      validation: null,
+      description: "Optional flag to enable phase governance"
     }
   },
 
@@ -151,6 +163,18 @@ const FieldDefinitions = {
       required: false,
       validation: validationRules.priorityLevel,
       description: "Optional project priority level (enum)"
+    },
+    REQUIREMENTS_GOVERNANCE_MODE: {
+      field: "requirementGovernanceMode",
+      required: false,
+      validation: validationRules.requirementGovernanceMode,
+      description: "Optional requirements governance mode (enum)"
+    },
+    ENABLE_PHASE_GOVERNANCE: {
+      field: "enablePhaseLevelGovernance",
+      required: false,
+      validation: null,
+      description: "Optional flag to enable phase governance"
     }
   },
 
@@ -773,21 +797,133 @@ const FieldDefinitions = {
   // ── CREATE ELICITATION ───────────────────────────────────────────
   CREATE_ELICITATION: {
     MODE: {
-      field: "mode",
-      required: true,
+      field: "workflowMode",
+      required: false,
       validation: validationRules.workflowMode,
       description: "Elicitation mode: OPEN | MODERATION (enum)"
     },
+    REQUIREMENT_GOVERNANCE_MODE: {
+      field: "requirementGovernanceMode",
+      required: false,
+      validation: validationRules.requirementGovernanceMode,
+      description: "Requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional, defaults to PHASE)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    }
   },
 
   // ── UPDATE ELICITATION ───────────────────────────────────────────
   UPDATE_ELICITATION: {
     MODE: {
-      field: "mode",
-      required: true,
+      field: "workflowMode",
+      required: false,
       validation: validationRules.workflowMode,
       description: "Updated elicitation mode: OPEN | MODERATION (enum)"
     },
+    REQUIREMENT_GOVERNANCE_MODE: {
+      field: "requirementGovernanceMode",
+      required: false,
+      validation: validationRules.requirementGovernanceMode,
+      description: "Updated requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    }
+  },
+
+  // ── CREATE ELABORATION ───────────────────────────────────────────
+  CREATE_ELABORATION: {
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Elaboration mode: OPEN | MODERATION (enum)"
+    },
+    REQUIREMENT_GOVERNANCE_MODE: {
+      field: "requirementGovernanceMode",
+      required: false,
+      validation: validationRules.requirementGovernanceMode,
+      description: "Requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional, defaults to PHASE)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    }
+  },
+
+  // ── UPDATE ELABORATION ───────────────────────────────────────────
+  UPDATE_ELABORATION: {
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Updated elaboration mode: OPEN | MODERATION (enum)"
+    },
+    REQUIREMENT_GOVERNANCE_MODE: {
+      field: "requirementGovernanceMode",
+      required: false,
+      validation: validationRules.requirementGovernanceMode,
+      description: "Updated requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    }
+  },
+
+  // ── CREATE NEGOTIATION ───────────────────────────────────────────
+  CREATE_NEGOTIATION: {
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Negotiation mode: OPEN | MODERATION (enum)"
+    },
+    REQUIREMENT_GOVERNANCE_MODE: {
+      field: "requirementGovernanceMode",
+      required: false,
+      validation: validationRules.requirementGovernanceMode,
+      description: "Requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional, defaults to PHASE)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    }
+  },
+
+  // ── UPDATE NEGOTIATION ───────────────────────────────────────────
+  UPDATE_NEGOTIATION: {
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Updated negotiation mode: OPEN | MODERATION (enum)"
+    },
+    REQUIREMENT_GOVERNANCE_MODE: {
+      field: "requirementGovernanceMode",
+      required: false,
+      validation: validationRules.requirementGovernanceMode,
+      description: "Updated requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    }
   },
 
   // ── DELETE ELICITATION ───────────────────────────────────────────
