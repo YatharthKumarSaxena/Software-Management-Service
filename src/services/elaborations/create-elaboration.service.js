@@ -2,7 +2,7 @@
 
 const { ProjectModel } = require("@models/project.model");
 const { ElaborationModel } = require("@models/elaboration.model");
-const { Phases } = require("@configs/enums.config");
+const { Phases, WorkflowModes, RequirementGovernanceModes } = require("@configs/enums.config");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
@@ -11,15 +11,19 @@ const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.co
  * Creates a new elaboration document in the database.
  *
  * @param {Object} params
- * @param {string} params.projectId              - Project MongoDB ObjectId
- * @param {boolean} [params.allowParallelMeetings] - Allow parallel meetings (default: false)
- * @param {string} params.createdBy              - Admin USR ID
- * @param {Object} params.auditContext           - { user, device, requestId }
+ * @param {string} params.projectId                    - Project MongoDB ObjectId
+ * @param {string} [params.workflowMode]               - Workflow mode (OPEN or MODERATION, default: OPEN)
+ * @param {string} [params.requirementGovernanceMode]  - Governance mode (PHASE | CREATED_IN_MODE | STRICT, default: PHASE)
+ * @param {boolean} [params.allowParallelMeetings]     - Allow parallel meetings (default: false)
+ * @param {string} params.createdBy                    - Admin USR ID
+ * @param {Object} params.auditContext                 - { user, device, requestId }
  *
  * @returns {{ success: true, elaboration } | { success: false, message, errorCode }}
  */
 const createElaborationService = async ({
   projectId,
+  workflowMode,
+  requirementGovernanceMode,
   allowParallelMeetings,
   createdBy,
   auditContext
@@ -56,6 +60,8 @@ const createElaborationService = async ({
       createdBy,
       auditContext,
       additionalData: { 
+        workflowMode: workflowMode || WorkflowModes.OPEN,
+        requirementGovernanceMode: requirementGovernanceMode || RequirementGovernanceModes.PHASE,
         allowParallelMeetings: allowParallelMeetings || false
       }
     });
