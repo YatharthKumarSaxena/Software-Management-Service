@@ -41,7 +41,7 @@ const createProjectController = async (req, res) => {
       projectCriticality,
       projectPriority,
       enablePhaseLevelGovernance,
-      requirementGovernanceMode
+      workflowMode
     } = req.body;
 
     // ── Derive createdBy from authenticated admin ────────────────────
@@ -65,7 +65,7 @@ const createProjectController = async (req, res) => {
       projectCriticality,
       projectPriority,
       enablePhaseLevelGovernance,
-      requirementGovernanceMode,
+      workflowMode,
       auditContext: {
         user: req.admin,
         device: req.device,
