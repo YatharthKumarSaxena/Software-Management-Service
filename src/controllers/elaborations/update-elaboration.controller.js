@@ -16,12 +16,11 @@ const { logWithTime } = require("@/utils/time-stamps.util");
 
 const updateElaborationController = async (req, res) => {
   const { projectId } = req.params;
-  const { allowParallelMeetings, requirementGovernanceMode, workflowMode } = req.body;
+  const { allowParallelMeetings, workflowMode } = req.body;
 
   const result = await updateElaborationService({
     projectId,
     allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
-    requirementGovernanceMode: typeof requirementGovernanceMode === 'string' ? requirementGovernanceMode : null,
     workflowMode: typeof workflowMode === 'string' ? workflowMode : null,
     updatedBy: req.admin.adminId,
     auditContext: {
