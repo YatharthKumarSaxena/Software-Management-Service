@@ -36,7 +36,7 @@ const updateProjectService = async (existingProject, updates) => {
       "projectCriticality",
       "projectPriority",
       "enablePhaseLevelGovernance",
-      "requirementGovernanceMode"
+      "workflowMode"
     ];
 
     const updatePayload = {};

@@ -46,7 +46,7 @@ const createProjectService = async ({
   projectCriticality,
   projectPriority,
   enablePhaseLevelGovernance,
-  requirementGovernanceMode,
+  workflowMode,
   auditContext
 }) => {
   try {
@@ -133,7 +133,7 @@ const createProjectService = async ({
       ...(projectCriticality !== undefined && { projectCriticality }),
       ...(projectPriority !== undefined && { projectPriority }),
       ...(enablePhaseLevelGovernance !== undefined && { enablePhaseLevelGovernance }),
-      ...(requirementGovernanceMode !== undefined && { requirementGovernanceMode }),
+      ...(workflowMode !== undefined && { workflowMode }),
     });
 
     logActivityTrackerEvent(
