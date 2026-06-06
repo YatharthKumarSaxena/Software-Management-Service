@@ -1,6 +1,6 @@
 const { customIdRegex } = require("@/configs/regex.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
-const { PhaseDeletionReason, WorkflowModes, RequirementGovernanceModes } = require("@/configs/enums.config");
+const { PhaseDeletionReason, WorkflowModes } = require("@/configs/enums.config");
 const { descriptionLength } = require("@/configs/fields-length.config");
 const mongoose = require("mongoose");
 
@@ -111,12 +111,6 @@ const negotiationSchema = new mongoose.Schema({
   isFrozen: {
     type: Boolean,
     default: false
-  },
-
-  requirementGovernanceMode: {
-    type: String,
-    enum: Object.values(RequirementGovernanceModes),
-    default: RequirementGovernanceModes.PHASE
   }
 
 }, { timestamps: true });

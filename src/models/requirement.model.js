@@ -256,7 +256,7 @@ const RequirementSchema = new mongoose.Schema({
 });
 
 RequirementSchema.index(
-    { entityId: 1, title: 1 },
+    { projectId: 1, title: 1 },
     {
         unique: true,
         partialFilterExpression: { isDeleted: false }
