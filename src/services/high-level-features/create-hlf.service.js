@@ -42,7 +42,7 @@ const createHlfService = async ({
     const normalizedDescription = description?.trim() || null;
 
     const existing = await HighLevelFeatureModel.findOne({
-      inceptionId,
+      projectId,
       title: normalizedTitle,
       isDeleted: false
     }).collation({ locale: "en", strength: 2 });
