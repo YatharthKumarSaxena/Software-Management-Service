@@ -43,7 +43,7 @@ const createScopeService = async ({
     const normalizedDescription = description?.trim() || null;
 
     const existing = await ScopeModel.findOne({
-      inceptionId,
+      projectId,
       title: normalizedTitle,
       type: type,
       isDeleted: false
