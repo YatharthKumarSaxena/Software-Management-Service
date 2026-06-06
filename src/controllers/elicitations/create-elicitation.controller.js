@@ -17,7 +17,7 @@ const { CONFLICT } = require("@configs/http-status.config");
 const createElicitationController = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { allowParallelMeetings, requirementGovernanceMode, workflowMode } = req.body;
+    const { allowParallelMeetings, workflowMode } = req.body;
 
     logWithTime(
       `📍 [createElicitationController] Creating elicitation for project: ${projectId} | ${getLogIdentifiers(req)}`
@@ -27,7 +27,6 @@ const createElicitationController = async (req, res) => {
     const result = await elicitationServices.createElicitationService({
       projectId,
       allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
-      requirementGovernanceMode: typeof requirementGovernanceMode === 'string' ? requirementGovernanceMode : null,
       workflowMode: typeof workflowMode === 'string' ? workflowMode : null,
       createdBy: req.admin.adminId,
       auditContext: {

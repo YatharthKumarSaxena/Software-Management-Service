@@ -16,7 +16,7 @@ const { OK } = require("@configs/http-status.config");
  */
 const updateElicitationController = async (req, res) => {
   try {
-    const { allowParallelMeetings, requirementGovernanceMode, workflowMode } = req.body;
+    const { allowParallelMeetings, workflowMode } = req.body;
     const { elicitation } = req;
 
     logWithTime(
@@ -28,7 +28,6 @@ const updateElicitationController = async (req, res) => {
       elicitation,
       {
         allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
-        requirementGovernanceMode: typeof requirementGovernanceMode === 'string' ? requirementGovernanceMode : null,
         workflowMode: typeof workflowMode === 'string' ? workflowMode : null,
         updatedBy: req.admin.adminId,
         auditContext: {
