@@ -2,7 +2,7 @@
 
 const { ProjectModel } = require("@models/project.model");
 const { NegotiationModel } = require("@models/negotiation.model");
-const { Phases, WorkflowModes, RequirementGovernanceModes } = require("@configs/enums.config");
+const { Phases, WorkflowModes } = require("@configs/enums.config");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
@@ -12,8 +12,7 @@ const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.co
  *
  * @param {Object} params
  * @param {string} params.projectId                    - Project MongoDB ObjectId
- * @param {string} [params.workflowMode]               - Workflow mode (OPEN or MODERATION, default: OPEN)
- * @param {string} [params.requirementGovernanceMode]  - Governance mode (PHASE | CREATED_IN_MODE | STRICT, default: PHASE)
+ * @param {string} [params.workflowMode]               - Workflow mode (OPEN | MODERATION | STRICT | CREATED_IN_MODE, default: OPEN)
  * @param {boolean} [params.allowParallelMeetings]     - Allow parallel meetings (default: false)
  * @param {string} params.createdBy                    - Admin USR ID
  * @param {Object} params.auditContext                 - { user, device, requestId }
@@ -23,7 +22,6 @@ const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.co
 const createNegotiationService = async ({
   projectId,
   workflowMode,
-  requirementGovernanceMode,
   allowParallelMeetings,
   createdBy,
   auditContext
@@ -61,7 +59,6 @@ const createNegotiationService = async ({
       auditContext,
       additionalData: { 
         workflowMode: workflowMode || WorkflowModes.OPEN,
-        requirementGovernanceMode: requirementGovernanceMode || RequirementGovernanceModes.PHASE,
         allowParallelMeetings: allowParallelMeetings || false
       }
     });
