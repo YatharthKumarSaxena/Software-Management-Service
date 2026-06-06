@@ -2,12 +2,11 @@
 
 const mongoose = require("mongoose");
 const { RequirementModel } = require("@models/requirement.model");
-const { HighLevelFeatureModel } = require("@models/high-level-feature.model");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@/configs/tracker.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { INTERNAL_ERROR, BAD_REQUEST, NOT_FOUND, CONFLICT } = require("@configs/http-status.config");
+const { INTERNAL_ERROR, BAD_REQUEST, CONFLICT } = require("@configs/http-status.config");
 const { RequirementStatuses, RequirementTypes, RequirementSources, MinBufferTime, ContributionTypes, PriorityLevels, RelationTypes, Phases, WorkflowModes } = require("@configs/enums.config");
 const { linkRequirementToHlfService } = require("../hlf-requirement/link-requirement-to-hlf.service");
 const { manualVersionControlService } = require("../common/version.service");
@@ -37,8 +36,6 @@ const createRequirementService = async ({
     const projectId = project._id.toString();
     const elicitationId = elicitation ? elicitation._id.toString() : null;
     const elaborationId = elaboration ? elaboration._id.toString() : null;
-
-    const activePhases = project.currentPhase;
 
     if (proposedDate) {
       const now = Date.now();
@@ -111,6 +108,24 @@ const createRequirementService = async ({
 
     const createdInMode = phaseContext.workflowMode;
 
+    const normalizedTitle = title.trim().replace(/\s+/g, " ");
+
+    const existingRequirement = await RequirementModel.findOne({
+      projectId,
+      title: normalizedTitle,
+      isDeleted: false
+    }).collation({ locale: "en", strength: 2 });
+
+    const normalizedDescription = description?.trim() || null;
+
+    if (existingRequirement) {
+      return {
+        success: false,
+        message: "Requirement with same title already exists",
+        errorCode: CONFLICT
+      };
+    }
+
     // ── Call counter service to get sequence and id ──────────────────────────
     const counterResult = await counterServices.requirementCounterService(projectId);
     if (!counterResult.success) {
@@ -123,8 +138,8 @@ const createRequirementService = async ({
       projectId: new mongoose.Types.ObjectId(projectId),
       entityType: entityType,
       entityId: new mongoose.Types.ObjectId(entityId),
-      title: title.trim(),
-      description: description ? description.trim() : null,
+      title: normalizedTitle,
+      description: normalizedDescription,
       priority,
       type,
       source,
