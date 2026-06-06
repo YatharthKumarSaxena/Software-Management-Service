@@ -82,12 +82,6 @@ const FieldDefinitions = {
       validation: validationRules.priorityLevel,
       description: "Optional project priority level (enum)"
     },
-    REQUIREMENTS_GOVERNANCE_MODE: {
-      field: "requirementGovernanceMode",
-      required: false,
-      validation: validationRules.requirementGovernanceMode,
-      description: "Optional requirements governance mode (enum)"
-    },
     ENABLE_PHASE_GOVERNANCE: {
       field: "enablePhaseLevelGovernance",
       required: false,
@@ -163,12 +157,6 @@ const FieldDefinitions = {
       required: false,
       validation: validationRules.priorityLevel,
       description: "Optional project priority level (enum)"
-    },
-    REQUIREMENTS_GOVERNANCE_MODE: {
-      field: "requirementGovernanceMode",
-      required: false,
-      validation: validationRules.requirementGovernanceMode,
-      description: "Optional requirements governance mode (enum)"
     },
     ENABLE_PHASE_GOVERNANCE: {
       field: "enablePhaseLevelGovernance",
@@ -802,12 +790,6 @@ const FieldDefinitions = {
       validation: validationRules.workflowMode,
       description: "Elicitation mode: OPEN | MODERATION (enum)"
     },
-    REQUIREMENT_GOVERNANCE_MODE: {
-      field: "requirementGovernanceMode",
-      required: false,
-      validation: validationRules.requirementGovernanceMode,
-      description: "Requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional, defaults to PHASE)"
-    },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",
       required: false,
@@ -823,12 +805,6 @@ const FieldDefinitions = {
       required: false,
       validation: validationRules.workflowMode,
       description: "Updated elicitation mode: OPEN | MODERATION (enum)"
-    },
-    REQUIREMENT_GOVERNANCE_MODE: {
-      field: "requirementGovernanceMode",
-      required: false,
-      validation: validationRules.requirementGovernanceMode,
-      description: "Updated requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional)"
     },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",
@@ -846,12 +822,6 @@ const FieldDefinitions = {
       validation: validationRules.workflowMode,
       description: "Elaboration mode: OPEN | MODERATION (enum)"
     },
-    REQUIREMENT_GOVERNANCE_MODE: {
-      field: "requirementGovernanceMode",
-      required: false,
-      validation: validationRules.requirementGovernanceMode,
-      description: "Requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional, defaults to PHASE)"
-    },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",
       required: false,
@@ -867,12 +837,6 @@ const FieldDefinitions = {
       required: false,
       validation: validationRules.workflowMode,
       description: "Updated elaboration mode: OPEN | MODERATION (enum)"
-    },
-    REQUIREMENT_GOVERNANCE_MODE: {
-      field: "requirementGovernanceMode",
-      required: false,
-      validation: validationRules.requirementGovernanceMode,
-      description: "Updated requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional)"
     },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",
@@ -890,12 +854,6 @@ const FieldDefinitions = {
       validation: validationRules.workflowMode,
       description: "Negotiation mode: OPEN | MODERATION (enum)"
     },
-    REQUIREMENT_GOVERNANCE_MODE: {
-      field: "requirementGovernanceMode",
-      required: false,
-      validation: validationRules.requirementGovernanceMode,
-      description: "Requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional, defaults to PHASE)"
-    },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",
       required: false,
@@ -911,12 +869,6 @@ const FieldDefinitions = {
       required: false,
       validation: validationRules.workflowMode,
       description: "Updated negotiation mode: OPEN | MODERATION (enum)"
-    },
-    REQUIREMENT_GOVERNANCE_MODE: {
-      field: "requirementGovernanceMode",
-      required: false,
-      validation: validationRules.requirementGovernanceMode,
-      description: "Updated requirement governance mode: PHASE | CREATED_IN_MODE | STRICT (optional)"
     },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",

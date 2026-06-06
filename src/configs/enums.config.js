@@ -426,7 +426,9 @@ const ParticipantTypes = Object.freeze({
 
 const WorkflowModes = Object.freeze({
   OPEN: "OPEN",
-  MODERATION: "MODERATION"
+  MODERATION: "MODERATION",
+  CREATED_IN_MODE: "CREATED_IN_MODE",
+  STRICT: "STRICT"
 });
 
 const MeetingPlatformTypes = Object.freeze({
@@ -622,12 +624,6 @@ const AllowedPhaseTypes = Object.freeze({
   [Phases.NEGOTIATION]: Phases.NEGOTIATION
 });
 
-const RequirementGovernanceModes = Object.freeze({
-  PHASE: "PHASE",
-  CREATED_IN_MODE: "CREATED_IN_MODE",
-  STRICT: "STRICT"
-});
-
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -706,6 +702,5 @@ module.exports = {
   MinBufferTime,
   MappingStatuses,
   ReviewNoteEntityTypes,
-  AllowedPhaseTypes,
-  RequirementGovernanceModes
+  AllowedPhaseTypes
 };
