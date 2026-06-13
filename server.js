@@ -1,3 +1,5 @@
+require("module-alias/register");
+
 const dotenv = require("dotenv");
 const dotenvExpand = require("dotenv-expand");
 
@@ -5,7 +7,9 @@ const dotenvExpand = require("dotenv-expand");
 const myEnv = dotenv.config();
 dotenvExpand.expand(myEnv);
 
-require("module-alias/register");
+// Boot Configuration
+require("@bootstrap/env.defaults").applyEnvDefaults();
+require("@bootstrap/env.validator").validateEnvironment();
 
 const mongoose = require("mongoose");
 
@@ -18,11 +22,12 @@ const { errorMessage } = require("@/responses/common/error-handler.response");
 (async () => {
     try {
 
-        // 🔑 DATABASE CONNECTION (CORRECT WAY)
+
+        // MongoDB Connection
         await mongoose.connect(DB_URL);
         logWithTime("✅ Connection established with MongoDB Successfully");
 
-        // 🔄 Microservice Init
+        // Microservice Initialization
         try {
             const {
                 initializeMicroservice,
@@ -31,14 +36,16 @@ const { errorMessage } = require("@/responses/common/error-handler.response");
 
             await initializeMicroservice();
             setupTokenRotationScheduler();
+
         } catch (err) {
-            logWithTime("⚠️ Microservice init failed");
+            logWithTime("⚠️ Microservice initialization failed");
             errorMessage(err);
         }
-        
-        // 🚀 Start Server
+
+        // Start Server
         app.listen(PORT_NUMBER, () => {
             logWithTime(`🚀 Server running on port ${PORT_NUMBER}`);
+
             require("@cron-jobs");
             logWithTime("✅ Cron Jobs Initialized");
         });
@@ -48,4 +55,6 @@ const { errorMessage } = require("@/responses/common/error-handler.response");
         errorMessage(err);
         process.exit(1);
     }
+
+
 })();

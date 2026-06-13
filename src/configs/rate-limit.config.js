@@ -576,13 +576,6 @@ module.exports = {
       reason: "Delete elicitation endpoint abuse",
       message: "Too many requests to delete elicitation endpoint. Please try again later."
     },
-    freezeElicitation: {
-      maxRequests: 10,
-      windowMs: 60 * 1000,
-      prefix: "freeze_elicitation",
-      reason: "Freeze elicitation endpoint abuse",
-      message: "Too many requests to freeze elicitation endpoint. Please try again later."
-    },
     getElicitation: {
       maxRequests: 30,
       windowMs: 60 * 1000,
@@ -631,13 +624,6 @@ module.exports = {
       prefix: "delete_inception",
       reason: "Delete inception endpoint abuse",
       message: "Too many requests to delete inception endpoint. Please try again later."
-    },
-    freezeInception: {
-      maxRequests: 10,
-      windowMs: 60 * 1000,
-      prefix: "freeze_inception",
-      reason: "Freeze inception endpoint abuse",
-      message: "Too many requests to freeze inception endpoint. Please try again later."
     },
     getLatestInception: {
       maxRequests: 30,
@@ -744,13 +730,6 @@ module.exports = {
       reason: "Delete negotiation endpoint abuse",
       message: "Too many requests to delete negotiation endpoint. Please try again later."
     },
-    freezeNegotiation: {
-      maxRequests: 10,
-      windowMs: 60 * 1000,
-      prefix: "freeze_negotiation",
-      reason: "Freeze negotiation endpoint abuse",
-      message: "Too many requests to freeze negotiation endpoint. Please try again later."
-    },
     getNegotiation: {
       maxRequests: 30,
       windowMs: 60 * 1000,
@@ -792,13 +771,6 @@ module.exports = {
       prefix: "delete_specification",
       reason: "Delete specification endpoint abuse",
       message: "Too many requests to delete specification endpoint. Please try again later."
-    },
-    freezeSpecification: {
-      maxRequests: 10,
-      windowMs: 60 * 1000,
-      prefix: "freeze_specification",
-      reason: "Freeze specification endpoint abuse",
-      message: "Too many requests to freeze specification endpoint. Please try again later."
     },
     getSpecification: {
       maxRequests: 30,
@@ -842,13 +814,6 @@ module.exports = {
       reason: "Delete elaboration endpoint abuse",
       message: "Too many requests to delete elaboration endpoint. Please try again later."
     },
-    freezeElaboration: {
-      maxRequests: 10,
-      windowMs: 60 * 1000,
-      prefix: "freeze_elaboration",
-      reason: "Freeze elaboration endpoint abuse",
-      message: "Too many requests to freeze elaboration endpoint. Please try again later."
-    },
     getElaboration: {
       maxRequests: 30,
       windowMs: 60 * 1000,
@@ -890,13 +855,6 @@ module.exports = {
       prefix: "delete_validation",
       reason: "Delete validation endpoint abuse",
       message: "Too many requests to delete validation endpoint. Please try again later."
-    },
-    freezeValidation: {
-      maxRequests: 10,
-      windowMs: 60 * 1000,
-      prefix: "freeze_validation",
-      reason: "Freeze validation endpoint abuse",
-      message: "Too many requests to freeze validation endpoint. Please try again later."
     },
     getValidation: {
       maxRequests: 30,

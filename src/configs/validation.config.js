@@ -14,6 +14,7 @@ const {
   ProjectAbortReasonHelper,
   ProjectResumeReasonHelper,
   ProjectDeletionReasonHelper,
+  PhaseStatusHelper,
   InceptionDeletionReasonHelper,
   AdminRoleTypesHelper,
   ClientRoleTypesHelper,
@@ -106,6 +107,9 @@ const validationRules = {
   },
   deletionReasonType: {
     enum: ProjectDeletionReasonHelper,
+  },
+  phaseStatus: {
+    enum: PhaseStatusHelper,
   },
 
   inceptionDeletionReasonType: {
