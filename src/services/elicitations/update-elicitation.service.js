@@ -6,7 +6,7 @@ const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.se
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { Phases } = require("@configs/enums.config");
+const { Phases, PhaseStatus } = require("@configs/enums.config");
 
 /**
  * Updates an elicitation's mode, and/or allowParallelMeetings.
@@ -29,7 +29,13 @@ const { Phases } = require("@configs/enums.config");
  */
 const updateElicitationService = async (
   elicitation,
-  { workflowMode, allowParallelMeetings, updatedBy, auditContext }
+  { 
+    allowParallelMeetings,
+    workflowMode,
+    phaseStatus,
+    updatedBy, 
+    auditContext 
+  }
 ) => {
   try {
     const { MeetingModel } = require("@models/meeting.model");
@@ -38,8 +44,9 @@ const updateElicitationService = async (
     // ── 1. Check if any changes are being made ────────────────────────
     const workflowModeChanged = workflowMode !== undefined && elicitation.workflowMode !== workflowMode;
     const allowParallelChanged = allowParallelMeetings !== undefined && elicitation.allowParallelMeetings !== allowParallelMeetings;
+    const phaseStatusChanged = phaseStatus !== undefined && elicitation.phaseStatus !== phaseStatus;
 
-    if (!workflowModeChanged && !allowParallelChanged) {
+    if (!workflowModeChanged && !allowParallelChanged && !phaseStatusChanged) {
       logWithTime(
         `⚠️ [updateElicitationService] No changes detected.`
       );
@@ -54,7 +61,7 @@ const updateElicitationService = async (
       logWithTime(
         `🔍 [updateElicitationService] Validating meeting statuses before disabling parallel meetings`
       );
-      
+
       // Check if there are any meetings
       if (elicitation.meetingIds && elicitation.meetingIds.length > 0) {
         // Fetch all meetings to check their status
@@ -64,7 +71,7 @@ const updateElicitationService = async (
         ).lean();
 
         // Check if any meeting is not COMPLETED or CANCELLED
-        const ongoingMeetings = meetings.filter(m => 
+        const ongoingMeetings = meetings.filter(m =>
           m.status !== MeetingStatuses.COMPLETED && m.status !== MeetingStatuses.CANCELLED
         );
 
@@ -82,13 +89,17 @@ const updateElicitationService = async (
 
     // ── 3. Build update payload ────────────────────────────────────────
     const updatePayload = { updatedBy, updatedAt: new Date() };
-    
+
     if (workflowModeChanged) {
       updatePayload.workflowMode = workflowMode;
     }
 
     if (allowParallelChanged) {
       updatePayload.allowParallelMeetings = allowParallelMeetings;
+    }
+
+    if (phaseStatusChanged) {
+      updatePayload.phaseStatus = phaseStatus;
     }
 
     // ── 4. Update via atomic findByIdAndUpdate ────────────────────
@@ -106,7 +117,8 @@ const updateElicitationService = async (
       let changeDesc = [];
       if (workflowModeChanged) changeDesc.push(`workflowMode: '${elicitation.workflowMode}' → '${workflowMode}'`);
       if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${elicitation.allowParallelMeetings} → ${allowParallelMeetings}`);
-
+      if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${elicitation.phaseStatus}' → '${phaseStatus}'`);
+      
       logActivityTrackerEvent(
         user,
         device,

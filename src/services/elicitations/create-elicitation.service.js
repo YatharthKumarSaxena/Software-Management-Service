@@ -2,7 +2,7 @@
 
 const { ProjectModel } = require("@models/project.model");
 const { ElicitationModel } = require("@models/elicitation.model");
-const { Phases, WorkflowModes } = require("@configs/enums.config");
+const { Phases, WorkflowModes, PhaseStatus } = require("@configs/enums.config");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
@@ -21,8 +21,9 @@ const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.co
  */
 const createElicitationService = async ({
   projectId,
-  workflowMode,
   allowParallelMeetings,
+  workflowMode,
+  phaseStatus,
   createdBy,
   auditContext
 }) => {
@@ -38,7 +39,7 @@ const createElicitationService = async ({
     const existingElicitation = await ElicitationModel.findOne({
       projectId,
       isDeleted: false,
-      isFrozen: false
+      phaseStatus: { $in: [PhaseStatus.OPEN, PhaseStatus.STABILIZING] }
     });
 
     if (existingElicitation) {
