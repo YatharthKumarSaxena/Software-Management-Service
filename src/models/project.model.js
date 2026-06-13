@@ -421,6 +421,11 @@ const projectSchema = new mongoose.Schema(
     enablePhaseLevelGovernance: {
       type: Boolean,
       default: false
+    },
+
+    allowStabilizingRollback: {
+      type: Boolean,
+      default: null
     }
   },
   {

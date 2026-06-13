@@ -45,7 +45,7 @@ productVisionRouter.post(
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    inceptionMiddlewares.fetchLatestOpenInceptionMiddleware,
     productVisionMiddlewares.createProductVisionPresenceMiddleware,
     productVisionMiddlewares.createProductVisionValidationMiddleware,
   ],
@@ -66,7 +66,7 @@ productVisionRouter.patch(
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
     productVisionMiddlewares.updateProductVisionPresenceMiddleware,
     productVisionMiddlewares.updateProductVisionValidationMiddleware,
   ],
@@ -87,7 +87,7 @@ productVisionRouter.delete(
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
     productVisionMiddlewares.deleteProductVisionPresenceMiddleware,
     productVisionMiddlewares.deleteProductVisionValidationMiddleware
   ],
@@ -105,7 +105,7 @@ productVisionRouter.get(
     getProductVisionRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
-    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
+    inceptionMiddlewares.fetchLatestAnyStatusInceptionMiddleware
   ],
   productVisionControllers.getProductVisionController
 );
