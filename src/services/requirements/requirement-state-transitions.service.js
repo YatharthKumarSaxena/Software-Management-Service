@@ -8,6 +8,7 @@ const { CONFLICT, INTERNAL_ERROR, BAD_REQUEST, FORBIDDEN } = require("@configs/h
 const { RequirementStatuses, WorkflowModes, Phases } = require("@configs/enums.config");
 const { prepareAuditData } = require("@/utils/audit-data.util");
 const { manualVersionControlService } = require("../common/version.service");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 /**
  * Issue a requirement (flag for discussion).
@@ -431,7 +432,7 @@ const revertToDraftService = async ({ requirementId, project, elicitation, elabo
       return { success: false, message: `Phase context not found for ${assignedPhase}`, errorCode: CONFLICT };
     }
 
-    if (phaseContext.isFrozen) {
+    if (isPhaseFrozen(phaseContext)) {
       return { success: false, message: "Cannot revert requirement in a frozen phase", errorCode: CONFLICT };
     }
 

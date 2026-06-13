@@ -7,6 +7,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { INTERNAL_ERROR, BAD_REQUEST, CONFLICT, NOT_FOUND, FORBIDDEN } = require("@configs/http-status.config");
 const { ReviewNoteDeletionReasons } = require("@/configs/reasons.config");
 const { manualVersionControlService } = require("../common/version.service");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 /**
  * Soft-deletes a review note
@@ -54,7 +55,7 @@ const deleteReviewNoteService = async ({
       };
     }
 
-    if (phaseContext.isFrozen) {
+    if (isPhaseFrozen(phaseContext)) {
       logWithTime(`❌ [deleteReviewNoteService] Cannot delete review note. ${phase} phase is frozen.`);
       return {
         success: false,

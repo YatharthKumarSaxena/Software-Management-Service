@@ -7,6 +7,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { INTERNAL_ERROR, CONFLICT } = require("@configs/http-status.config");
 const { ReviewNoteEntityTypes } = require("@/configs/enums.config");
 const { manualVersionControlService } = require("../common/version.service");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 /**
  * Creates a review note for an entity (requirement, scope, inception, high-level-feature)
@@ -74,7 +75,7 @@ const createReviewNoteService = async ({
       };
     }
 
-    if (phaseContext.isFrozen) {
+    if (isPhaseFrozen(phaseContext)) {
       logWithTime(`❌ [createReviewNoteService] Cannot add review note. ${phaseName} phase is frozen.`);
       return {
         success: false,

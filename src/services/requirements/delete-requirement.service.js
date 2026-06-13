@@ -8,6 +8,7 @@ const { INTERNAL_ERROR, FORBIDDEN, CONFLICT } = require("@configs/http-status.co
 const { UserTypes, WorkflowModes, RequirementStatuses, Phases } = require("@configs/enums.config");
 const { ActivityTrackerModel } = require("@/models");
 const { manualVersionControlService } = require("../common/version.service");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 /**
  * Soft-deletes a requirement (only allowed in Elicitation and Elaboration phases).
@@ -92,7 +93,7 @@ const deleteRequirementService = async ({
       return { success: false, message: `No active ${assignedPhase} context provided`, errorCode: CONFLICT };
     }
 
-    if (activePhaseContext.isFrozen) {
+    if (isPhaseFrozen(activePhaseContext)) {
       return { success: false, message: `Cannot delete requirement in a frozen ${assignedPhase} phase`, errorCode: CONFLICT };
     }
 

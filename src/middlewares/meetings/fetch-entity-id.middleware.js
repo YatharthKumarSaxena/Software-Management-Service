@@ -1,9 +1,7 @@
 const { Phases } = require("@configs/enums.config");
 const { throwValidationError } = require("@/responses/common/error-handler.response");
 
-const {
-    createCheckLatestPhaseNotFrozenMiddleware
-} = require("../factory/check-not-frozen.middleware-factory");
+const { createCheckLatestPhaseNotFrozenMiddleware, createCheckLatestPhaseAnyStatusMiddleware } = require("../factory/check-latest-phase.middleware-factory");
 
 const PHASE_MAPPING = {
     inceptions: Phases.INCEPTIONS,
@@ -30,10 +28,18 @@ const createFetchEntityMiddleware = (checkNotFrozen = true) => {
             }]);
         }
 
-        const middleware = createCheckLatestPhaseNotFrozenMiddleware(
-            [phaseEnum],
-            checkNotFrozen
-        );
+        let middleware;
+
+        if (checkNotFrozen) {
+            middleware = createCheckLatestPhaseNotFrozenMiddleware(
+                [phaseEnum]
+            );
+        }
+        else {
+            middleware = createCheckLatestPhaseAnyStatusMiddleware(
+                [phaseEnum]
+            );
+        }
 
         return middleware(req, res, next);
     };

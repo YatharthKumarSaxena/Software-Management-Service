@@ -8,6 +8,7 @@ const { CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
 const { RequirementStatuses, Phases, WorkflowModes } = require("@configs/enums.config");
 const { prepareAuditData } = require("@/utils/audit-data.util");
 const { manualVersionControlService } = require("../common/version.service");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 /**
  * Update requirement status.
@@ -53,7 +54,7 @@ const startReviewRequirementService = async ({ requirementId, project, phase = n
       return { success: false, message: `Phase context not found for ${assignedPhase}`, errorCode: CONFLICT };
     }
 
-    if (phaseContext.isFrozen) {
+    if (isPhaseFrozen(phaseContext)) {
       return { success: false, message: "Cannot start review for requirement in a frozen phase", errorCode: CONFLICT };
     }
 

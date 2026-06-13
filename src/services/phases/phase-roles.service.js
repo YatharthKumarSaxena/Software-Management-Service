@@ -10,6 +10,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { NOT_FOUND, CONFLICT, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
 const { prepareAuditData } = require("@/utils/audit-data.util");
 const { AllowedPhaseTypes } = require("@/configs/enums.config");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 // Map phase types to models
 const phaseModels = {
@@ -33,7 +34,7 @@ const addContributorService = async ({ phaseType, phaseId, adminId, projectId, a
       return { success: false, message: `${phaseType} not found`, errorCode: NOT_FOUND };
     }
 
-    if (phase.isFrozen) {
+    if (isPhaseFrozen(phase)) {
       return { success: false, message: `${phaseType} is frozen`, errorCode: BAD_REQUEST };
     }
 
@@ -92,7 +93,7 @@ const removeContributorService = async ({ phaseType, phaseId, adminId, projectId
       return { success: false, message: `${phaseType} not found`, errorCode: NOT_FOUND };
     }
 
-    if (phase.isFrozen) {
+    if (isPhaseFrozen(phase)) {
       return { success: false, message: `${phaseType} is frozen`, errorCode: BAD_REQUEST };
     }
 
@@ -150,7 +151,7 @@ const addReviewerService = async ({ phaseType, phaseId, adminId, projectId, audi
       return { success: false, message: `${phaseType} not found`, errorCode: NOT_FOUND };
     }
 
-    if (phase.isFrozen) {
+    if (isPhaseFrozen(phase)) {
       return { success: false, message: `${phaseType} is frozen`, errorCode: BAD_REQUEST };
     }
 
@@ -212,7 +213,7 @@ const removeReviewerService = async ({ phaseType, phaseId, adminId, projectId, a
       return { success: false, message: `${phaseType} not found`, errorCode: NOT_FOUND };
     }
 
-    if (phase.isFrozen) {
+    if (isPhaseFrozen(phase)) {
       return { success: false, message: `${phaseType} is frozen`, errorCode: BAD_REQUEST };
     }
 
@@ -269,7 +270,7 @@ const addApproverService = async ({ phaseType, phaseId, adminId, projectId, audi
       return { success: false, message: `${phaseType} not found`, errorCode: NOT_FOUND };
     }
 
-    if (phase.isFrozen) {
+    if (isPhaseFrozen(phase)) {
       return { success: false, message: `${phaseType} is frozen`, errorCode: BAD_REQUEST };
     }
 
@@ -327,7 +328,7 @@ const removeApproverService = async ({ phaseType, phaseId, adminId, projectId, a
       return { success: false, message: `${phaseType} not found`, errorCode: NOT_FOUND };
     }
 
-    if (phase.isFrozen) {
+    if (isPhaseFrozen(phase)) {
       return { success: false, message: `${phaseType} is frozen`, errorCode: BAD_REQUEST };
     }
 

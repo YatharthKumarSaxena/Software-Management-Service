@@ -8,6 +8,7 @@ const { CONFLICT, INTERNAL_ERROR, BAD_REQUEST } = require("@configs/http-status.
 const { prepareAuditData } = require("@/utils/audit-data.util");
 const { manualVersionControlService } = require("../common/version.service");
 const { RequirementStatuses, Phases } = require("@/configs/enums.config");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 /**
  * Unassign a requirement from a specific user.
@@ -55,7 +56,7 @@ const unassignRequirementService = async ({ requirementId, userId, project, elic
     if (!assignedPhaseContext) {
       return { success: false, message: "Phase context not found for the specified phase", errorCode: CONFLICT };
     }
-    if (assignedPhaseContext.isFrozen) {
+    if (isPhaseFrozen(assignedPhaseContext)) {
       return { success: false, message: "Cannot unassign requirement in a frozen phase", errorCode: CONFLICT };
     }
 

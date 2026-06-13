@@ -10,6 +10,8 @@ const { ValidationModel } = require("@models/validation.model");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { buildActivePhaseQuery } = require("@utils/phase-status.util");
+const { prepareAuditData } = require("@utils/audit-data.util");
 
 const PHASE_MODEL_MAP = {
   [Phases.INCEPTION]: InceptionModel,
@@ -24,7 +26,7 @@ const determineNextVersion = async (project, PhaseModel) => {
   const projectId = project._id;
 
   const existingPhaseDoc = await PhaseModel
-    .findOne({ projectId, isDeleted: false, isFrozen: false })
+    .findOne(buildActivePhaseQuery(projectId))
     .sort({
       "version.major": -1,
       "version.minor": -1
@@ -68,21 +70,20 @@ const applyVersionUpdate = async ({
     };
   }
 
-  if (existingDoc) {
-    result = await PhaseModel.findByIdAndUpdate(
-      existingDoc._id,
-      {
-        $set: {
-          version,
-          updatedBy: performedBy
-        }
-      },
-      { returnDocument: 'after', runValidators: true }
-    );
-  }
+  result = await PhaseModel.findByIdAndUpdate(
+    existingDoc._id,
+    {
+      $set: {
+        version,
+        updatedBy: performedBy
+      }
+    },
+    { returnDocument: 'after', runValidators: true }
+  );
 
   // ✅ Tracker AFTER DB operation (for both create & update)
   const { user, device, requestId } = auditContext || {};
+  const { oldData, newData } = prepareAuditData(existingDoc, result);
 
   logActivityTrackerEvent(
     user,
@@ -91,11 +92,11 @@ const applyVersionUpdate = async ({
     ACTIVITY_TRACKER_EVENTS.PHASE_VERSION_CHANGE,
     action,
     {
-      newData: {
-        phase: currentPhase,
-        version: `v${version.major}.${version.minor}`
+      oldData,
+      newData,
+      adminActions: {
+        targetId: projectId?.toString(),
       },
-      adminActions: { targetId: projectId?.toString() },
     }
   );
 
@@ -132,7 +133,7 @@ const versionControlService = async (project, action, performedBy, auditContext,
     return { success: false, message: "No active phase document found. Version update skipped." };
   }
 
-  await applyVersionUpdate({
+  const updatedDoc = await applyVersionUpdate({
     PhaseModel,
     projectId: project._id,
     version: nextVersion,
@@ -142,6 +143,13 @@ const versionControlService = async (project, action, performedBy, auditContext,
     action,
     auditContext
   });
+
+  if (!updatedDoc) {
+    return {
+      success: false,
+      message: "Version update failed"
+    };
+  }
 
   logWithTime(`✅ Version updated → v${nextVersion.major}.${nextVersion.minor}`);
 
@@ -171,7 +179,18 @@ const manualVersionControlService = async ({
   const { version: nextVersion, existingPhaseDoc } =
     await determineNextVersion(project, PhaseModel);
 
-  await applyVersionUpdate({
+  if (!existingPhaseDoc) {
+    logWithTime(
+      `⚠️ [manualVersionControlService] No active document found for phase "${currentPhase}" and project ${projectId}.`
+    );
+
+    return {
+      success: false,
+      message: "No active phase document found."
+    };
+  }
+
+  const updatedDoc = await applyVersionUpdate({
     PhaseModel,
     projectId,
     version: nextVersion,
@@ -181,6 +200,13 @@ const manualVersionControlService = async ({
     action,
     auditContext
   });
+
+  if (!updatedDoc) {
+    return {
+      success: false,
+      message: "Version update failed"
+    };
+  }
 
   logWithTime(`✅ Manual Version updated → v${nextVersion.major}.${nextVersion.minor}`);
 

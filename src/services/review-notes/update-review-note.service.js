@@ -7,6 +7,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { NOT_FOUND, INTERNAL_ERROR, FORBIDDEN, CONFLICT, BAD_REQUEST } = require("@configs/http-status.config");
 const { descriptionLength } = require("@/configs/fields-length.config");
 const { manualVersionControlService } = require("../common/version.service");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 /**
  * Updates a review note
@@ -55,7 +56,7 @@ const updateReviewNoteService = async ({
       };
     }
 
-    if (phaseContext.isFrozen) {
+    if (isPhaseFrozen(phaseContext)) {
       logWithTime(`❌ [updateReviewNoteService] Cannot update review note. ${phase} phase is frozen.`);
       return {
         success: false,
