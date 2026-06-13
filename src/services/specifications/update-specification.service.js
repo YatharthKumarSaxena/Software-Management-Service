@@ -14,6 +14,8 @@ const { Phases } = require("@configs/enums.config");
 const updateSpecificationService = async ({
   projectId,
   allowParallelMeetings,
+  workflowMode,
+  phaseStatus,
   updatedBy,
   auditContext,
 }) => {
@@ -44,8 +46,10 @@ const updateSpecificationService = async ({
 
     // ── 1. Check if any changes are being made ────────────────────────
     const allowParallelChanged = allowParallelMeetings !== undefined && specification.allowParallelMeetings !== allowParallelMeetings;
+    const workflowModeChanged = workflowMode !== undefined && specification.workflowMode !== workflowMode;
+    const phaseStatusChanged = phaseStatus !== undefined && specification.phaseStatus !== phaseStatus;
 
-    if (!allowParallelChanged) {
+    if (!allowParallelChanged && !workflowModeChanged && !phaseStatusChanged) {
       return {
         success: true,
         message: "No changes detected",
@@ -82,12 +86,24 @@ const updateSpecificationService = async ({
     }
 
     // ── 3. Update specification with allowParallelMeetings toggle ────────
-    specification.allowParallelMeetings = allowParallelMeetings;
+    if (workflowModeChanged) {
+      specification.workflowMode = workflowMode;
+    }
+    if (allowParallelChanged) {
+      specification.allowParallelMeetings = allowParallelMeetings;
+    }
+    if (phaseStatusChanged) {
+      specification.phaseStatus = phaseStatus;
+    }
     specification.updatedBy = updatedBy;
     specification.updatedAt = new Date();
 
     await specification.save();
 
+    let changeDesc = [];
+    if (workflowModeChanged) changeDesc.push(`workflowMode: '${specification.workflowMode}' → '${workflowMode}'`);
+    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${!allowParallelMeetings} → ${allowParallelMeetings}`);
+    if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${specification.phaseStatus}' → '${phaseStatus}'`);
     // ── 4. Log activity ──────────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
     logActivityTrackerEvent(
@@ -95,7 +111,7 @@ const updateSpecificationService = async ({
       device,
       requestId,
       ACTIVITY_TRACKER_EVENTS.UPDATE_SPECIFICATION,
-      `Specification updated - allowParallelMeetings toggled`,
+      `Specification updated: ${changeDesc.join(', ')}`,
       { adminActions: { targetId: projectId } }
     );
 
@@ -104,7 +120,7 @@ const updateSpecificationService = async ({
     await manualVersionControlService({
       projectId,
       currentPhase: Phases.SPECIFICATION,
-      action: `Specification updated - allowParallelMeetings toggled — version bump`,
+      action: `Specification updated: ${changeDesc.join(', ')}`,
       performedBy: updatedBy,
       auditContext
     });
