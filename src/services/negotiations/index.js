@@ -6,7 +6,6 @@ const { updateNegotiationService } = require("./update-negotiation.service");
 const { getNegotiationService } = require("./get-negotiation.service");
 const { getLatestNegotiationService } = require("./get-latest-negotiation.service");
 const { listNegotiationsService } = require("./list-negotiations.service");
-const { freezeNegotiationService } = require("./freeze-negotiation.service");
 
 const negotiationServices = {
   createNegotiationService,
@@ -14,8 +13,7 @@ const negotiationServices = {
   updateNegotiationService,
   getNegotiationService,
   getLatestNegotiationService,
-  listNegotiationsService,
-  freezeNegotiationService,
+  listNegotiationsService
 };
 
 module.exports = { negotiationServices };

@@ -17,7 +17,7 @@ const { CONFLICT } = require("@configs/http-status.config");
 const createNegotiationController = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { allowParallelMeetings, workflowMode } = req.body;
+    const { allowParallelMeetings, workflowMode, phaseStatus } = req.body;
 
     logWithTime(
       `📍 [createNegotiationController] Creating negotiation for project: ${projectId} | ${getLogIdentifiers(req)}`
@@ -28,6 +28,7 @@ const createNegotiationController = async (req, res) => {
       projectId,
       allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
       workflowMode: typeof workflowMode === 'string' ? workflowMode : null,
+      phaseStatus: typeof phaseStatus === 'string' ? phaseStatus : null,
       createdBy: req.admin.adminId,
       auditContext: {
         user: req.admin,

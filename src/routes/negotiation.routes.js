@@ -8,7 +8,6 @@ const {
   createNegotiationRateLimiter,
   updateNegotiationRateLimiter,
   deleteNegotiationRateLimiter,
-  freezeNegotiationRateLimiter,
   getNegotiationRateLimiter,
   getLatestNegotiationRateLimiter,
   listNegotiationsRateLimiter
@@ -27,8 +26,7 @@ const {
   DELETE_NEGOTIATION,
   GET_NEGOTIATION,
   GET_LATEST_NEGOTIATION,
-  LIST_NEGOTIATIONS,
-  FREEZE_NEGOTIATION
+  LIST_NEGOTIATIONS
 } = NEGOTIATION_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -59,8 +57,8 @@ negotiationRouter.post(
     createNegotiationRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
-    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.createNegotiationStakeholderRoleAccessMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
     negotiationMiddlewares.createNegotiationPresenceMiddleware,
     negotiationMiddlewares.createNegotiationValidationMiddleware
   ],
@@ -77,11 +75,11 @@ negotiationRouter.patch(
   [
     ...baseAuthAdminMiddlewares,
     updateNegotiationRateLimiter,
-    negotiationMiddlewares.fetchLatestNegotiationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
-    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.updateNegotiationStakeholderRoleAccessMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    negotiationMiddlewares.fetchLatestNotFrozenNegotiationMiddleware,
     negotiationMiddlewares.updateNegotiationPresenceMiddleware,
     negotiationMiddlewares.updateNegotiationValidationMiddleware
   ],
@@ -98,12 +96,11 @@ negotiationRouter.delete(
   [ 
     ...baseAuthAdminMiddlewares,
     deleteNegotiationRateLimiter,
-    negotiationMiddlewares.fetchLatestNegotiationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
-    projectMiddlewares.activeProjectGuardMiddleware,
-    checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.deleteNegotiationStakeholderRoleAccessMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    negotiationMiddlewares.fetchLatestNotFrozenNegotiationMiddleware,
     negotiationMiddlewares.deleteNegotiationPresenceMiddleware,
     negotiationMiddlewares.deleteNegotiationValidationMiddleware
   ],
@@ -137,9 +134,9 @@ negotiationRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getLatestNegotiationRateLimiter,
-    negotiationMiddlewares.fetchLatestFrozenNegotiationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
-    checkUserIsStakeholder
+    checkUserIsStakeholder,
+    negotiationMiddlewares.fetchLatestAnyStatusNegotiationMiddleware
   ],
   negotiationControllers.getLatestNegotiationController
 );
@@ -158,25 +155,6 @@ negotiationRouter.get(
     checkUserIsStakeholder
   ],
   negotiationControllers.listNegotiationsController
-);
-
-/**
- * PATCH /projects/:projectId/negotiations/freeze/:projectId
- * Freeze the latest negotiation for a project.
- * Allowed roles: PROJECT_OWNER
- */
-negotiationRouter.patch(
-  FREEZE_NEGOTIATION,
-  [
-    ...baseAuthAdminMiddlewares,
-    freezeNegotiationRateLimiter,
-    projectMiddlewares.fetchProjectMiddleware,
-    checkUserIsStakeholder,
-    stakeholderRoleAccessMiddlewares.freezeNegotiationStakeholderRoleAccessMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
-    negotiationMiddlewares.fetchLatestFrozenNegotiationMiddleware
-  ],
-  negotiationControllers.freezeNegotiationController
 );
 
 module.exports = { negotiationRouter };
