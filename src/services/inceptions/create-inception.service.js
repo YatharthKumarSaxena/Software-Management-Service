@@ -2,7 +2,7 @@
 
 const { ProjectModel } = require("@models/project.model");
 const { InceptionModel } = require("@models/inception.model");
-const { Phases } = require("@configs/enums.config");
+const { Phases, PhaseStatus } = require("@configs/enums.config");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
@@ -21,6 +21,8 @@ const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.co
 const createInceptionService = async ({
   projectId,
   allowParallelMeetings,
+  workflowMode,
+  phaseStatus,
   createdBy,
   auditContext
 }) => {
@@ -36,7 +38,7 @@ const createInceptionService = async ({
     const existingInception = await InceptionModel.findOne({
       projectId,
       isDeleted: false,
-      isFrozen: false
+      phaseStatus: { $in: [PhaseStatus.OPEN, PhaseStatus.STABILIZING] }
     });
 
     if (existingInception) {

@@ -16,7 +16,7 @@ const { OK } = require("@configs/http-status.config");
  */
 const updateInceptionController = async (req, res) => {
   try {
-    const { allowParallelMeetings } = req.body;
+    const { allowParallelMeetings, workflowMode, phaseStatus } = req.body;
     const { inception } = req;
 
     logWithTime(
@@ -28,6 +28,8 @@ const updateInceptionController = async (req, res) => {
       inception,
       {
         allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : undefined,
+        workflowMode: typeof workflowMode === 'string' ? workflowMode : undefined,
+        phaseStatus: typeof phaseStatus === 'string' ? phaseStatus : undefined,
         updatedBy: req.admin.adminId,
         auditContext: {
           user: req.admin,

@@ -4,6 +4,8 @@ const { validationSets } = require("@configs/validation-sets.config");
 const { validateBody } = require("../factory/field-validation.middleware-factory");
 
 const validationMiddlewares = {
+  createInceptionValidationMiddleware: validateBody("createInception", validationSets.createInceptionValidationSet),
+  updateInceptionValidationMiddleware: validateBody("updateInception", validationSets.updateInceptionValidationSet),
   deleteInceptionValidationMiddleware: validateBody("deleteInception", validationSets.deleteInceptionValidationSet)
 };
 

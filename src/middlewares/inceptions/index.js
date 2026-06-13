@@ -1,17 +1,18 @@
 // middlewares/inceptions/index.js
 
-const { fetchInceptionMiddleware, fetchLatestFrozenInceptionMiddleware, fetchLatestInceptionMiddleware } = require("./fetch-inception.middleware");
+const { fetchInceptionMiddleware, fetchLatestAnyStatusInceptionMiddleware, fetchLatestOpenInceptionMiddleware, fetchLatestNotFrozenInceptionMiddleware } = require("./fetch-inception.middleware");
 const { validationMiddlewares } = require("./field-validation.middleware");
 const { presenceMiddlewares } = require("./validate-request-body.middleware");
 
 const inceptionMiddlewares = {
     fetchInceptionMiddleware,
-    fetchLatestInceptionMiddleware,
-    fetchLatestFrozenInceptionMiddleware,
+    fetchLatestAnyStatusInceptionMiddleware,
+    fetchLatestOpenInceptionMiddleware,
+    fetchLatestNotFrozenInceptionMiddleware,
     ...validationMiddlewares,
     ...presenceMiddlewares
 }
 
-module.exports = { 
+module.exports = {
     inceptionMiddlewares
 };
