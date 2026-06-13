@@ -1,5 +1,6 @@
 const { CONFLICT } = require("@configs/http-status.config");
 const { WorkflowModes } = require("@configs/enums.config");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 const validatePhaseContext = ({
     phase,
@@ -15,7 +16,7 @@ const validatePhaseContext = ({
         };
     }
 
-    if (phaseContext.isFrozen) {
+    if (isPhaseFrozen(phaseContext)) {
         return {
             success: false,
             errorCode: CONFLICT,

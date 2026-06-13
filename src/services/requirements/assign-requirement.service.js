@@ -9,6 +9,7 @@ const { CONFLICT, INTERNAL_ERROR, NOT_FOUND, BAD_REQUEST } = require("@configs/h
 const { prepareAuditData } = require("@/utils/audit-data.util");
 const { manualVersionControlService } = require("../common/version.service");
 const { TotalTypes, Phases, RequirementStatuses } = require("@/configs/enums.config");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 /**
  * Assign a requirement to an admin stakeholder.
@@ -47,7 +48,7 @@ const assignRequirementService = async ({ requirementId, userId, project, elicit
     if (!assignedPhaseContext) {
       return { success: false, message: "Phase context not found for the specified phase", errorCode: CONFLICT };
     }
-    if (assignedPhaseContext.isFrozen) {
+    if (isPhaseFrozen(assignedPhaseContext)) {
       return { success: false, message: "Cannot assign requirement in a frozen phase", errorCode: CONFLICT };
     }
 

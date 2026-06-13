@@ -1,4 +1,4 @@
-const { createCheckLatestPhaseNotFrozenMiddleware } = require("../factory/check-not-frozen.middleware-factory");
+const { createCheckLatestPhaseNotFrozenMiddleware } = require("../factory/check-latest-phase.middleware-factory");
 const { Phases } = require("@/configs/enums.config");
 
 const allowedPhaseMiddlewares = {

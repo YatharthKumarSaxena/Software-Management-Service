@@ -1,6 +1,8 @@
 const { errorMessage } = require("@/utils/log-error.util");
 const { logWithTime } = require("@/utils/time-stamps.util");
 
+const { AuthorityTypes, WorkflowModes } = require("@/configs/enums.config");
+
 const resolvePhaseGovernance = ({
     phase
 }) => {
@@ -54,6 +56,29 @@ const createRequirementGovernanceResolver = ({
                 };
             }
 
+            const unvalidatedFields = [];
+            if (!AuthorityTypes.includes(authorityType)){
+                unvalidatedFields.push("authorityType");
+            }
+
+            
+
+            if (unvalidatedFields.length){
+                return {
+                    success: false,
+                    message: `Unvalidated fields: ${unvalidatedFields.join(", ")}`
+                };
+            }
+
+            const phaseGovernanceEnabled = project.enablePhaseLevelGovernance;
+
+            if(phaseGovernanceEnabled) {
+                
+                
+            }
+            else {
+                const projectGovernance = project.workflowMode
+            }
             
 
 
