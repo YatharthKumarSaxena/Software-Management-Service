@@ -51,7 +51,7 @@ scopeRouter.post(
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    inceptionMiddlewares.fetchLatestOpenInceptionMiddleware,
     scopeMiddlewares.createScopePresenceMiddleware,
     scopeMiddlewares.createScopeValidationMiddleware,
   ],
@@ -72,7 +72,7 @@ scopeRouter.patch(
     scopeMiddlewares.fetchScopeMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
     scopeMiddlewares.updateScopePresenceMiddleware,
     scopeMiddlewares.updateScopeValidationMiddleware,
   ],
@@ -91,9 +91,9 @@ scopeRouter.delete(
     ...baseAuthAdminMiddlewares,
     deleteScopeRateLimiter,
     scopeMiddlewares.fetchScopeMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
     scopeMiddlewares.deleteScopePresenceMiddleware,
     scopeMiddlewares.deleteScopeValidationMiddleware
   ],
@@ -126,7 +126,7 @@ scopeRouter.get(
     listScopesRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
-    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
+    inceptionMiddlewares.fetchLatestAnyStatusInceptionMiddleware
   ],
   scopeControllers.listScopesController
 );
@@ -145,7 +145,7 @@ scopeRouter.patch(
     scopeMiddlewares.fetchScopeMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     hlfMiddlewares.fetchHlfMiddleware,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware
   ],
   scopeControllers.linkScopeToHlfController
@@ -164,7 +164,7 @@ scopeRouter.patch(
     unlinkScopeToHlfRateLimiter,
     scopeMiddlewares.fetchScopeMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware
   ],
   scopeControllers.unlinkScopeToHlfController

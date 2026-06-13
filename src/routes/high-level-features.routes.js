@@ -50,7 +50,7 @@ hlfRouter.post(
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware,
+    inceptionMiddlewares.fetchLatestOpenInceptionMiddleware,
     hlfMiddlewares.createHlfPresenceMiddleware,
     hlfMiddlewares.createHlfValidationMiddleware,
   ],
@@ -70,7 +70,7 @@ hlfRouter.patch(
     updateHLFRateLimiter,
     hlfMiddlewares.fetchHlfMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
-    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware,
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
     hlfMiddlewares.updateHlfPresenceMiddleware,
     hlfMiddlewares.updateHlfValidationMiddleware,
@@ -92,7 +92,7 @@ hlfRouter.delete(
     hlfMiddlewares.fetchHlfMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware,
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
     hlfMiddlewares.deleteHlfPresenceMiddleware,
     hlfMiddlewares.deleteHlfValidationMiddleware,
   ],
@@ -125,7 +125,7 @@ hlfRouter.get(
     listHLFsRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware
+    inceptionMiddlewares.fetchLatestAnyStatusInceptionMiddleware
   ],
   hlfControllers.listHlfController
 );
@@ -145,7 +145,7 @@ hlfRouter.patch(
     commonMiddlewares.checkUserIsStakeholder,
     ideaMiddlewares.fetchIdeaMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware
   ],
   hlfControllers.linkHlfToIdeaController
 );
@@ -154,11 +154,11 @@ hlfRouter.patch(
   UNLINK_HLF,
   [
     ...baseAuthAdminMiddlewares,
-    linkHLFtoIdeaRateLimiter,
+    unlinkHLFFromIdeaRateLimiter,
     hlfMiddlewares.fetchHlfMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware
   ],
   hlfControllers.unlinkHlfFromIdeaController
 );
