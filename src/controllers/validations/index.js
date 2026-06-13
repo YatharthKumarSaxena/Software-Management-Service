@@ -6,7 +6,6 @@ const { updateValidationController } = require("./update-validation.controller")
 const { getValidationController } = require("./get-validation.controller");
 const { getLatestValidationController } = require("./get-latest-validation.controller");
 const { listValidationsController } = require("./list-validations.controller");
-const { freezeValidationController } = require("./freeze-validation.controller");
 
 const validationControllers = {
   createValidationController,
@@ -14,8 +13,7 @@ const validationControllers = {
   updateValidationController,
   getValidationController,
   getLatestValidationController,
-  listValidationsController,
-  freezeValidationController,
+  listValidationsController
 };
 
 module.exports = { validationControllers };

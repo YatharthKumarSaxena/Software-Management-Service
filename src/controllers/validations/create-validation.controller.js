@@ -17,7 +17,7 @@ const { CONFLICT } = require("@configs/http-status.config");
 const createValidationController = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { allowParallelMeetings } = req.body;
+    const { allowParallelMeetings, workflowMode, phaseStatus } = req.body;
 
     logWithTime(
       `📍 [createValidationController] Creating validation for project: ${projectId} | ${getLogIdentifiers(req)}`
@@ -27,6 +27,8 @@ const createValidationController = async (req, res) => {
     const result = await validationServices.createValidationService({
       projectId,
       allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
+      workflowMode: typeof workflowMode === 'string' ? workflowMode : null,
+      phaseStatus: typeof phaseStatus === 'string' ? phaseStatus : null,
       createdBy: req.admin.adminId,
       auditContext: {
         user: req.admin,
