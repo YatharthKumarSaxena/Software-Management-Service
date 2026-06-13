@@ -13,8 +13,9 @@ const { Phases } = require("@configs/enums.config");
 
 const updateNegotiationService = async ({
   projectId,
-  workflowMode,
   allowParallelMeetings,
+  workflowMode,
+  phaseStatus,
   updatedBy,
   auditContext,
 }) => {
@@ -46,8 +47,9 @@ const updateNegotiationService = async ({
     // ── 1. Check if any changes are being made ────────────────────────
     const workflowModeChanged = workflowMode !== undefined && negotiation.workflowMode !== workflowMode;
     const allowParallelChanged = allowParallelMeetings !== undefined && negotiation.allowParallelMeetings !== allowParallelMeetings;
+    const phaseStatusChanged = phaseStatus !== undefined && negotiation.phaseStatus !== phaseStatus;
 
-    if (!workflowModeChanged && !allowParallelChanged) {
+    if (!workflowModeChanged && !allowParallelChanged && !phaseStatusChanged) {
       return {
         success: true,
         message: "No changes detected",
@@ -90,6 +92,9 @@ const updateNegotiationService = async ({
     if (allowParallelChanged) {
       negotiation.allowParallelMeetings = allowParallelMeetings;
     }
+    if (phaseStatusChanged) {
+      negotiation.phaseStatus = phaseStatus;
+    }
     negotiation.updatedBy = updatedBy;
     negotiation.updatedAt = new Date();
 
@@ -100,6 +105,7 @@ const updateNegotiationService = async ({
     let changeDesc = [];
     if (workflowModeChanged) changeDesc.push(`workflowMode: '${negotiation.workflowMode}' → '${workflowMode}'`);
     if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${!allowParallelMeetings} → ${allowParallelMeetings}`);
+    if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${negotiation.phaseStatus}' → '${phaseStatus}'`);
     logActivityTrackerEvent(
       user,
       device,

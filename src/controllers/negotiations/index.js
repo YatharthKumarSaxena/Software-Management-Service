@@ -6,7 +6,6 @@ const { updateNegotiationController } = require("./update-negotiation.controller
 const { getNegotiationController } = require("./get-negotiation.controller");
 const { getLatestNegotiationController } = require("./get-latest-negotiation.controller");
 const { listNegotiationsController } = require("./list-negotiations.controller");
-const { freezeNegotiationController } = require("./freeze-negotiation.controller");
 
 const negotiationControllers = {
   createNegotiationController,
@@ -14,8 +13,7 @@ const negotiationControllers = {
   updateNegotiationController,
   getNegotiationController,
   getLatestNegotiationController,
-  listNegotiationsController,
-  freezeNegotiationController,
+  listNegotiationsController
 };
 
 module.exports = { negotiationControllers };

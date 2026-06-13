@@ -1,13 +1,14 @@
 // middlewares/negotiations/index.js
 
-const { fetchNegotiationMiddleware, fetchLatestFrozenNegotiationMiddleware, fetchLatestNegotiationMiddleware } = require("./fetch-negotiation.middleware");
+const { fetchNegotiationMiddleware, fetchLatestAnyStatusNegotiationMiddleware, fetchLatestOpenNegotiationMiddleware, fetchLatestNotFrozenNegotiationMiddleware } = require("./fetch-negotiation.middleware");
 const { validationMiddlewares } = require("./field-validation.middleware");
 const { presenceMiddlewares } = require("./validate-request-body.middleware");
 
 const negotiationMiddlewares = {
   fetchNegotiationMiddleware,
-  fetchLatestNegotiationMiddleware,
-  fetchLatestFrozenNegotiationMiddleware,
+  fetchLatestAnyStatusNegotiationMiddleware,
+  fetchLatestOpenNegotiationMiddleware,
+  fetchLatestNotFrozenNegotiationMiddleware,
   ...presenceMiddlewares,
     ...validationMiddlewares
 };
