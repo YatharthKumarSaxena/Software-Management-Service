@@ -8,7 +8,6 @@ const {
   createElicitationRateLimiter,
   updateElicitationRateLimiter,
   deleteElicitationRateLimiter,
-  freezeElicitationRateLimiter,
   getElicitationRateLimiter,
   getLatestElicitationRateLimiter,
   listElicitationsRateLimiter
@@ -27,8 +26,7 @@ const {
   DELETE_ELICITATION,
   GET_ELICITATION,
   GET_LATEST_ELICITATION,
-  LIST_ELICITATIONS,
-  FREEZE_ELICITATION
+  LIST_ELICITATIONS
 } = ELICITATION_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -59,8 +57,8 @@ elicitationRouter.post(
     createElicitationRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
-    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.createElicitationStakeholderRoleAccessMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
     elicitationMiddlewares.createElicitationPresenceMiddleware,
     elicitationMiddlewares.createElicitationValidationMiddleware
   ],
@@ -77,11 +75,11 @@ elicitationRouter.patch(
   [
     ...baseAuthAdminMiddlewares,
     updateElicitationRateLimiter,
-    elicitationMiddlewares.fetchLatestElicitationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
-    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.updateElicitationStakeholderRoleAccessMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    elicitationMiddlewares.fetchLatestNotFrozenElicitationMiddleware,
     elicitationMiddlewares.updateElicitationPresenceMiddleware,
     elicitationMiddlewares.updateElicitationValidationMiddleware
   ],
@@ -98,11 +96,11 @@ elicitationRouter.delete(
   [ 
     ...baseAuthAdminMiddlewares,
     deleteElicitationRateLimiter,
-    elicitationMiddlewares.fetchLatestElicitationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
-    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.deleteElicitationStakeholderRoleAccessMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    elicitationMiddlewares.fetchLatestNotFrozenElicitationMiddleware,
     elicitationMiddlewares.deleteElicitationPresenceMiddleware,
     elicitationMiddlewares.deleteElicitationValidationMiddleware
   ],
@@ -136,9 +134,9 @@ elicitationRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getLatestElicitationRateLimiter,
-    elicitationMiddlewares.fetchLatestFrozenElicitationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
-    checkUserIsStakeholder
+    checkUserIsStakeholder,
+    elicitationMiddlewares.fetchLatestAnyStatusElicitationMiddleware
   ],
   elicitationControllers.getLatestElicitationController
 );
@@ -157,25 +155,6 @@ elicitationRouter.get(
     checkUserIsStakeholder
   ],
   elicitationControllers.listElicitationsController
-);
-
-/**
- * PATCH /projects/:projectId/elicitations/freeze/:projectId
- * Freeze the latest elicitation for a project.
- * Allowed roles: PROJECT_OWNER
- */
-elicitationRouter.patch(
-  FREEZE_ELICITATION,
-  [
-    ...baseAuthAdminMiddlewares,
-    freezeElicitationRateLimiter,
-    projectMiddlewares.fetchProjectMiddleware,
-    checkUserIsStakeholder,
-    stakeholderRoleAccessMiddlewares.freezeElicitationStakeholderRoleAccessMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
-    elicitationMiddlewares.fetchLatestFrozenElicitationMiddleware
-  ],
-  elicitationControllers.freezeElicitationController
 );
 
 module.exports = { elicitationRouter };
