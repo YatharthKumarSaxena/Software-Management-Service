@@ -17,7 +17,7 @@ const { CONFLICT } = require("@configs/http-status.config");
 const createSpecificationController = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { allowParallelMeetings } = req.body;
+    const { allowParallelMeetings, workflowMode, phaseStatus } = req.body;
 
     logWithTime(
       `📍 [createSpecificationController] Creating specification for project: ${projectId} | ${getLogIdentifiers(req)}`
@@ -27,6 +27,8 @@ const createSpecificationController = async (req, res) => {
     const result = await specificationServices.createSpecificationService({
       projectId,
       allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
+      workflowMode: typeof workflowMode === 'string' ? workflowMode : null,
+      phaseStatus: typeof phaseStatus === 'string' ? phaseStatus : null,
       createdBy: req.admin.adminId,
       auditContext: {
         user: req.admin,

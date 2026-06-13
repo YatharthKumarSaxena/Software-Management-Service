@@ -6,7 +6,6 @@ const { updateSpecificationService } = require("./update-specification.service")
 const { getSpecificationService } = require("./get-specification.service");
 const { getLatestSpecificationService } = require("./get-latest-specification.service");
 const { listSpecificationsService } = require("./list-specifications.service");
-const { freezeSpecificationService } = require("./freeze-specification.service");
 
 const specificationServices = {
   createSpecificationService,
@@ -14,8 +13,7 @@ const specificationServices = {
   updateSpecificationService,
   getSpecificationService,
   getLatestSpecificationService,
-  listSpecificationsService,
-  freezeSpecificationService,
+  listSpecificationsService
 };
 
 module.exports = { specificationServices };

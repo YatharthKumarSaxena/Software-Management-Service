@@ -8,7 +8,6 @@ const {
   createSpecificationRateLimiter,
   updateSpecificationRateLimiter,
   deleteSpecificationRateLimiter,
-  freezeSpecificationRateLimiter,
   getSpecificationRateLimiter,
   getLatestSpecificationRateLimiter,
   listSpecificationsRateLimiter
@@ -27,8 +26,7 @@ const {
   DELETE_SPECIFICATION,
   GET_SPECIFICATION,
   GET_LATEST_SPECIFICATION,
-  LIST_SPECIFICATIONS,
-  FREEZE_SPECIFICATION
+  LIST_SPECIFICATIONS
 } = SPECIFICATION_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -60,7 +58,9 @@ specificationRouter.post(
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.createSpecificationStakeholderRoleAccessMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware
+    projectMiddlewares.activeProjectGuardMiddleware,
+    specificationMiddlewares.createSpecificationPresenceMiddleware,
+    specificationMiddlewares.createSpecificationValidationMiddleware
   ],
   specificationControllers.createSpecificationController
 );
@@ -75,11 +75,13 @@ specificationRouter.patch(
   [
     ...baseAuthAdminMiddlewares,
     updateSpecificationRateLimiter,
-    specificationMiddlewares.fetchLatestSpecificationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.updateSpecificationStakeholderRoleAccessMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware
+    projectMiddlewares.activeProjectGuardMiddleware,
+    specificationMiddlewares.fetchLatestNotFrozenSpecificationMiddleware,
+    specificationMiddlewares.updateSpecificationPresenceMiddleware,
+    specificationMiddlewares.updateSpecificationValidationMiddleware
   ],
   specificationControllers.updateSpecificationController
 );
@@ -94,11 +96,11 @@ specificationRouter.delete(
   [ 
     ...baseAuthAdminMiddlewares,
     deleteSpecificationRateLimiter,
-    specificationMiddlewares.fetchLatestSpecificationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.deleteSpecificationStakeholderRoleAccessMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
+    specificationMiddlewares.fetchLatestNotFrozenSpecificationMiddleware,
     specificationMiddlewares.deleteSpecificationPresenceMiddleware,
     specificationMiddlewares.deleteSpecificationValidationMiddleware
   ],
@@ -132,9 +134,9 @@ specificationRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getLatestSpecificationRateLimiter,
-    specificationMiddlewares.fetchLatestFrozenSpecificationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
-    checkUserIsStakeholder
+    checkUserIsStakeholder,
+    specificationMiddlewares.fetchLatestAnyStatusSpecificationMiddleware
   ],
   specificationControllers.getLatestSpecificationController
 );
@@ -153,25 +155,6 @@ specificationRouter.get(
     checkUserIsStakeholder
   ],
   specificationControllers.listSpecificationsController
-);
-
-/**
- * PATCH /projects/:projectId/specifications/freeze/:projectId
- * Freeze the latest specification for a project.
- * Allowed roles: PROJECT_OWNER
- */
-specificationRouter.patch(
-  FREEZE_SPECIFICATION,
-  [
-    ...baseAuthAdminMiddlewares,
-    freezeSpecificationRateLimiter,
-    projectMiddlewares.fetchProjectMiddleware,
-    checkUserIsStakeholder,
-    stakeholderRoleAccessMiddlewares.freezeSpecificationStakeholderRoleAccessMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
-    specificationMiddlewares.fetchLatestFrozenSpecificationMiddleware
-  ],
-  specificationControllers.freezeSpecificationController
 );
 
 module.exports = { specificationRouter };

@@ -6,7 +6,6 @@ const { updateSpecificationController } = require("./update-specification.contro
 const { getSpecificationController } = require("./get-specification.controller");
 const { getLatestSpecificationController } = require("./get-latest-specification.controller");
 const { listSpecificationsController } = require("./list-specifications.controller");
-const { freezeSpecificationController } = require("./freeze-specification.controller");
 
 const specificationControllers = {
   createSpecificationController,
@@ -14,8 +13,7 @@ const specificationControllers = {
   updateSpecificationController,
   getSpecificationController,
   getLatestSpecificationController,
-  listSpecificationsController,
-  freezeSpecificationController,
+  listSpecificationsController
 };
 
 module.exports = { specificationControllers };
