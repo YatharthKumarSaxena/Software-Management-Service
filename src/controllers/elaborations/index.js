@@ -6,7 +6,6 @@ const { updateElaborationController } = require("./update-elaboration.controller
 const { getElaborationController } = require("./get-elaboration.controller");
 const { getLatestElaborationController } = require("./get-latest-elaboration.controller");
 const { listElaborationsController } = require("./list-elaborations.controller");
-const { freezeElaborationController } = require("./freeze-elaboration.controller");
 
 const elaborationControllers = {
   createElaborationController,
@@ -14,8 +13,7 @@ const elaborationControllers = {
   updateElaborationController,
   getElaborationController,
   getLatestElaborationController,
-  listElaborationsController,
-  freezeElaborationController,
+  listElaborationsController
 };
 
 module.exports = { elaborationControllers };

@@ -13,8 +13,9 @@ const { Phases } = require("@configs/enums.config");
 
 const updateElaborationService = async ({
   projectId,
-  workflowMode,
   allowParallelMeetings,
+  workflowMode,
+  phaseStatus,
   updatedBy,
   auditContext,
 }) => {
@@ -49,8 +50,9 @@ const updateElaborationService = async ({
     // ── 1. Check if any changes are being made ────────────────────────
     const workflowModeChanged = workflowMode !== undefined && elaboration.workflowMode !== workflowMode;
     const allowParallelChanged = allowParallelMeetings !== undefined && elaboration.allowParallelMeetings !== allowParallelMeetings;
+    const phaseStatusChanged = phaseStatus !== undefined && elaboration.phaseStatus !== phaseStatus;
 
-    if (!workflowModeChanged && !allowParallelChanged) {
+    if (!workflowModeChanged && !allowParallelChanged && !phaseStatusChanged) {
       return {
         success: true,
         message: "No changes detected",
@@ -103,6 +105,7 @@ const updateElaborationService = async ({
     let changeDesc = [];
     if (workflowModeChanged) changeDesc.push(`workflowMode: '${elaboration.workflowMode}' → '${workflowMode}'`);
     if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${!allowParallelMeetings} → ${allowParallelMeetings}`);
+    if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${elaboration.phaseStatus}' → '${phaseStatus}'`);
     logActivityTrackerEvent(
       user,
       device,

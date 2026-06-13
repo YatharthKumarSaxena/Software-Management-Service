@@ -6,7 +6,6 @@ const { updateElaborationService } = require("./update-elaboration.service");
 const { getElaborationService } = require("./get-elaboration.service");
 const { getLatestElaborationService } = require("./get-latest-elaboration.service");
 const { listElaborationsService } = require("./list-elaborations.service");
-const { freezeElaborationService } = require("./freeze-elaboration.service");
 
 const elaborationServices = {
   createElaborationService,
@@ -14,8 +13,7 @@ const elaborationServices = {
   updateElaborationService,
   getElaborationService,
   getLatestElaborationService,
-  listElaborationsService,
-  freezeElaborationService,
+  listElaborationsService
 };
 
 module.exports = { elaborationServices };

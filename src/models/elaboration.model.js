@@ -1,5 +1,5 @@
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
-const { PhaseDeletionReason, WorkflowModes } = require("@/configs/enums.config");
+const { PhaseDeletionReason, WorkflowModes, PhaseStatus } = require("@/configs/enums.config");
 const { customIdRegex } = require("@/configs/regex.config");
 const { descriptionLength } = require("@/configs/fields-length.config");
 const mongoose = require("mongoose");
@@ -108,9 +108,10 @@ const elaborationSchema = new mongoose.Schema({
     maxlength: descriptionLength.max
   },
 
-  isFrozen: {
-    type: Boolean,
-    default: false
+  phaseStatus: {
+    type: String,
+    enum: Object.values(PhaseStatus),
+    default: PhaseStatus.OPEN
   }
 
 }, { timestamps: true });
