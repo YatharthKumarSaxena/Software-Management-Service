@@ -9,7 +9,6 @@ const {
   createInceptionRateLimiter,
   updateInceptionRateLimiter,
   deleteInceptionRateLimiter,
-  freezeInceptionRateLimiter,
   getInceptionRateLimiter,
   getLatestInceptionRateLimiter,
   listInceptionsRateLimiter
@@ -19,14 +18,12 @@ const { inceptionControllers } = require("@controllers/inceptions");
 const { inceptionMiddlewares } = require("@/middlewares/inceptions");
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { checkUserIsStakeholder } = require("@/middlewares/stakeholders/check-user-is-stakeholder.middleware");
-const { commonMiddlewares } = require("@/middlewares/common");
 const { stakeholderRoleAccessMiddlewares } = require("@/middlewares/stakeholders/api-stakeholder-role-access.middleware");
 
 const {
   CREATE_INCEPTION,
   UPDATE_INCEPTION,
   DELETE_INCEPTION,
-  FREEZE_INCEPTION,
   GET_INCEPTION,
   GET_LATEST_INCEPTION,
   LIST_INCEPTIONS
@@ -64,7 +61,7 @@ inceptionRouter.get(
     getLatestInceptionRateLimiter,
     projectMiddlewares.fetchProjectMiddleware, // Validates projectId, fetches project document for controller
     checkUserIsStakeholder,
-    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
+    inceptionMiddlewares.fetchLatestAnyStatusInceptionMiddleware
   ],
   inceptionControllers.getLatestInceptionController
 );
@@ -117,7 +114,7 @@ inceptionRouter.delete(
     checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.deleteInceptionStakeholderRoleAccessMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware,
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
     inceptionMiddlewares.deleteInceptionPresenceMiddleware,
     inceptionMiddlewares.deleteInceptionValidationMiddleware
   ],
@@ -131,29 +128,12 @@ inceptionRouter.post(
     createInceptionRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
+    stakeholderRoleAccessMiddlewares.createInceptionStakeholderRoleAccessMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
-    stakeholderRoleAccessMiddlewares.createInceptionStakeholderRoleAccessMiddleware
+    inceptionMiddlewares.createInceptionPresenceMiddleware,
+    inceptionMiddlewares.createInceptionValidationMiddleware
   ],
   inceptionControllers.createInceptionController
-);
-
-/**
- * PATCH /projects/:projectId/inceptions/freeze/:projectId
- * Freeze the latest inception for a project.
- * Allowed roles: PROJECT_OWNER
- */
-inceptionRouter.patch(
-  FREEZE_INCEPTION,
-  [
-    ...baseAuthAdminMiddlewares,
-    freezeInceptionRateLimiter,
-    projectMiddlewares.fetchProjectMiddleware,
-    checkUserIsStakeholder,
-    stakeholderRoleAccessMiddlewares.freezeInceptionStakeholderRoleAccessMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestFrozenInceptionMiddleware
-  ],
-  inceptionControllers.freezeInceptionController
 );
 
 inceptionRouter.patch(
@@ -165,7 +145,9 @@ inceptionRouter.patch(
     checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.updateInceptionStakeholderRoleAccessMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
-    inceptionMiddlewares.fetchLatestInceptionMiddleware
+    inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
+    inceptionMiddlewares.updateInceptionPresenceMiddleware,
+    inceptionMiddlewares.updateInceptionValidationMiddleware
   ],
   inceptionControllers.updateInceptionController
 );

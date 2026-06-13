@@ -29,7 +29,13 @@ const { InceptionModel } = require("@/models");
  */
 const updateInceptionService = async (
   inception,
-  { allowParallelMeetings, updatedBy, auditContext }
+  {   
+    allowParallelMeetings,
+    workflowMode,
+    phaseStatus,
+    updatedBy, 
+    auditContext 
+  }
 ) => {
   try { 
     const { MeetingModel } = require("@models/meeting.model");
@@ -37,8 +43,10 @@ const updateInceptionService = async (
 
     // ── 1. Check if any changes are being made ────────────────────────
     const allowParallelChanged = allowParallelMeetings !== undefined && inception.allowParallelMeetings !== allowParallelMeetings;
+    const workflowModeChanged = workflowMode !== undefined && inception.workflowMode !== workflowMode;
+    const phaseStatusChanged = phaseStatus !== undefined && inception.phaseStatus !== phaseStatus;
 
-    if (!allowParallelChanged) {
+    if (!allowParallelChanged && !workflowModeChanged && !phaseStatusChanged) {
       logWithTime(
         `⚠️ [updateInceptionService] No changes detected.`
       );
@@ -85,6 +93,12 @@ const updateInceptionService = async (
     if (allowParallelChanged) {
       updatePayload.allowParallelMeetings = allowParallelMeetings;
     }
+    if (workflowModeChanged) {
+      updatePayload.workflowMode = workflowMode;
+    }
+    if (phaseStatusChanged) {
+      updatePayload.phaseStatus = phaseStatus;
+    }
 
     // ── 4. Update via atomic findByIdAndUpdate ────────────────────
     const updatedInception = await InceptionModel.findByIdAndUpdate(
@@ -100,6 +114,8 @@ const updateInceptionService = async (
 
       let changeDesc = [];
       if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${inception.allowParallelMeetings} → ${allowParallelMeetings}`);
+      if (workflowModeChanged) changeDesc.push(`workflowMode: '${inception.workflowMode}' → '${workflowMode}'`);
+      if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${inception.phaseStatus}' → '${phaseStatus}'`);
 
       logActivityTrackerEvent(
         user,
