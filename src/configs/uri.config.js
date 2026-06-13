@@ -174,7 +174,6 @@ module.exports = {
         GET_ELICITATION:    `/get/:elicitationId`,    // GET /api/v1/elicitations/get/:projectId/:elicitationId
         GET_LATEST_ELICITATION: `/latest/:projectId`,            // GET /api/v1/elicitations/latest/:projectId
         LIST_ELICITATIONS:  `/list/:projectId`,       // GET /api/v1/elicitations/list/:projectId
-        FREEZE_ELICITATION: `/freeze/:projectId`  // PATCH /api/v1/elicitations/freeze/:elicitationId
     },
     INCEPTION_ROUTES: {
         GET_LATEST_INCEPTION: `/get-latest/:projectId`,      // GET /software-management-service/api/v1/inceptions/get/:projectId
@@ -183,7 +182,6 @@ module.exports = {
         DELETE_INCEPTION: `/delete/:projectId`,  // DELETE /api/v1/inceptions/delete/:inceptionId
         CREATE_INCEPTION: `/create/:projectId`,  // POST /api/v1/inceptions/create/:projectId
         UPDATE_INCEPTION: `/update/:projectId`,  // PATCH /api/v1/inceptions/update/:projectId
-        FREEZE_INCEPTION: `/freeze/:projectId`,  // PATCH /api/v1/inceptions/freeze/:inceptionId
     },
     MEETING_ROUTES: {
         CREATE_MEETING: `/create/:entityType/:projectId`,  // POST /api/v1/meetings/create/:entityType/:entityId
@@ -211,7 +209,6 @@ module.exports = {
         GET_NEGOTIATION: `/get/:negotiationId`, // GET /api/v1/negotiations/get/:projectId/:negotiationId
         LIST_NEGOTIATIONS: `/list/:projectId`, // GET /api/v1/negotiations/list/:projectId
         GET_LATEST_NEGOTIATION: `/latest/:projectId`, // GET /api/v1/negotiations/latest/:projectId
-        FREEZE_NEGOTIATION: `/freeze/:projectId`
     },
     ELABORATION_ROUTES: {
         CREATE_ELABORATION: `/create/:projectId`, // POST /api/v1/elaborations/create/:projectId
@@ -220,7 +217,6 @@ module.exports = {
         GET_ELABORATION: `/get/:elaborationId`, // GET /api/v1/elaborations/get/:projectId/:elaborationId
         LIST_ELABORATIONS: `/list/:projectId`, // GET /api/v1/elaborations/list/:projectId
         GET_LATEST_ELABORATION: `/latest/:projectId`, // GET /api/v1/elaborations/latest/:projectId
-        FREEZE_ELABORATION: `/freeze/:projectId`
     },
     VALIDATION_ROUTES: {
         CREATE_VALIDATION: `/create/:projectId`, // POST /api/v1/validations/create/:projectId
@@ -229,7 +225,6 @@ module.exports = {
         GET_VALIDATION: `/get/:validationId`, // GET /api/v1/validations/get/:projectId/:validationId
         LIST_VALIDATIONS: `/list/:projectId`, // GET /api/v1/validations/list/:projectId
         GET_LATEST_VALIDATION: `/latest/:projectId`, // GET /api/v1/validations/latest/:projectId
-        FREEZE_VALIDATION: `/freeze/:projectId` // PATCH /api/v1/validations/freeze/:validationId
     },
     SPECIFICATION_ROUTES: {
         CREATE_SPECIFICATION: `/create/:projectId`, // POST /api/v1/specifications/create/:projectId
@@ -238,7 +233,6 @@ module.exports = {
         GET_SPECIFICATION: `/get/:specificationId`, // GET /api/v1/specifications/get/:projectId/:specificationId
         LIST_SPECIFICATIONS: `/list/:projectId`, // GET /api/v1/specifications/list/:projectId
         GET_LATEST_SPECIFICATION: `/latest/:projectId`, // GET /api/v1/specifications/latest/:projectId
-        FREEZE_SPECIFICATION: `/freeze/:projectId` // PATCH /api/v1/specifications/freeze/:projectId
     },
     REQUIREMENT_ROUTES: {
         CREATE_REQUIREMENT: `/create/:projectId`, // POST /api/v1/requirements/create/:projectId

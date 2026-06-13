@@ -87,6 +87,12 @@ const FieldDefinitions = {
       required: false,
       validation: null,
       description: "Optional flag to enable phase governance"
+    },
+    ALLOW_STABILIZING_ROLLBACK: {
+      field: "allowStabilizingRollback",
+      required: false,
+      validation: null,
+      description: "Optional flag to allow STABILIZING to OPEN rollback"
     }
   },
 
@@ -163,6 +169,12 @@ const FieldDefinitions = {
       required: false,
       validation: null,
       description: "Optional flag to enable phase governance"
+    },
+    ALLOW_STABILIZING_ROLLBACK: {
+      field: "allowStabilizingRollback",
+      required: false,
+      validation: null,
+      description: "Optional flag to allow STABILIZING to OPEN rollback"
     }
   },
 
@@ -782,19 +794,69 @@ const FieldDefinitions = {
     },
   },
 
-  // ── CREATE ELICITATION ───────────────────────────────────────────
-  CREATE_ELICITATION: {
+  // ── CREATE INCEPTION ─────────────────────────────────────────────
+  CREATE_INCEPTION: {
     MODE: {
       field: "workflowMode",
       required: false,
       validation: validationRules.workflowMode,
-      description: "Elicitation mode: OPEN | MODERATION (enum)"
+      description: "Inception mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
     },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",
       required: false,
       validation: null,
       description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
+    }
+  },
+
+  // ── UPDATE INCEPTION ─────────────────────────────────────────────
+  UPDATE_INCEPTION: {
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Updated inception mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
+    }
+  },
+
+  // ── CREATE ELICITATION ───────────────────────────────────────────
+  CREATE_ELICITATION: {
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Elicitation mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
     }
   },
 
@@ -804,13 +866,19 @@ const FieldDefinitions = {
       field: "workflowMode",
       required: false,
       validation: validationRules.workflowMode,
-      description: "Updated elicitation mode: OPEN | MODERATION (enum)"
+      description: "Updated elicitation mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
     },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",
       required: false,
       validation: null,
       description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
     }
   },
 
@@ -820,13 +888,19 @@ const FieldDefinitions = {
       field: "workflowMode",
       required: false,
       validation: validationRules.workflowMode,
-      description: "Elaboration mode: OPEN | MODERATION (enum)"
+      description: "Elaboration mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
     },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",
       required: false,
       validation: null,
       description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
     }
   },
 
@@ -836,13 +910,19 @@ const FieldDefinitions = {
       field: "workflowMode",
       required: false,
       validation: validationRules.workflowMode,
-      description: "Updated elaboration mode: OPEN | MODERATION (enum)"
+      description: "Updated elaboration mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
     },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",
       required: false,
       validation: null,
       description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
     }
   },
 
@@ -852,13 +932,19 @@ const FieldDefinitions = {
       field: "workflowMode",
       required: false,
       validation: validationRules.workflowMode,
-      description: "Negotiation mode: OPEN | MODERATION (enum)"
+      description: "Negotiation mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
     },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",
       required: false,
       validation: null,
       description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
     }
   },
 
@@ -868,13 +954,107 @@ const FieldDefinitions = {
       field: "workflowMode",
       required: false,
       validation: validationRules.workflowMode,
-      description: "Updated negotiation mode: OPEN | MODERATION (enum)"
+      description: "Updated negotiation mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
     },
     ALLOW_PARALLEL_MEETINGS: {
       field: "allowParallelMeetings",
       required: false,
       validation: null,
       description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
+    }
+  },
+
+  // ── CREATE SPECIFICATION ───────────────────────────────────────────
+  CREATE_SPECIFICATION: {
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Specification mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
+    }
+  },
+
+  // ── UPDATE SPECIFICATION ───────────────────────────────────────────
+  UPDATE_SPECIFICATION: {
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Updated specification mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
+    }
+  },
+
+  // ── CREATE VALIDATION ───────────────────────────────────────────────
+  CREATE_VALIDATION: {
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Validation mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
+    }
+  },
+
+  // ── UPDATE VALIDATION ───────────────────────────────────────────────
+  UPDATE_VALIDATION: {
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Updated validation mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
     }
   },
 

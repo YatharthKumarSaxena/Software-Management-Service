@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["src/*"],
       "@testing/*": ["testing/*"],
@@ -14,8 +14,9 @@
       "@controllers/*": ["src/controllers/*"],
       "@routes/*": ["src/routes/*"],
       "@models/*": ["src/models/*"],
-      "@internals/*": ["src/internals"],
-      "@responses/*": ["src/responses/*"]
+      "@internals/*": ["src/internals/*"],
+      "@responses/*": ["src/responses/*"],
+      "@bootstrap/*": ["src/bootstrap/*"],
     }
   },
   "exclude": ["node_modules"]

@@ -257,6 +257,12 @@ const Phases = Object.freeze({
   MANAGEMENT: "MANAGEMENT"
 });
 
+const PhaseStatus = Object.freeze({
+  OPEN: "OPEN",
+  STABILIZING: "STABILIZING",
+  FROZEN: "FROZEN"
+});
+
 const StakeholderDeletionReason = Object.freeze({
   DUPLICATE: "duplicate_stakeholder",
   TEST_STAKEHOLDER: "test_or_demo_stakeholder_cleanup",
@@ -624,6 +630,13 @@ const AllowedPhaseTypes = Object.freeze({
   [Phases.NEGOTIATION]: Phases.NEGOTIATION
 });
 
+const AuthorityTypes = Object.freeze({
+    CONTRIBUTOR: "contributors",
+    REVIEWER: "reviewers",
+    APPROVER: "approvers",
+    COLLABORATORS: "collaborators"
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -657,6 +670,7 @@ module.exports = {
   ProjectResumeReason,
   ProjectDeletionReason,
   Phases,
+  PhaseStatus,
   StakeholderDeletionReason,
   PhaseDeletionReason,
   InceptionDeletionReason,
@@ -702,5 +716,6 @@ module.exports = {
   MinBufferTime,
   MappingStatuses,
   ReviewNoteEntityTypes,
-  AllowedPhaseTypes
+  AllowedPhaseTypes,
+  AuthorityTypes
 };
