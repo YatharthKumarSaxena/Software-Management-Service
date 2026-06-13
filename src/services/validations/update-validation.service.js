@@ -14,6 +14,8 @@ const { Phases } = require("@configs/enums.config");
 const updateValidationService = async ({
   projectId,
   allowParallelMeetings,
+  workflowMode,
+  phaseStatus,
   updatedBy,
   auditContext,
 }) => {
@@ -44,8 +46,10 @@ const updateValidationService = async ({
 
     // ── 1. Check if any changes are being made ────────────────────────
     const allowParallelChanged = allowParallelMeetings !== undefined && validation.allowParallelMeetings !== allowParallelMeetings;
+    const workflowModeChanged = workflowMode !== undefined && validation.workflowMode !== workflowMode;
+    const phaseStatusChanged = phaseStatus !== undefined && validation.phaseStatus !== phaseStatus;
 
-    if (!allowParallelChanged) {
+    if (!allowParallelChanged && !workflowModeChanged && !phaseStatusChanged) {
       return {
         success: true,
         message: "No changes detected",
@@ -82,11 +86,24 @@ const updateValidationService = async ({
     }
 
     // ── 3. Update validation with allowParallelMeetings toggle ────────
-    validation.allowParallelMeetings = allowParallelMeetings;
+    if (workflowModeChanged) {
+      validation.workflowMode = workflowMode;
+    }
+    if (allowParallelChanged) {
+      validation.allowParallelMeetings = allowParallelMeetings;
+    }
+    if (phaseStatusChanged) {
+      validation.phaseStatus = phaseStatus;
+    }
     validation.updatedBy = updatedBy;
     validation.updatedAt = new Date();
 
     await validation.save();
+
+    let changeDesc = [];
+    if (workflowModeChanged) changeDesc.push(`workflowMode: '${validation.workflowMode}' → '${workflowMode}'`);
+    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${!allowParallelMeetings} → ${allowParallelMeetings}`);
+    if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${validation.phaseStatus}' → '${phaseStatus}'`);
 
     // ── 4. Log activity ──────────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
@@ -95,7 +112,7 @@ const updateValidationService = async ({
       device,
       requestId,
       ACTIVITY_TRACKER_EVENTS.UPDATE_VALIDATION,
-      `Validation updated - allowParallelMeetings toggled`,
+      `Validation updated: ${changeDesc.join(', ')}`,
       { adminActions: { targetId: projectId } }
     );
 
@@ -104,7 +121,7 @@ const updateValidationService = async ({
     await manualVersionControlService({
       projectId,
       currentPhase: Phases.VALIDATION,
-      action: `Validation updated - allowParallelMeetings toggled — version bump`,
+      action: `Validation updated: ${changeDesc.join(', ')}`,
       performedBy: updatedBy,
       auditContext
     });

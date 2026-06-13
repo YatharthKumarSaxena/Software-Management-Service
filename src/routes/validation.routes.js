@@ -8,7 +8,6 @@ const {
   createValidationRateLimiter,
   updateValidationRateLimiter,
   deleteValidationRateLimiter,
-  freezeValidationRateLimiter,
   getValidationRateLimiter,
   getLatestValidationRateLimiter,
   listValidationsRateLimiter
@@ -27,8 +26,7 @@ const {
   DELETE_VALIDATION,
   GET_VALIDATION,
   GET_LATEST_VALIDATION,
-  LIST_VALIDATIONS,
-  FREEZE_VALIDATION
+  LIST_VALIDATIONS
 } = VALIDATION_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -60,7 +58,9 @@ validationRouter.post(
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.createValidationStakeholderRoleAccessMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware
+    projectMiddlewares.activeProjectGuardMiddleware,
+    validationMiddlewares.createValidationPresenceMiddleware,
+    validationMiddlewares.createValidationValidationMiddleware
   ],
   validationControllers.createValidationController
 );
@@ -75,11 +75,13 @@ validationRouter.patch(
   [
     ...baseAuthAdminMiddlewares,
     updateValidationRateLimiter,
-    validationMiddlewares.fetchLatestValidationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.updateValidationStakeholderRoleAccessMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware
+    projectMiddlewares.activeProjectGuardMiddleware,
+    validationMiddlewares.fetchLatestNotFrozenValidationMiddleware,
+    validationMiddlewares.updateValidationPresenceMiddleware,
+    validationMiddlewares.updateValidationValidationMiddleware
   ],
   validationControllers.updateValidationController
 );
@@ -94,11 +96,11 @@ validationRouter.delete(
   [ 
     ...baseAuthAdminMiddlewares,
     deleteValidationRateLimiter,
-    validationMiddlewares.fetchLatestValidationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     stakeholderRoleAccessMiddlewares.deleteValidationStakeholderRoleAccessMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware,
+    validationMiddlewares.fetchLatestNotFrozenValidationMiddleware,
     validationMiddlewares.deleteValidationPresenceMiddleware,
     validationMiddlewares.deleteValidationValidationMiddleware
   ],
@@ -132,9 +134,9 @@ validationRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getLatestValidationRateLimiter,
-    validationMiddlewares.fetchLatestFrozenValidationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
-    checkUserIsStakeholder
+    checkUserIsStakeholder,
+    validationMiddlewares.fetchLatestAnyStatusValidationMiddleware
   ],
   validationControllers.getLatestValidationController
 );
@@ -153,25 +155,6 @@ validationRouter.get(
     checkUserIsStakeholder
   ],
   validationControllers.listValidationsController
-);
-
-/**
- * PATCH /projects/:projectId/validations/freeze/:projectId
- * Freeze the latest validation for a project.
- * Allowed roles: PROJECT_OWNER
- */
-validationRouter.patch(
-  FREEZE_VALIDATION,
-  [
-    ...baseAuthAdminMiddlewares,
-    freezeValidationRateLimiter,
-    projectMiddlewares.fetchProjectMiddleware,
-    checkUserIsStakeholder,
-    stakeholderRoleAccessMiddlewares.freezeValidationStakeholderRoleAccessMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware,
-    validationMiddlewares.fetchLatestFrozenValidationMiddleware
-  ],
-  validationControllers.freezeValidationController
 );
 
 module.exports = { validationRouter };

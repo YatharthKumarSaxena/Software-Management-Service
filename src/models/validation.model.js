@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { descriptionLength } = require("@/configs/fields-length.config");
 const { customIdRegex } = require("@/configs/regex.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
-const { PhaseDeletionReason, ValidationPhaseStatus } = require("@/configs/enums.config");
+const { PhaseDeletionReason, ValidationPhaseStatus, PhaseStatus } = require("@/configs/enums.config");
 
 const validationSchema = new mongoose.Schema({
 
@@ -83,10 +83,11 @@ const validationSchema = new mongoose.Schema({
     minlength: descriptionLength.min,
     maxlength: descriptionLength.max
   },
-
-  isFrozen: {
-    type: Boolean,
-    default: false
+  
+  phaseStatus: {
+    type: String,
+    enum: Object.values(PhaseStatus),
+    default: PhaseStatus.OPEN
   }
 
 }, { timestamps: true });

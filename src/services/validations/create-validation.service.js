@@ -2,7 +2,7 @@
 
 const { ProjectModel } = require("@models/project.model");
 const { ValidationModel } = require("@models/validation.model");
-const { Phases } = require("@configs/enums.config");
+const { Phases, PhaseStatus } = require("@configs/enums.config");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
@@ -36,7 +36,7 @@ const createValidationService = async ({
     const existingValidation = await ValidationModel.findOne({
       projectId,
       isDeleted: false,
-      isFrozen: false
+      phaseStatus: { $in: [PhaseStatus.OPEN, PhaseStatus.STABILIZING] }
     });
 
     if (existingValidation) {

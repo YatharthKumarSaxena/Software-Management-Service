@@ -6,7 +6,6 @@ const { updateValidationService } = require("./update-validation.service");
 const { getValidationService } = require("./get-validation.service");
 const { getLatestValidationService } = require("./get-latest-validation.service");
 const { listValidationsService } = require("./list-validations.service");
-const { freezeValidationService } = require("./freeze-validation.service");
 
 const validationServices = {
   createValidationService,
@@ -14,8 +13,7 @@ const validationServices = {
   updateValidationService,
   getValidationService,
   getLatestValidationService,
-  listValidationsService,
-  freezeValidationService,
+  listValidationsService
 };
 
 module.exports = { validationServices };
