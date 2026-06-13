@@ -8,7 +8,6 @@ const {
   createElaborationRateLimiter,
   updateElaborationRateLimiter,
   deleteElaborationRateLimiter,
-  freezeElaborationRateLimiter,
   getElaborationRateLimiter,
   getLatestElaborationRateLimiter,
   listElaborationsRateLimiter
@@ -27,8 +26,7 @@ const {
   DELETE_ELABORATION,
   GET_ELABORATION,
   GET_LATEST_ELABORATION,
-  LIST_ELABORATIONS,
-  FREEZE_ELABORATION
+  LIST_ELABORATIONS
 } = ELABORATION_ROUTES;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -59,8 +57,8 @@ elaborationRouter.post(
     createElaborationRateLimiter,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
-    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.createElaborationStakeholderRoleAccessMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
     elaborationMiddlewares.createElaborationPresenceMiddleware,
     elaborationMiddlewares.createElaborationValidationMiddleware
   ],
@@ -77,11 +75,11 @@ elaborationRouter.patch(
   [
     ...baseAuthAdminMiddlewares,
     updateElaborationRateLimiter,
-    elaborationMiddlewares.fetchLatestElaborationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
-    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.updateElaborationStakeholderRoleAccessMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    elaborationMiddlewares.fetchLatestNotFrozenElaborationMiddleware,
     elaborationMiddlewares.updateElaborationPresenceMiddleware,
     elaborationMiddlewares.updateElaborationValidationMiddleware
   ],
@@ -98,11 +96,11 @@ elaborationRouter.delete(
   [ 
     ...baseAuthAdminMiddlewares,
     deleteElaborationRateLimiter,
-    elaborationMiddlewares.fetchLatestElaborationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
-    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderRoleAccessMiddlewares.deleteElaborationStakeholderRoleAccessMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    elaborationMiddlewares.fetchLatestNotFrozenElaborationMiddleware,
     elaborationMiddlewares.deleteElaborationPresenceMiddleware,
     elaborationMiddlewares.deleteElaborationValidationMiddleware
   ],
@@ -136,9 +134,9 @@ elaborationRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getLatestElaborationRateLimiter,
-    elaborationMiddlewares.fetchLatestFrozenElaborationMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
-    checkUserIsStakeholder
+    checkUserIsStakeholder,
+    elaborationMiddlewares.fetchLatestAnyStatusElaborationMiddleware
   ],
   elaborationControllers.getLatestElaborationController
 );
@@ -157,25 +155,6 @@ elaborationRouter.get(
     checkUserIsStakeholder
   ],
   elaborationControllers.listElaborationsController
-);
-
-/**
- * PATCH /projects/:projectId/elaborations/freeze/:projectId
- * Freeze the latest elaboration for a project.
- * Allowed roles: PROJECT_OWNER
- */
-elaborationRouter.patch(
-  FREEZE_ELABORATION,
-  [
-    ...baseAuthAdminMiddlewares,
-    freezeElaborationRateLimiter,
-    elaborationMiddlewares.fetchLatestFrozenElaborationMiddleware,
-    projectMiddlewares.fetchProjectMiddleware,
-    checkUserIsStakeholder,
-    stakeholderRoleAccessMiddlewares.freezeElaborationStakeholderRoleAccessMiddleware,
-    projectMiddlewares.activeProjectGuardMiddleware
-  ],
-  elaborationControllers.freezeElaborationController
 );
 
 module.exports = { elaborationRouter };

@@ -1,13 +1,20 @@
 const { createFetchPhaseMiddleware } = require("../factory/fetch-phase.middleware-factory");
-const { createCheckLatestPhaseNotFrozenMiddleware } = require("../factory/check-not-frozen.middleware-factory");
+const { createCheckLatestPhaseNotFrozenMiddleware, createCheckLatestPhaseAnyStatusMiddleware, createCheckLatestPhaseOpenMiddleware } = require("../factory/check-latest-phase.middleware-factory");
 const { Phases } = require("@/configs/enums.config");
 
 const fetchElaborationMiddleware = createFetchPhaseMiddleware(Phases.ELABORATION, "elaborationId", "elaboration");
-const fetchLatestElaborationMiddleware = createCheckLatestPhaseNotFrozenMiddleware([Phases.ELABORATION],true);
-const fetchLatestFrozenElaborationMiddleware = createCheckLatestPhaseNotFrozenMiddleware([Phases.ELABORATION],false);
+const fetchLatestAnyStatusElaborationMiddleware =
+    createCheckLatestPhaseAnyStatusMiddleware([Phases.ELABORATION]);
+
+const fetchLatestOpenElaborationMiddleware =
+    createCheckLatestPhaseOpenMiddleware([Phases.ELABORATION]);
+
+const fetchLatestNotFrozenElaborationMiddleware =
+    createCheckLatestPhaseNotFrozenMiddleware([Phases.ELABORATION]);
 
 module.exports = { 
   fetchElaborationMiddleware,
-  fetchLatestElaborationMiddleware,
-  fetchLatestFrozenElaborationMiddleware
+  fetchLatestAnyStatusElaborationMiddleware,
+  fetchLatestOpenElaborationMiddleware,
+  fetchLatestNotFrozenElaborationMiddleware
 };
