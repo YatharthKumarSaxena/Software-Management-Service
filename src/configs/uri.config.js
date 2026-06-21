@@ -29,6 +29,7 @@ const SPECIFICATION_BASE = `${API_PREFIX}/specifications`; // /software-manageme
 const NEGOTIATION_BASE = `${API_PREFIX}/negotiations`; // /software-management-service/api/v1/negotiations
 const HLF_REQUIREMENT_BASE = `${API_PREFIX}/requirements`; // /software-management-service/api/v1/requirements
 const REQUIREMENT_BASE = `${API_PREFIX}/requirements`; // /software-management-service/api/v1/requirements
+const PHASE_BASE = `${API_PREFIX}/phases`; // /software-management-service/api/v1/phases
 
 module.exports = {
     INTERNAL_BASE,
@@ -54,6 +55,7 @@ module.exports = {
     NEGOTIATION_BASE,
     HLF_REQUIREMENT_BASE,
     REQUIREMENT_BASE,
+    PHASE_BASE,
     INTERNAL_ROUTES: {
         CREATE_SUPER_ADMIN: `/create-super-admin`, // /software-management-service/api/v1/internal/create-super-admin
         CREATE_USER: `/create-user`, // /software-management-service/api/v1/internal/admin-panel/create-user
@@ -242,5 +244,14 @@ module.exports = {
         LIST_REQUIREMENTS: `/list/:projectId`, // GET /api/v1/requirements/list/:projectId
         LINK_REQUIREMENT_TO_HLF: `/link-to-hlf/:requirementId/:hlfId`, // PATCH /api/v1/requirements/link-to-hlf/:requirementId/:hlfId
         UNLINK_REQUIREMENT_FROM_HLF: `/unlink-from-hlf/:requirementId` // PATCH /api/v1/requirements/unlink-from-hlf/:requirementId
+    },
+    PHASE_ROUTES: {
+        CREATE_PHASE: `/create/:projectId`, // POST /api/v1/phases/create/:projectId
+        UPDATE_PHASE_SETTING: `/update/:projectId`, // PATCH /api/v1/phases/update/:projectId/:projectId
+        UPDATE_PHASE_STATUS: `/update/:projectId`, // PATCH /api/v1/phases/update/:projectId/:projectId
+        DELETE_PHASE: `/delete/:projectId`, // DELETE /api/v1/phases/delete/:projectId/:projectId
+        GET_PHASE: `/get/:phaseType/:phaseId`, // GET /api/v1/phases/get/:projectId/:phaseId
+        LIST_PHASES: `/list/:phaseType/:projectId`, // GET /api/v1/phases/list/:projectId
+        GET_LATEST_PHASE: `/latest/:phaseType/:projectId`, // GET /api/v1/phases/latest/:projectId
     }
 };

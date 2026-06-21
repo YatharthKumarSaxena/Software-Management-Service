@@ -93,6 +93,11 @@ const validationSets = {
     updateRequirementToHlfValidationSet: getValidationSet(FieldDefinitions.UPDATE_REQUIREMENT_TO_HLF),
     unlinkRequirementToHlfValidationSet: getValidationSet(FieldDefinitions.UNLINK_REQUIREMENT_TO_HLF),
 
+    createPhaseValidationSet: getValidationSet(FieldDefinitions.CREATE_PHASE),
+    updatePhaseStatusValidationSet: getValidationSet(FieldDefinitions.UPDATE_PHASE_STATUS),
+    updatePhaseSettingsValidationSet: getValidationSet(FieldDefinitions.UPDATE_PHASE_SETTINGS),
+    deletePhaseValidationSet: getValidationSet(FieldDefinitions.DELETE_PHASE),
+
     phaseRoleActionValidationSet: getValidationSet(FieldDefinitions.PHASE_ROLE_ACTION),
 };
 

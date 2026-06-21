@@ -19,87 +19,87 @@ const { FieldDefinitions } = require("./field-definitions.config");
 const requiredFields = {
     createProjectField: getRequiredFields(FieldDefinitions.CREATE_PROJECT),
     updateProjectField: getRequiredFields(FieldDefinitions.UPDATE_PROJECT),
-    onHoldProjectField:getRequiredFields(FieldDefinitions.ON_HOLD_PROJECT),
-    abortProjectField   :getRequiredFields(FieldDefinitions.ABORT_PROJECT),
-    completeProjectField:getRequiredFields(FieldDefinitions.COMPLETE_PROJECT),
-    resumeProjectField  :getRequiredFields(FieldDefinitions.RESUME_PROJECT),
-    deleteProjectField  :getRequiredFields(FieldDefinitions.DELETE_PROJECT),
-    archiveProjectField :getRequiredFields(FieldDefinitions.ARCHIVE_PROJECT),
-    activateProjectField :getRequiredFields(FieldDefinitions.ACTIVATE_PROJECT),
-    changeProjectOwnerField :getRequiredFields(FieldDefinitions.CHANGE_PROJECT_OWNER),
+    onHoldProjectField: getRequiredFields(FieldDefinitions.ON_HOLD_PROJECT),
+    abortProjectField: getRequiredFields(FieldDefinitions.ABORT_PROJECT),
+    completeProjectField: getRequiredFields(FieldDefinitions.COMPLETE_PROJECT),
+    resumeProjectField: getRequiredFields(FieldDefinitions.RESUME_PROJECT),
+    deleteProjectField: getRequiredFields(FieldDefinitions.DELETE_PROJECT),
+    archiveProjectField: getRequiredFields(FieldDefinitions.ARCHIVE_PROJECT),
+    activateProjectField: getRequiredFields(FieldDefinitions.ACTIVATE_PROJECT),
+    changeProjectOwnerField: getRequiredFields(FieldDefinitions.CHANGE_PROJECT_OWNER),
 
     // ── Stakeholder ──────────────────────────────────────────────────────────────
-    createStakeholderField:getRequiredFields(FieldDefinitions.CREATE_STAKEHOLDER),
-    updateStakeholderField:getRequiredFields(FieldDefinitions.UPDATE_STAKEHOLDER),
-    deleteStakeholderField:getRequiredFields(FieldDefinitions.DELETE_STAKEHOLDER),
+    createStakeholderField: getRequiredFields(FieldDefinitions.CREATE_STAKEHOLDER),
+    updateStakeholderField: getRequiredFields(FieldDefinitions.UPDATE_STAKEHOLDER),
+    deleteStakeholderField: getRequiredFields(FieldDefinitions.DELETE_STAKEHOLDER),
 
     // ── Product Request ───────────────────────────────────────────────────────────
-    createProductRequestField:getRequiredFields(FieldDefinitions.CREATE_PRODUCT_REQUEST),
-    updateProductRequestField:getRequiredFields(FieldDefinitions.UPDATE_PRODUCT_REQUEST),
-    deleteProductRequestField:getRequiredFields(FieldDefinitions.DELETE_PRODUCT_REQUEST),
-    approveProductRequestField:getRequiredFields(FieldDefinitions.APPROVE_PRODUCT_REQUEST),
-    rejectProductRequestField:getRequiredFields(FieldDefinitions.REJECT_PRODUCT_REQUEST),
+    createProductRequestField: getRequiredFields(FieldDefinitions.CREATE_PRODUCT_REQUEST),
+    updateProductRequestField: getRequiredFields(FieldDefinitions.UPDATE_PRODUCT_REQUEST),
+    deleteProductRequestField: getRequiredFields(FieldDefinitions.DELETE_PRODUCT_REQUEST),
+    approveProductRequestField: getRequiredFields(FieldDefinitions.APPROVE_PRODUCT_REQUEST),
+    rejectProductRequestField: getRequiredFields(FieldDefinitions.REJECT_PRODUCT_REQUEST),
 
     // ── Scope ────────────────────────────────────────────────────────────────────
-    createScopeField:getRequiredFields(FieldDefinitions.CREATE_SCOPE),
-    updateScopeField:getRequiredFields(FieldDefinitions.UPDATE_SCOPE),
-    deleteScopeField:getRequiredFields(FieldDefinitions.DELETE_SCOPE),
+    createScopeField: getRequiredFields(FieldDefinitions.CREATE_SCOPE),
+    updateScopeField: getRequiredFields(FieldDefinitions.UPDATE_SCOPE),
+    deleteScopeField: getRequiredFields(FieldDefinitions.DELETE_SCOPE),
 
     // ── High-Level Feature ────────────────────────────────────────────────────────
-    createHlfField:getRequiredFields(FieldDefinitions.CREATE_HLF),
-    updateHlfField:getRequiredFields(FieldDefinitions.UPDATE_HLF),
-    deleteHlfField:getRequiredFields(FieldDefinitions.DELETE_HLF),
+    createHlfField: getRequiredFields(FieldDefinitions.CREATE_HLF),
+    updateHlfField: getRequiredFields(FieldDefinitions.UPDATE_HLF),
+    deleteHlfField: getRequiredFields(FieldDefinitions.DELETE_HLF),
 
     // ── Product Vision ────────────────────────────────────────────────────────
-    createProductVisionField:getRequiredFields(FieldDefinitions.CREATE_PRODUCT_VISION),
-    updateProductVisionField:getRequiredFields(FieldDefinitions.UPDATE_PRODUCT_VISION),
-    deleteProductVisionField:getRequiredFields(FieldDefinitions.DELETE_PRODUCT_VISION),
+    createProductVisionField: getRequiredFields(FieldDefinitions.CREATE_PRODUCT_VISION),
+    updateProductVisionField: getRequiredFields(FieldDefinitions.UPDATE_PRODUCT_VISION),
+    deleteProductVisionField: getRequiredFields(FieldDefinitions.DELETE_PRODUCT_VISION),
 
     // ── Comment ───────────────────────────────────────────────────────────────
-    createCommentField:getRequiredFields(FieldDefinitions.CREATE_COMMENT),
-    updateCommentField:getRequiredFields(FieldDefinitions.UPDATE_COMMENT),
-    deleteCommentField:getRequiredFields(FieldDefinitions.DELETE_COMMENT),
-    commentEntityField:getRequiredFields(FieldDefinitions.COMMENT_ENTITY),
+    createCommentField: getRequiredFields(FieldDefinitions.CREATE_COMMENT),
+    updateCommentField: getRequiredFields(FieldDefinitions.UPDATE_COMMENT),
+    deleteCommentField: getRequiredFields(FieldDefinitions.DELETE_COMMENT),
+    commentEntityField: getRequiredFields(FieldDefinitions.COMMENT_ENTITY),
 
     // ── Idea ──────────────────────────────────────────────────────────────
-    createIdeaField:getRequiredFields(FieldDefinitions.CREATE_IDEA),
-    updateIdeaField:getRequiredFields(FieldDefinitions.UPDATE_IDEA),
-    deleteIdeaField:getRequiredFields(FieldDefinitions.DELETE_IDEA),
-    acceptIdeaField:getRequiredFields(FieldDefinitions.ACCEPT_IDEA),
-    rejectIdeaField:getRequiredFields(FieldDefinitions.REJECT_IDEA),
-    deferIdeaField:getRequiredFields(FieldDefinitions.DEFER_IDEA),
-    reopenIdeaField:getRequiredFields(FieldDefinitions.REOPEN_IDEA),
-    revokeIdeaField:getRequiredFields(FieldDefinitions.REVOKE_IDEA),
+    createIdeaField: getRequiredFields(FieldDefinitions.CREATE_IDEA),
+    updateIdeaField: getRequiredFields(FieldDefinitions.UPDATE_IDEA),
+    deleteIdeaField: getRequiredFields(FieldDefinitions.DELETE_IDEA),
+    acceptIdeaField: getRequiredFields(FieldDefinitions.ACCEPT_IDEA),
+    rejectIdeaField: getRequiredFields(FieldDefinitions.REJECT_IDEA),
+    deferIdeaField: getRequiredFields(FieldDefinitions.DEFER_IDEA),
+    reopenIdeaField: getRequiredFields(FieldDefinitions.REOPEN_IDEA),
+    revokeIdeaField: getRequiredFields(FieldDefinitions.REVOKE_IDEA),
 
     // ── Inception ────────────────────────────────────────────────────────────────
-    createInceptionField:getRequiredFields(FieldDefinitions.CREATE_INCEPTION),
-    updateInceptionField:getRequiredFields(FieldDefinitions.UPDATE_INCEPTION),
-    deleteInceptionField:getRequiredFields(FieldDefinitions.DELETE_INCEPTION),
+    createInceptionField: getRequiredFields(FieldDefinitions.CREATE_INCEPTION),
+    updateInceptionField: getRequiredFields(FieldDefinitions.UPDATE_INCEPTION),
+    deleteInceptionField: getRequiredFields(FieldDefinitions.DELETE_INCEPTION),
 
     // ── Elicitation ───────────────────────────────────────────────────────────────
-    createElicitationField:getRequiredFields(FieldDefinitions.CREATE_ELICITATION),
-    updateElicitationField:getRequiredFields(FieldDefinitions.UPDATE_ELICITATION),
-    deleteElicitationField:getRequiredFields(FieldDefinitions.DELETE_ELICITATION),
+    createElicitationField: getRequiredFields(FieldDefinitions.CREATE_ELICITATION),
+    updateElicitationField: getRequiredFields(FieldDefinitions.UPDATE_ELICITATION),
+    deleteElicitationField: getRequiredFields(FieldDefinitions.DELETE_ELICITATION),
 
     // ── Elaboration ───────────────────────────────────────────────────────────────
-    createElaborationField:getRequiredFields(FieldDefinitions.CREATE_ELABORATION),
-    updateElaborationField:getRequiredFields(FieldDefinitions.UPDATE_ELABORATION),
-    deleteElaborationField:getRequiredFields(FieldDefinitions.DELETE_ELABORATION),
-    
+    createElaborationField: getRequiredFields(FieldDefinitions.CREATE_ELABORATION),
+    updateElaborationField: getRequiredFields(FieldDefinitions.UPDATE_ELABORATION),
+    deleteElaborationField: getRequiredFields(FieldDefinitions.DELETE_ELABORATION),
+
     // ── Negotiation ───────────────────────────────────────────────────────────────
-    createNegotiationField:getRequiredFields(FieldDefinitions.CREATE_NEGOTIATION),
-    updateNegotiationField:getRequiredFields(FieldDefinitions.UPDATE_NEGOTIATION),
-    deleteNegotiationField:getRequiredFields(FieldDefinitions.DELETE_NEGOTIATION),
+    createNegotiationField: getRequiredFields(FieldDefinitions.CREATE_NEGOTIATION),
+    updateNegotiationField: getRequiredFields(FieldDefinitions.UPDATE_NEGOTIATION),
+    deleteNegotiationField: getRequiredFields(FieldDefinitions.DELETE_NEGOTIATION),
 
     // ── Specification ───────────────────────────────────────────────────────────────
-    createSpecificationField:getRequiredFields(FieldDefinitions.CREATE_SPECIFICATION),
-    updateSpecificationField:getRequiredFields(FieldDefinitions.UPDATE_SPECIFICATION),
-    deleteSpecificationField:getRequiredFields(FieldDefinitions.DELETE_SPECIFICATION),
+    createSpecificationField: getRequiredFields(FieldDefinitions.CREATE_SPECIFICATION),
+    updateSpecificationField: getRequiredFields(FieldDefinitions.UPDATE_SPECIFICATION),
+    deleteSpecificationField: getRequiredFields(FieldDefinitions.DELETE_SPECIFICATION),
 
     // ── Validation ───────────────────────────────────────────────────────────────
-    createValidationField:getRequiredFields(FieldDefinitions.CREATE_VALIDATION),
-    updateValidationField:getRequiredFields(FieldDefinitions.UPDATE_VALIDATION),
-    deleteValidationField:getRequiredFields(FieldDefinitions.DELETE_VALIDATION),
+    createValidationField: getRequiredFields(FieldDefinitions.CREATE_VALIDATION),
+    updateValidationField: getRequiredFields(FieldDefinitions.UPDATE_VALIDATION),
+    deleteValidationField: getRequiredFields(FieldDefinitions.DELETE_VALIDATION),
 
     createMeetingField: getRequiredFields(FieldDefinitions.CREATE_MEETING),
     updateMeetingField: getRequiredFields(FieldDefinitions.UPDATE_MEETING),
@@ -135,7 +135,12 @@ const requiredFields = {
     updateRequirementToHlfField: getRequiredFields(FieldDefinitions.UPDATE_REQUIREMENT_TO_HLF),
     unlinkRequirementToHlfField: getRequiredFields(FieldDefinitions.UNLINK_REQUIREMENT_TO_HLF),
 
-    phaseRoleActionField: getRequiredFields(FieldDefinitions.PHASE_ROLE_ACTION),
+    createPhaseField: getRequiredFields(FieldDefinitions.CREATE_PHASE),
+    updatePhaseStatusField: getRequiredFields(FieldDefinitions.UPDATE_PHASE_STATUS),
+    updatePhaseSettingsField: getRequiredFields(FieldDefinitions.UPDATE_PHASE_SETTINGS),
+    deletePhaseField: getRequiredFields(FieldDefinitions.DELETE_PHASE),
+
+    phaseRoleActionField: getRequiredFields(FieldDefinitions.PHASE_ROLE_ACTION)
 }
 
 module.exports = {

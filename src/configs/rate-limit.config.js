@@ -1029,6 +1029,55 @@ module.exports = {
       prefix: "unmap_feature_requirement",
       reason: "Unmap feature requirement endpoint abuse",
       message: "Too many requests to unmap feature requirement endpoint. Please try again later."
+    },
+    createPhase: {
+      maxRequests: 50,
+      windowMs: 60 * 1000,
+      prefix: "create_phase",
+      reason: "Create phase endpoint abuse",
+      message: "Too many requests to create phase endpoint. Please try again later."
+    },
+    updatePhaseStatus: {
+      maxRequests: 50,
+      windowMs: 60 * 1000,
+      prefix: "update_phase_status",
+      reason: "Update phase status endpoint abuse",
+      message: "Too many requests to update phase status endpoint. Please try again later."
+    },
+    updatePhaseSettings: {
+      maxRequests: 50,
+      windowMs: 60 * 1000,
+      prefix: "update_phase_settings",
+      reason: "Update phase settings endpoint abuse",
+      message: "Too many requests to update phase settings endpoint. Please try again later."
+    },
+    deletePhase: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "delete_phase",
+      reason: "Delete phase endpoint abuse",
+      message: "Too many requests to delete phase endpoint. Please try again later."
+    },
+    getLatestPhase: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_latest_phase",
+      reason: "Get latest phase endpoint abuse",
+      message: "Too many requests to get latest phase endpoint. Please try again later."
+    },
+    getPhase: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_phase",
+      reason: "Get phase endpoint abuse",
+      message: "Too many requests to get phase endpoint. Please try again later."
+    },
+    listPhases: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_phases",
+      reason: "List phases endpoint abuse",
+      message: "Too many requests to list phases endpoint. Please try again later."
     }
   }
 }

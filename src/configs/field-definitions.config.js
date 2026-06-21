@@ -93,6 +93,12 @@ const FieldDefinitions = {
       required: false,
       validation: null,
       description: "Optional flag to allow STABILIZING to OPEN rollback"
+    },
+    OWNER_ID: {
+      field: "ownerId",
+      required: false,
+      validation: validationRules.userId,
+      description: "USR-prefixed custom user ID of the Admin"
     }
   },
 
@@ -175,7 +181,25 @@ const FieldDefinitions = {
       required: false,
       validation: null,
       description: "Optional flag to allow STABILIZING to OPEN rollback"
-    }
+    },
+    OWNER_ID: {
+      field: "ownerId",
+      required: false,
+      validation: validationRules.userId,
+      description: "USR-prefixed custom user ID of the Admin"
+    },
+    OWNER_CHANGE_REASON_TYPE: {
+      field: "changeOwnerReasonType",
+      required: false,
+      validation: validationRules.changeOwnerReasonType,
+      description: "Reason category for changing the owner (enum)"
+    },
+    OWNER_CHANGE_REASON_DESCRIPTION: {
+      field: "ownerChangeReasonDescription",
+      required: false,
+      validation: validationRules.reasonDescription,
+      description: "Optional description (mandatory if criticality is CRITICAL)"
+    },
   },
 
   // ── ON_HOLD PROJECT ──────────────────────────────────────
@@ -1695,7 +1719,7 @@ const FieldDefinitions = {
       description: "Optional reason for deferral"
     }
   },
-  
+
   LINK_REQUIREMENT_TO_HLF: {
     HIGH_LEVEL_FEATURE_ID: {
       field: "highLevelFeatureId",
@@ -1731,44 +1755,125 @@ const FieldDefinitions = {
     description: "Specific phase to assign when multiple phases are active (optional)"
   },
 
-UPDATE_REQUIREMENT_TO_HLF: {
-  RELATIONSHIP_NOTES: {
-    field: "relationshipNotes",
-    required: false,
-    validation: validationRules.descriptionField,
-    description: "Updated description of relation between requirement and HLF (optional)"
+  UPDATE_REQUIREMENT_TO_HLF: {
+    RELATIONSHIP_NOTES: {
+      field: "relationshipNotes",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Updated description of relation between requirement and HLF (optional)"
+    },
+    RELATION_TYPE: {
+      field: "relationType",
+      required: false,
+      validation: validationRules.RelationTypes,
+      description: "Updated type of relation between requirement and feature (optional enum)"
+    }
   },
-  RELATION_TYPE: {
-    field: "relationType",
-    required: false,
-    validation: validationRules.RelationTypes,
-    description: "Updated type of relation between requirement and feature (optional enum)"
-  }
-},
 
-UNLINK_REQUIREMENT_TO_HLF: {
-  UNLINK_REASON: {
-    field: "unlinkReason",
-    required: true,
-    validation: validationRules.UnlinkReasonTypes,
-    description: "Reason for unlinking requirement from HLF (required enum)"
+  UNLINK_REQUIREMENT_TO_HLF: {
+    UNLINK_REASON: {
+      field: "unlinkReason",
+      required: true,
+      validation: validationRules.UnlinkReasonTypes,
+      description: "Reason for unlinking requirement from HLF (required enum)"
+    },
+    UNLINK_DESCRIPTION: {
+      field: "unlinkDescription",
+      required: false,
+      validation: validationRules.descriptionField,
+      description: "Optional description of the unlink reason"
+    }
   },
-  UNLINK_DESCRIPTION: {
-    field: "unlinkDescription",
-    required: false,
-    validation: validationRules.descriptionField,
-    description: "Optional description of the unlink reason"
-  }
-},
 
-PHASE_ROLE_ACTION: {
-  PHASE_TYPE: {
-    field: "phaseType",
-    required: true,
-    validation: validationRules.AllowedPhaseTypes,
-    description: "Phase to assign the role for (required)"
-  }
-}
+  PHASE_ROLE_ACTION: {
+    PHASE_TYPE: {
+      field: "phaseType",
+      required: true,
+      validation: validationRules.AllowedPhaseTypes,
+      description: "Phase to assign the role for (required)"
+    }
+  },
+
+  // ── CREATE INCEPTION ─────────────────────────────────────────────
+  CREATE_PHASE: {
+    PHASE: {
+      field: "phaseType",
+      required: true,
+      validation: validationRules.phaseType,
+      description: "Phase Type: inceptions | elicitations | elaborations | negotiations | specifications | validations"
+    },
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Inception mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
+    }
+  },
+
+  // ── UPDATE INCEPTION ─────────────────────────────────────────────
+  UPDATE_PHASE_STATUS: {
+    PHASE: {
+      field: "phaseType",
+      required: true,
+      validation: validationRules.phaseType,
+      description: "Phase Type: inceptions | elicitations | elaborations | negotiations | specifications | validations"
+    },
+    PHASE_STATUS: {
+      field: "phaseStatus",
+      required: false,
+      validation: validationRules.phaseStatus,
+      description: "Lifecycle status: OPEN | STABILIZING | FROZEN"
+    }
+  },
+
+  UPDATE_PHASE_SETTINGS: {
+    PHASE: {
+      field: "phaseType",
+      required: true,
+      validation: validationRules.phaseType,
+      description: "Phase Type: inceptions | elicitations | elaborations | negotiations | specifications | validations"
+    },
+    ALLOW_PARALLEL_MEETINGS: {
+      field: "allowParallelMeetings",
+      required: false,
+      validation: null,
+      description: "Whether parallel meetings are allowed during elaboration (optional, defaults to false)"
+    },
+    MODE: {
+      field: "workflowMode",
+      required: false,
+      validation: validationRules.workflowMode,
+      description: "Inception mode: OPEN | MODERATION | STRICT | CREATED_IN_MODE (enum)"
+    },
+  },
+
+  DELETE_PHASE: {
+    DELETION_REASON_TYPE: {
+      field: "deletionReasonType",
+      required: true,
+      validation: validationRules.inceptionDeletionReasonType,
+      description: "Reason category for deleting inception (enum)"
+    },
+    DELETION_REASON_DESCRIPTION: {
+      field: "deletionReasonDescription",
+      required: false,
+      validation: validationRules.reasonDescription,
+      description: "Optional free-text elaboration on deletion reason"
+    },
+  },
+
 
 };
 

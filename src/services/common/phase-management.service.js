@@ -193,16 +193,17 @@ const createPhaseWithVersionManagement = async ({
 }) => {
   try {
     const projectId = project._id.toString();
+    const phaseName = targetPhase.charAt(0).toUpperCase() + targetPhase.slice(1);
 
     // ── Validation ────────────────────────────────────────────────────
     if (!PHASE_MODEL_MAP[targetPhase]) {
       logWithTime(`❌ Invalid target phase: ${targetPhase}`);
-      return { success: false, message: `Invalid target phase: ${targetPhase}`, errorCode: 400 };
+      return { success: false, message: `Invalid target phase: ${targetPhase}`, errorCode: BAD_REQUEST };
     }
 
     if (!mongoose.Types.ObjectId.isValid(projectId)) {
       logWithTime(`❌ Invalid projectId: ${projectId}`);
-      return { success: false, message: "Invalid project ID", errorCode: 400 };
+      return { success: false, message: "Invalid project ID", errorCode: BAD_REQUEST };
     }
 
     // ── Step 1: Block multiple active documents for the SAME phase ────
@@ -234,7 +235,6 @@ const createPhaseWithVersionManagement = async ({
     let targetPhaseHighestMajor = 0;
 
     // Track latest workflow position in the highest cycle
-    let latestWorkflowPhase = null;
     let latestWorkflowOrder = 0;
 
     // Poori list traverse karke max version find kar rahe hain
@@ -256,7 +256,6 @@ const createPhaseWithVersionManagement = async ({
           highestMajor = docMajor;
 
           // Reset workflow tracking for this newer cycle
-          latestWorkflowPhase = phase;
           latestWorkflowOrder = phaseOrder;
         }
 
@@ -265,7 +264,6 @@ const createPhaseWithVersionManagement = async ({
           docMajor === highestMajor &&
           phaseOrder > latestWorkflowOrder
         ) {
-          latestWorkflowPhase = phase;
           latestWorkflowOrder = phaseOrder;
         }
 
@@ -353,10 +351,17 @@ const createPhaseWithVersionManagement = async ({
       { oldData, newData, adminActions: { targetId: projectId } }
     );
 
-    return { success: true,alreadyInRequestedStatus: false, phase: createdPhase, version: { major: newMajorVersion, minor: 0 } };
+    return { success: true, message: `${phaseName} phase created successfully`, phase: createdPhase, version: { major: newMajorVersion, minor: 0 } };
 
   } catch (error) {
     logWithTime(`❌ Error: ${error.message}`);
+    if (error.name === "ValidationError" || error.name === "CastError") {
+      return {
+        success: false,
+        message: error.message,
+        errorCode: BAD_REQUEST
+      };
+    }
     return { success: false, message: "Internal error while creating phase", error: error.message, errorCode: INTERNAL_ERROR };
   }
 };
@@ -399,6 +404,8 @@ const updatePhaseStatus = async ({
     return { success: false, message: `Invalid phase: ${phase}`, errorCode: BAD_REQUEST };
   }
 
+  const phaseName = phase.charAt(0).toUpperCase() + phase.slice(1);
+
   const currentStatus = getPhaseStatus(phaseDocument);
 
   if (currentStatus === nextStatus) {
@@ -406,7 +413,7 @@ const updatePhaseStatus = async ({
       success: true,
       alreadyInRequestedStatus: true,
       phase: phaseDocument,
-      message: "Phase is already in the requested status."
+      message: `${phaseName} Phase is already in the requested status.`
     };
   }
 
@@ -414,7 +421,7 @@ const updatePhaseStatus = async ({
   if (currentStatus === PhaseStatus.FROZEN) {
     return {
       success: false,
-      message: "Frozen phases cannot be modified",
+      message: `${phaseName} Phase is frozen and cannot be modified`,
       errorCode: CONFLICT
     };
   }
@@ -425,8 +432,8 @@ const updatePhaseStatus = async ({
   if (!canTransitionPhaseStatus({ currentStatus, nextStatus, allowStabilizingRollback })) {
     return {
       success: false,
-      message: `Invalid phase status transition: ${currentStatus} to ${nextStatus}`,
-      errorCode: CONFLICT
+      message: `Phase status transition: ${currentStatus} to ${nextStatus} is not allowed`,
+      errorCode: BAD_REQUEST
     };
   }
 
@@ -462,7 +469,7 @@ const updatePhaseStatus = async ({
         device,
         requestId,
         trackerEvent,
-        `${phase} phase status changed from ${currentStatus} to ${nextStatus}`,
+        `${phaseName} phase status changed from ${currentStatus} to ${nextStatus}`,
         {
           oldData,
           newData,
@@ -474,7 +481,7 @@ const updatePhaseStatus = async ({
     }
   }
 
-  return { success: true, alreadyInRequestedStatus: false, phase: updatedDoc };
+  return { success: true, alreadyInRequestedStatus: false, message: `Phase status for ${phaseName} Phase updated from ${currentStatus} to ${nextStatus}`, phase: updatedDoc };
 };
 
 /**
