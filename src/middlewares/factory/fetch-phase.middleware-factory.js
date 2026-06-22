@@ -45,7 +45,7 @@ const { Phases } = require("@configs/enums.config");
  */
 const createFetchPhaseMiddleware = (
     phaseEnum,
-    paramName = "elaborationId",
+    paramName = "phaseId",
     requestKey = null
 ) => {
     // Auto-derive request key from phase enum if not provided
@@ -117,6 +117,7 @@ const createFetchPhaseMiddleware = (
             // ============================================
             // Attach to request & proceed
             // ============================================
+            req.phase = phaseDocument;
             req[derivedRequestKey] = phaseDocument;
             req.projectId = phaseDocument.projectId.toString();
 

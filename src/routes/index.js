@@ -1,4 +1,28 @@
-const { REQUIREMENT_BASE, INTERNAL_BASE, TEST_BASE, PROJECT_BASE, STAKEHOLDER_BASE, PRODUCT_REQUEST_BASE, ORG_PROJECT_REQUEST_BASE, SCOPE_BASE, HLF_BASE, IDEAS_BASE, PRODUCT_VISION_BASE, COMMENT_BASE, ACTIVITY_TRACKER_BASE, ELICITATION_BASE, INCEPTION_BASE, MEETINGS_BASE, PARTICIPANTS_BASE, ELABORATION_BASE, NEGOTIATION_BASE, SPECIFICATION_BASE, VALIDATION_BASE } = require("@/configs/uri.config");
+const { 
+  REQUIREMENT_BASE, 
+  INTERNAL_BASE, 
+  TEST_BASE, 
+  PROJECT_BASE, 
+  STAKEHOLDER_BASE, 
+  PRODUCT_REQUEST_BASE, 
+  ORG_PROJECT_REQUEST_BASE, 
+  SCOPE_BASE, 
+  HLF_BASE, 
+  IDEAS_BASE, 
+  PRODUCT_VISION_BASE, 
+  COMMENT_BASE, 
+  ACTIVITY_TRACKER_BASE, 
+  ELICITATION_BASE, 
+  INCEPTION_BASE, 
+  MEETINGS_BASE, 
+  PARTICIPANTS_BASE, 
+  ELABORATION_BASE, 
+  NEGOTIATION_BASE, 
+  SPECIFICATION_BASE, 
+  VALIDATION_BASE, 
+  PHASE_BASE 
+} = require("@/configs/uri.config");
+
 const { internalRouter }    = require("./internal.routes");
 const { testRouter }        = require("./test.routes");
 const { projectRouter }     = require("./project.routes");
@@ -20,6 +44,7 @@ const { specificationRouter } = require("./specification.routes");
 const { negotiationRouter } = require("./negotiation.routes");
 const { elaborationRouter } = require("./elaboration.routes");
 const { requirementRouter } = require("./requirement.routes");
+const { phaseRouter } = require("./phase.routes")
 
 module.exports = (app) => {
   // Internal service-to-service routes (protected by service token)
@@ -76,4 +101,6 @@ module.exports = (app) => {
   app.use(NEGOTIATION_BASE, negotiationRouter);
 
   app.use(REQUIREMENT_BASE, requirementRouter);
+
+  app.use(PHASE_BASE, phaseRouter)
 };

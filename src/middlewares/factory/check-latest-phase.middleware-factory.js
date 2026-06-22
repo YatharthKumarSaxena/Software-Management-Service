@@ -208,8 +208,8 @@ const createCheckLatestPhaseStatusMiddleware =
                         `✅ Latest phases matched for statuses [${allowedStatuses.join(", ")}]: ${matchedPhases.join(", ")}`
                     );
 
-                    req.projectId =
-                        projectId;
+                    req.projectId = projectId.toString();
+                    req.latestPhases = latestPhases;
 
                     return next();
 
