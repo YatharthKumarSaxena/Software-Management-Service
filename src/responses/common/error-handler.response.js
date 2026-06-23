@@ -133,7 +133,7 @@ const throwInternalServerError = (res,error) => {
     return res.status(INTERNAL_ERROR).json({
         success: false,
         response: "An internal server error occurred while processing your request.",
-        message: "W    errorMessage,e apologize for the inconvenience. Please try again later."
+        message: "We apologize for the inconvenience. Please try again later."
     });
 }
 
