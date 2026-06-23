@@ -5,34 +5,35 @@ const {
     INTERNAL_ERROR,
     BAD_REQUEST
 } = require("@configs/http-status.config");
+const { InceptionModel, ElicitationModel, ElaborationModel, NegotiationModel, SpecificationModel, ValidationModel } = require("@/models");
 
 const listInceptionService = createListService({
-    model: Phases.INCEPTION,
+    model: InceptionModel,
     hiddenFields: ["__v"]
 });
 
 const listElicitationService = createListService({
-    model: Phases.ELICITATION,
+    model: ElicitationModel,
     hiddenFields: ["__v"]
 });
 
 const listElaborationService = createListService({
-    model: Phases.ELABORATION,
+    model: ElaborationModel,
     hiddenFields: ["__v"]
 });
 
 const listNegotiationService = createListService({
-    model: Phases.NEGOTIATION,
+    model: NegotiationModel,
     hiddenFields: ["__v"]
 })
 
 const listSpecificationService = createListService({
-    model: Phases.SPECIFICATION,
+    model: SpecificationModel,
     hiddenFields: ["__v"]
 });
 
 const listValidationService = createListService({
-    model: Phases.VALIDATION,
+    model: ValidationModel,
     hiddenFields: ["__v"]
 });
 
