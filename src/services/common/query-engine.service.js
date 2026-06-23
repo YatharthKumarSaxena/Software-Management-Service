@@ -186,6 +186,16 @@ const queryEngineService = async ({
                     : -1
         };
 
+        pageNumber = Math.max(
+            1,
+            Number(pageNumber) || 1
+        );
+
+        pageSize = Math.max(
+            1,
+            Number(pageSize) || 10
+        );
+
         const skip =
             (pageNumber - 1) * pageSize;
 
