@@ -50,7 +50,7 @@ const createCommentController = async (req, res) => {
       
       if (!project) {
         logWithTime(`❌ [createCommentController] Project ${projectId} not found | ${getLogIdentifiers(req)}`);
-        return throwInternalServerError(res, "Error validating project access");
+        return throwInternalServerError(res, new Error("Error validating project access"));
       }
 
       const { isClient } = checkUserRoleType(stakeholder.role);
