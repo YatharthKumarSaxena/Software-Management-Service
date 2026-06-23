@@ -19,7 +19,7 @@ const {
 
 const {
   updatePhaseStatusSuccessResponse
-} = require("@responses/success/phase-roles.response");
+} = require("@responses/success/phase.response");
 
 const updatePhaseStatusController =
 async (req, res) => {
