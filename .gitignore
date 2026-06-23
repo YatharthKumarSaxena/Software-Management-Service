@@ -1,3 +1,4 @@
 .env
 *.postman_enviornment.json
 node_modules/
+.agents
