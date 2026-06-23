@@ -90,53 +90,11 @@ const updateProductVisionRateLimiter = createRateLimiter(perUserAndDevice.update
 const deleteProductVisionRateLimiter = createRateLimiter(perUserAndDevice.deleteProductVision);
 const getProductVisionRateLimiter    = createRateLimiter(perUserAndDevice.getProductVision);
 
-const createInceptionRateLimiter = createRateLimiter(perUserAndDevice.createInception);
-const getInceptionRateLimiter    = createRateLimiter(perUserAndDevice.getInception);
-const listInceptionsRateLimiter  = createRateLimiter(perUserAndDevice.listInceptions);
-const deleteInceptionRateLimiter = createRateLimiter(perUserAndDevice.deleteInception);
-const getLatestInceptionRateLimiter = createRateLimiter(perUserAndDevice.getLatestInception);
-const updateInceptionRateLimiter = createRateLimiter(perUserAndDevice.updateInception);
-
-const createElicitationRateLimiter = createRateLimiter(perUserAndDevice.createElicitation);
-const updateElicitationRateLimiter = createRateLimiter(perUserAndDevice.updateElicitation);
-const deleteElicitationRateLimiter = createRateLimiter(perUserAndDevice.deleteElicitation);
-const getElicitationRateLimiter    = createRateLimiter(perUserAndDevice.getElicitation);
-const getLatestElicitationRateLimiter = createRateLimiter(perUserAndDevice.getLatestElicitation);
-const listElicitationsRateLimiter  = createRateLimiter(perUserAndDevice.listElicitations);
-
 const addParticipantRateLimiter = createRateLimiter(perUserAndDevice.addParticipant);
 const removeParticipantRateLimiter = createRateLimiter(perUserAndDevice.removeParticipant);
 const updateParticipantRateLimiter = createRateLimiter(perUserAndDevice.updateParticipant);
 const getParticipantRateLimiter = createRateLimiter(perUserAndDevice.getParticipant);
 const listParticipantsRateLimiter = createRateLimiter(perUserAndDevice.listParticipants);
-
-const createNegotiationRateLimiter = createRateLimiter(perUserAndDevice.createNegotiation);
-const updateNegotiationRateLimiter = createRateLimiter(perUserAndDevice.updateNegotiation);
-const deleteNegotiationRateLimiter = createRateLimiter(perUserAndDevice.deleteNegotiation);
-const getNegotiationRateLimiter = createRateLimiter(perUserAndDevice.getNegotiation);
-const getLatestNegotiationRateLimiter = createRateLimiter(perUserAndDevice.getLatestNegotiation);
-const listNegotiationsRateLimiter = createRateLimiter(perUserAndDevice.listNegotiations);
-
-const createSpecificationRateLimiter = createRateLimiter(perUserAndDevice.createSpecification);
-const updateSpecificationRateLimiter = createRateLimiter(perUserAndDevice.updateSpecification);
-const deleteSpecificationRateLimiter = createRateLimiter(perUserAndDevice.deleteSpecification);
-const getSpecificationRateLimiter = createRateLimiter(perUserAndDevice.getSpecification);
-const getLatestSpecificationRateLimiter = createRateLimiter(perUserAndDevice.getLatestSpecification);
-const listSpecificationsRateLimiter = createRateLimiter(perUserAndDevice.listSpecifications);
-
-const createElaborationRateLimiter = createRateLimiter(perUserAndDevice.createElaboration);
-const updateElaborationRateLimiter = createRateLimiter(perUserAndDevice.updateElaboration);
-const deleteElaborationRateLimiter = createRateLimiter(perUserAndDevice.deleteElaboration);
-const getElaborationRateLimiter = createRateLimiter(perUserAndDevice.getElaboration);
-const getLatestElaborationRateLimiter = createRateLimiter(perUserAndDevice.getLatestElaboration);
-const listElaborationsRateLimiter = createRateLimiter(perUserAndDevice.listElaborations);
-
-const createValidationRateLimiter = createRateLimiter(perUserAndDevice.createValidation);
-const updateValidationRateLimiter = createRateLimiter(perUserAndDevice.updateValidation);
-const deleteValidationRateLimiter = createRateLimiter(perUserAndDevice.deleteValidation);
-const getValidationRateLimiter = createRateLimiter(perUserAndDevice.getValidation);
-const getLatestValidationRateLimiter = createRateLimiter(perUserAndDevice.getLatestValidation);
-const listValidationsRateLimiter = createRateLimiter(perUserAndDevice.listValidations);
 
 // ── Meeting rate limiters ────────────────────────────────────────────────────
 const createMeetingRateLimiter = createRateLimiter(perUserAndDevice.createMeeting);
@@ -240,47 +198,11 @@ module.exports = {
     updateProductVisionRateLimiter,
     deleteProductVisionRateLimiter,
     getProductVisionRateLimiter,
-    getInceptionRateLimiter,
-    listInceptionsRateLimiter,
-    deleteInceptionRateLimiter,
-    getLatestInceptionRateLimiter,
-    updateInceptionRateLimiter,
-    createElicitationRateLimiter,
-    updateElicitationRateLimiter,
-    deleteElicitationRateLimiter,
-    getElicitationRateLimiter,
-    getLatestElicitationRateLimiter,
-    listElicitationsRateLimiter,
-    createInceptionRateLimiter,
     addParticipantRateLimiter,
     removeParticipantRateLimiter,
     updateParticipantRateLimiter,
     getParticipantRateLimiter,
     listParticipantsRateLimiter,
-    createNegotiationRateLimiter,
-    updateNegotiationRateLimiter,
-    deleteNegotiationRateLimiter,
-    getNegotiationRateLimiter,
-    getLatestNegotiationRateLimiter,
-    listNegotiationsRateLimiter,
-    createSpecificationRateLimiter,
-    updateSpecificationRateLimiter,
-    deleteSpecificationRateLimiter,
-    getSpecificationRateLimiter,
-    getLatestSpecificationRateLimiter,
-    listSpecificationsRateLimiter,
-    createElaborationRateLimiter,
-    updateElaborationRateLimiter,
-    deleteElaborationRateLimiter,
-    getElaborationRateLimiter,
-    getLatestElaborationRateLimiter,
-    listElaborationsRateLimiter,
-    createValidationRateLimiter,
-    updateValidationRateLimiter,
-    deleteValidationRateLimiter,
-    getValidationRateLimiter,
-    getLatestValidationRateLimiter,
-    listValidationsRateLimiter,
     createMeetingRateLimiter,
     updateMeetingRateLimiter,
     cancelMeetingRateLimiter,

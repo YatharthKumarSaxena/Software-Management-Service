@@ -37,7 +37,6 @@ const updateProjectService = async (existingProject, updates) => {
       "projectPriority",
       "enablePhaseLevelGovernance",
       "workflowMode",
-      "ownerId",
       "allowStabilizingRollback"
     ];
 
@@ -55,26 +54,6 @@ const updateProjectService = async (existingProject, updates) => {
 
     if (updatePayload.description !== undefined) {
       updatePayload.description = updatePayload.description.trim();
-    }
-
-    const ownerChanged =
-      updatePayload.ownerId !== undefined &&
-      String(updatePayload.ownerId) !== String(existingProject.ownerId);
-
-    if (ownerChanged) {
-      const newOwner = await AdminModel.findOne({ adminId: updatePayload.ownerId });
-      if (!newOwner) {
-        return {
-          success: false,
-          message: "No Admin user found with the provided ownerId"
-        };
-      }
-      updatePayload.ownerChangedAt = new Date();
-      updatePayload.ownerChangedBy = updates.updatedBy;
-      updatePayload.ownerChangeReasonType = updates.ownerChangeReasonType ?? null;
-      updatePayload.ownerChangeReasonDescription = updates.ownerChangeReasonDescription ?? null;
-    } else {
-      delete updatePayload.ownerId;
     }
 
     /* ───────── Organization Handling ───────── */
@@ -206,8 +185,6 @@ const updateProjectService = async (existingProject, updates) => {
     const hasActualChanges =
       hasOrgChanges ||
       hasLinkedProjectChanges ||
-      ownerChanged ||
-      allowStabilizingRollbackChanged ||
       allowedFields.some(field =>
         updatePayload[field] !== undefined &&
         updatePayload[field] !== existingProject[field]

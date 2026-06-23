@@ -123,11 +123,12 @@ const fetchLatestPhaseDocument = async (phase, projectId) => {
   }
 
   const latestDoc = await PhaseModel
-    .findOne({ projectId })
+    .find({ projectId })
     .sort({
       "version.major": -1,
-      "version.minor": -1
+      "updatedAt": -1
     })
+    .limit(1)
     .lean();
 
   return latestDoc || null;

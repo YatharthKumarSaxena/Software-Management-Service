@@ -2,7 +2,7 @@ const { createFetchPhaseMiddleware } = require("../factory/fetch-phase.middlewar
 const { createCheckLatestPhaseNotFrozenMiddleware, createCheckLatestPhaseAnyStatusMiddleware, createCheckLatestPhaseOpenMiddleware } = require("../factory/check-latest-phase.middleware-factory");
 const { Phases } = require("@/configs/enums.config");
 
-const fetchSpecificationMiddleware = createFetchPhaseMiddleware(Phases.SPECIFICATION, "specificationId", "specification");
+const fetchSpecificationMiddleware = createFetchPhaseMiddleware(Phases.SPECIFICATION, "phaseId", "specification");
 const fetchLatestAnyStatusSpecificationMiddleware =
     createCheckLatestPhaseAnyStatusMiddleware([Phases.SPECIFICATION]);
 

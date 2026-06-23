@@ -9,6 +9,7 @@ const { isValidMongoID } = require("@/utils/id-validators.util");
 const { validateLinkedProjectIds } = require("@/services/projects/linked-projects.service");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { getMyEnvAsBool } = require("@/utils/env.util");
 
 /**
  * Creates a new project document in the database.
@@ -51,6 +52,7 @@ const createProjectService = async ({
   allowStabilizingRollback,
   auditContext
 }) => {
+
   try {
     // ── Validate projectCategory (required) ─────────────────────────
     if (!projectCategory) {
@@ -101,15 +103,24 @@ const createProjectService = async ({
       };
     }
 
-    const isNewAdmin = createdBy != ownerId;
-    if (isNewAdmin) {
-      const newOwner = await AdminModel.findOne({ adminId: ownerId });
+    let finalOwnerId = createdBy;
+
+    if (ownerId && ownerId !== createdBy) {
+
+      const newOwner =
+        await AdminModel.findOne({
+          adminId: ownerId
+        });
+
       if (!newOwner) {
         return {
           success: false,
-          message: "No Admin user found with the provided ownerId"
-         };
-       }
+          message:
+            "No Admin user found with the provided ownerId"
+        };
+      }
+
+      finalOwnerId = ownerId;
     }
 
     const projectId = new mongoose.Types.ObjectId();
@@ -124,6 +135,14 @@ const createProjectService = async ({
       return linkedProjectsValidation;
     }
 
+    const finalAllowStabilizingRollback =
+      allowStabilizingRollback !== undefined
+        ? allowStabilizingRollback
+        : getMyEnvAsBool(
+          "DEFAULT_ALLOW_STABILIZING_ROLLBACK",
+          false
+        );
+
     // ── Persist ───────────────────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
 
@@ -135,20 +154,19 @@ const createProjectService = async ({
       goal,
       projectCategory,
       orgIds: resolvedOrgIds,
+      allowStabilizingRollback: finalAllowStabilizingRollback,
       linkedProjectIds: linkedProjectsValidation.addedLinkedProjectIds,
       ...(expectedBudget !== undefined && { expectedBudget }),
       ...(expectedTimelineInDays !== undefined && { expectedTimelineInDays }),
       createdBy,
-      ownerId: createdBy, // Set creator as initial owner
+      ownerId: finalOwnerId, // Set creator as initial owner
       projectCreationReasonType,
       projectCreationReasonDescription: projectCreationReasonDescription || null,
       ...(projectComplexity !== undefined && { projectComplexity }),
       ...(projectCriticality !== undefined && { projectCriticality }),
       ...(projectPriority !== undefined && { projectPriority }),
       ...(enablePhaseLevelGovernance !== undefined && { enablePhaseLevelGovernance }),
-      ...(workflowMode !== undefined && { workflowMode }),
-      ...(ownerId !== undefined && { ownerId }),
-      ...(allowStabilizingRollback !== undefined && { allowStabilizingRollback }),
+      ...(workflowMode !== undefined && { workflowMode })
     });
 
     logActivityTrackerEvent(

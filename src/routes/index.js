@@ -12,14 +12,8 @@ const {
   PRODUCT_VISION_BASE, 
   COMMENT_BASE, 
   ACTIVITY_TRACKER_BASE, 
-  ELICITATION_BASE, 
-  INCEPTION_BASE, 
   MEETINGS_BASE, 
   PARTICIPANTS_BASE, 
-  ELABORATION_BASE, 
-  NEGOTIATION_BASE, 
-  SPECIFICATION_BASE, 
-  VALIDATION_BASE, 
   PHASE_BASE 
 } = require("@/configs/uri.config");
 
@@ -35,14 +29,8 @@ const { ideaRouter } = require("./idea.routes");
 const { productVisionRouter } = require("./product-vision.routes");
 const { commentRouter } = require("./comment.routes");
 const { activityTrackerRouter } = require("./activity-tracker.routes");
-const { elicitationRouter } = require("./elicitation.routes");
-const { inceptionRouter } = require("./inception.routes");
 const { meetingRouter } = require("./meeting.routes");
 const { participantRouter } = require("./participant.routes");
-const { validationRouter } = require("./validation.routes");
-const { specificationRouter } = require("./specification.routes");
-const { negotiationRouter } = require("./negotiation.routes");
-const { elaborationRouter } = require("./elaboration.routes");
 const { requirementRouter } = require("./requirement.routes");
 const { phaseRouter } = require("./phase.routes")
 
@@ -81,24 +69,10 @@ module.exports = (app) => {
   // Admin/Client-facing API routes — activity trackers
   app.use(ACTIVITY_TRACKER_BASE, activityTrackerRouter);
 
-  // Admin-facing API routes — elicitations
-  app.use(ELICITATION_BASE, elicitationRouter);
-
-  // Admin-facing API routes — inceptions
-  app.use(INCEPTION_BASE, inceptionRouter);
-
   // Admin/Client-facing API routes — meetings
   app.use(MEETINGS_BASE, meetingRouter);
 
   app.use(PARTICIPANTS_BASE, participantRouter);
-
-  app.use(ELABORATION_BASE, elaborationRouter);
-
-  app.use(VALIDATION_BASE, validationRouter);
-
-  app.use(SPECIFICATION_BASE, specificationRouter);
-
-  app.use(NEGOTIATION_BASE, negotiationRouter);
 
   app.use(REQUIREMENT_BASE, requirementRouter);
 
