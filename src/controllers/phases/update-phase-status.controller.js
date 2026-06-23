@@ -21,6 +21,8 @@ const {
   updatePhaseStatusSuccessResponse
 } = require("@responses/success/phase.response");
 
+const { logWithTime } = require("@utils/time-stamps.util");
+
 const updatePhaseStatusController =
 async (req, res) => {
 
@@ -83,6 +85,8 @@ async (req, res) => {
           );
       }
     }
+
+    logWithTime(`✅ ${phaseType} phase status updated to ${phaseStatus}`);
 
     return updatePhaseStatusSuccessResponse(
       res,

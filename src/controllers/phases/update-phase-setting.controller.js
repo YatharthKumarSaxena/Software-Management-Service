@@ -11,6 +11,8 @@ const {
   throwInternalServerError
 } = require("@responses/common/error-handler.response");
 
+const { logWithTime } = require("@utils/time-stamps.util");
+
 const {
   CONFLICT,
   NOT_FOUND,
@@ -93,6 +95,8 @@ async (req, res) => {
           );
       }
     }
+
+    logWithTime(`✅ ${phaseType} phase settings updated successfully`);
 
     return updatePhaseSettingsSuccessResponse(
       res,

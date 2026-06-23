@@ -12,6 +12,8 @@ const {
   throwSpecificInternalServerError
 } = require("@responses/common/error-handler.response");
 
+const { logWithTime } = require("@utils/time-stamps.util");
+
 const {
   CONFLICT,
   NOT_FOUND,
@@ -93,6 +95,8 @@ const deletePhaseController = async (
           );
       }
     }
+
+    logWithTime(`✅ ${phaseType} phase deleted successfully`);
 
     return deletePhaseSuccessResponse(
       res,
