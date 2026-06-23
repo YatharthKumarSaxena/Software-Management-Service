@@ -71,36 +71,6 @@ const requiredFields = {
     reopenIdeaField: getRequiredFields(FieldDefinitions.REOPEN_IDEA),
     revokeIdeaField: getRequiredFields(FieldDefinitions.REVOKE_IDEA),
 
-    // ── Inception ────────────────────────────────────────────────────────────────
-    createInceptionField: getRequiredFields(FieldDefinitions.CREATE_INCEPTION),
-    updateInceptionField: getRequiredFields(FieldDefinitions.UPDATE_INCEPTION),
-    deleteInceptionField: getRequiredFields(FieldDefinitions.DELETE_INCEPTION),
-
-    // ── Elicitation ───────────────────────────────────────────────────────────────
-    createElicitationField: getRequiredFields(FieldDefinitions.CREATE_ELICITATION),
-    updateElicitationField: getRequiredFields(FieldDefinitions.UPDATE_ELICITATION),
-    deleteElicitationField: getRequiredFields(FieldDefinitions.DELETE_ELICITATION),
-
-    // ── Elaboration ───────────────────────────────────────────────────────────────
-    createElaborationField: getRequiredFields(FieldDefinitions.CREATE_ELABORATION),
-    updateElaborationField: getRequiredFields(FieldDefinitions.UPDATE_ELABORATION),
-    deleteElaborationField: getRequiredFields(FieldDefinitions.DELETE_ELABORATION),
-
-    // ── Negotiation ───────────────────────────────────────────────────────────────
-    createNegotiationField: getRequiredFields(FieldDefinitions.CREATE_NEGOTIATION),
-    updateNegotiationField: getRequiredFields(FieldDefinitions.UPDATE_NEGOTIATION),
-    deleteNegotiationField: getRequiredFields(FieldDefinitions.DELETE_NEGOTIATION),
-
-    // ── Specification ───────────────────────────────────────────────────────────────
-    createSpecificationField: getRequiredFields(FieldDefinitions.CREATE_SPECIFICATION),
-    updateSpecificationField: getRequiredFields(FieldDefinitions.UPDATE_SPECIFICATION),
-    deleteSpecificationField: getRequiredFields(FieldDefinitions.DELETE_SPECIFICATION),
-
-    // ── Validation ───────────────────────────────────────────────────────────────
-    createValidationField: getRequiredFields(FieldDefinitions.CREATE_VALIDATION),
-    updateValidationField: getRequiredFields(FieldDefinitions.UPDATE_VALIDATION),
-    deleteValidationField: getRequiredFields(FieldDefinitions.DELETE_VALIDATION),
-
     createMeetingField: getRequiredFields(FieldDefinitions.CREATE_MEETING),
     updateMeetingField: getRequiredFields(FieldDefinitions.UPDATE_MEETING),
     cancelMeetingField: getRequiredFields(FieldDefinitions.CANCEL_MEETING),
