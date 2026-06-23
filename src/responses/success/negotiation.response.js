@@ -24,10 +24,10 @@ const sendNegotiationCreatedSuccess = (res, negotiation) => {
  * @param {Object} res - Express response object
  * @param {Object} negotiation - Updated negotiation document
  */
-const sendNegotiationUpdatedSuccess = (res, negotiation) => {
+const sendNegotiationUpdatedSuccess = (res, negotiation, message = "Negotiation updated successfully.") => {
   return res.status(OK).json({
     success: true,
-    message: "Negotiation updated successfully.",
+    message,
     data: { negotiation },
   });
 };

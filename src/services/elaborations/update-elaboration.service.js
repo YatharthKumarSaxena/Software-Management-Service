@@ -2,13 +2,12 @@
 
 const { ProjectModel } = require("../../models");
 const { ElaborationModel } = require("../../models");
-const { manualVersionControlService } = require("@services/common/version.service");
+const { executePhaseUpdate } = require("@services/common/phase-update.service");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
-const { logWithTime } = require("@utils/time-stamps.util");
 const { Phases } = require("@configs/enums.config");
 
 const updateElaborationService = async ({
@@ -52,13 +51,7 @@ const updateElaborationService = async ({
     const allowParallelChanged = allowParallelMeetings !== undefined && elaboration.allowParallelMeetings !== allowParallelMeetings;
     const phaseStatusChanged = phaseStatus !== undefined && elaboration.phaseStatus !== phaseStatus;
 
-    if (!workflowModeChanged && !allowParallelChanged && !phaseStatusChanged) {
-      return {
-        success: true,
-        message: "No changes detected",
-        elaboration,
-      };
-    }
+    const documentChanged = workflowModeChanged || allowParallelChanged;
 
     // ── 2. If toggling allowParallelMeetings from true to false, validate meetings ────────
     if (allowParallelChanged && elaboration.allowParallelMeetings === true && allowParallelMeetings === false) {
@@ -88,50 +81,35 @@ const updateElaborationService = async ({
       }
     }
 
-    // ── 3. Update elaboration with new values ────────────────────────
-    if (workflowModeChanged) {
-      elaboration.workflowMode = workflowMode;
-    }
-    if (allowParallelChanged) {
-      elaboration.allowParallelMeetings = allowParallelMeetings;
-    }
-    elaboration.updatedBy = updatedBy;
-    elaboration.updatedAt = new Date();
-
-    await elaboration.save();
-
-    // ── 4. Log activity ──────────────────────────────────────────────
-    const { user, device, requestId } = auditContext || {};
-    let changeDesc = [];
+    const changeDesc = [];
     if (workflowModeChanged) changeDesc.push(`workflowMode: '${elaboration.workflowMode}' → '${workflowMode}'`);
-    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${!allowParallelMeetings} → ${allowParallelMeetings}`);
-    if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${elaboration.phaseStatus}' → '${phaseStatus}'`);
-    logActivityTrackerEvent(
-      user,
-      device,
-      requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_ELABORATION,
-      `Elaboration updated: ${changeDesc.join(', ')}`,
-      { adminActions: { targetId: projectId } }
-    );
+    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${elaboration.allowParallelMeetings} → ${allowParallelMeetings}`);
 
-    // ── 5. Manual version control (increment minor version) ──────────────
-    logWithTime(`[updateElaborationService] Incrementing version for elaboration`);
-    await manualVersionControlService({
-      projectId,
-      currentPhase: Phases.ELABORATION,
-      action: `Elaboration updated - allowParallelMeetings toggled — version bump`,
-      performedBy: updatedBy,
-      auditContext
+    const result = await executePhaseUpdate({
+      phaseDocument: elaboration,
+      phase: Phases.ELABORATION,
+      phaseName: "Elaboration",
+      requestedPhaseStatus: phaseStatus,
+      phaseStatusChanged,
+      documentChanged,
+      updatedBy,
+      auditContext,
+      versionAction: "Elaboration update — version bump",
+      updateDocument: async currentElaboration => {
+        if (workflowModeChanged) currentElaboration.workflowMode = workflowMode;
+        if (allowParallelChanged) currentElaboration.allowParallelMeetings = allowParallelMeetings;
+        currentElaboration.updatedBy = updatedBy;
+        currentElaboration.updatedAt = new Date();
+        await currentElaboration.save();
+        const { user, device, requestId } = auditContext || {};
+        logActivityTrackerEvent(user, device, requestId, ACTIVITY_TRACKER_EVENTS.UPDATE_ELABORATION,
+          `Elaboration updated: ${changeDesc.join(', ')}`,
+          { adminActions: { targetId: projectId } });
+        return currentElaboration;
+      }
     });
 
-    logWithTime(`✅ [updateElaborationService] Elaboration updated with version control`);
-
-    return {
-      success: true,
-      message: "Elaboration updated successfully",
-      elaboration,
-    };
+    return { ...result, elaboration: result.phaseDocument };
   } catch (error) {
     console.error("[updateElaborationService] Error:", error);
     return {

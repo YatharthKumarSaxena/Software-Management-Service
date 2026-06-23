@@ -414,7 +414,7 @@ const projectSchema = new mongoose.Schema(
 
     workflowMode: {
       type: String,
-      enum: Object.values(WorkflowModes.OPEN),
+      enum: Object.values(WorkflowModes),
       default: WorkflowModes.OPEN
     },
 

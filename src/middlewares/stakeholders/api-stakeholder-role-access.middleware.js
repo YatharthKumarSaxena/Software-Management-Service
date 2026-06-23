@@ -2,6 +2,10 @@ const { ProjectRoleTypes, ClientRoleTypes } = require("@configs/enums.config");
 const { checkUserRoleFactory } = require("../factory/check-user-role.middleware-factory");
 
 const stakeholderRoleAccessMiddlewares = {  
+    createPhaseStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),
+    deletePhaseStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),
+    updatePhaseStatusStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),
+    updatePhaseSettingsStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),
     createElicitationStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),
     updateElicitationStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),
     deleteElicitationStakeholderRoleAccessMiddleware: checkUserRoleFactory([ProjectRoleTypes.OWNER]),

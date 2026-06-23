@@ -52,7 +52,11 @@ const updateProjectController = async (req, res) => {
       projectCriticality,
       projectPriority,
       enablePhaseLevelGovernance,
-      workflowMode
+      workflowMode,
+      ownerId,
+      ownerChangeReasonType,
+      ownerChangeReasonDescription,
+      allowStabilizingRollback
     } = req.body;
 
     const hasUpdate =
@@ -70,14 +74,16 @@ const updateProjectController = async (req, res) => {
       projectCriticality !== undefined ||
       projectPriority !== undefined ||
       enablePhaseLevelGovernance !== undefined ||
-      workflowMode !== undefined;
+      workflowMode !== undefined ||
+      ownerId !== undefined ||
+      allowStabilizingRollback !== undefined;
 
     if (!hasUpdate) {
       logWithTime(`❌ [updateProjectController] No updatable fields provided | ${getLogIdentifiers(req)}`);
       return throwBadRequestError(
         res,
         "No updatable fields provided",
-        "Provide at least one of: name, description, problemStatement, goal, expectedBudget, expectedTimelineInDays, addedOrgIds, removedOrgIds, addedLinkedProjectIds, removedLinkedProjectIds, projectComplexity, projectCriticality, projectPriority, enablePhaseLevelGovernance, workflowMode."
+        "Provide at least one of: name, description, problemStatement, goal, expectedBudget, expectedTimelineInDays, addedOrgIds, removedOrgIds, addedLinkedProjectIds, removedLinkedProjectIds, projectComplexity, projectCriticality, projectPriority, enablePhaseLevelGovernance, workflowMode, ownerId, allowStabilizingRollback."
       );
     }
 
@@ -102,6 +108,10 @@ const updateProjectController = async (req, res) => {
       projectPriority,
       enablePhaseLevelGovernance,
       workflowMode,
+      ownerId,
+      ownerChangeReasonType,
+      ownerChangeReasonDescription,
+      allowStabilizingRollback,
       auditContext: {
         user: req.admin,
         device: req.device,
@@ -149,7 +159,8 @@ const updateProjectController = async (req, res) => {
         result.message === "One or more linked projects do not exist" ||
         result.message === "Only active, non-archived, non-deleted projects can be linked" ||
         result.message === "A project cannot be linked to itself" ||
-        result.message === "Linking these projects would create a circular reference"
+        result.message === "Linking these projects would create a circular reference" ||
+        result.message === "No Admin user found with the provided ownerId"
       ) {
         logWithTime(`❌ [updateProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message);

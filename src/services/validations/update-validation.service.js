@@ -2,13 +2,12 @@
 
 const { ProjectModel } = require("../../models");
 const { ValidationModel } = require("../../models");
-const { manualVersionControlService } = require("@services/common/version.service");
+const { executePhaseUpdate } = require("@services/common/phase-update.service");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
-const { logWithTime } = require("@utils/time-stamps.util");
 const { Phases } = require("@configs/enums.config");
 
 const updateValidationService = async ({
@@ -49,13 +48,7 @@ const updateValidationService = async ({
     const workflowModeChanged = workflowMode !== undefined && validation.workflowMode !== workflowMode;
     const phaseStatusChanged = phaseStatus !== undefined && validation.phaseStatus !== phaseStatus;
 
-    if (!allowParallelChanged && !workflowModeChanged && !phaseStatusChanged) {
-      return {
-        success: true,
-        message: "No changes detected",
-        validation,
-      };
-    }
+    const documentChanged = allowParallelChanged || workflowModeChanged;
 
     // ── 2. If toggling allowParallelMeetings from true to false, validate meetings ────────
     if (allowParallelChanged && validation.allowParallelMeetings === true && allowParallelMeetings === false) {
@@ -85,54 +78,35 @@ const updateValidationService = async ({
       }
     }
 
-    // ── 3. Update validation with allowParallelMeetings toggle ────────
-    if (workflowModeChanged) {
-      validation.workflowMode = workflowMode;
-    }
-    if (allowParallelChanged) {
-      validation.allowParallelMeetings = allowParallelMeetings;
-    }
-    if (phaseStatusChanged) {
-      validation.phaseStatus = phaseStatus;
-    }
-    validation.updatedBy = updatedBy;
-    validation.updatedAt = new Date();
-
-    await validation.save();
-
-    let changeDesc = [];
+    const changeDesc = [];
     if (workflowModeChanged) changeDesc.push(`workflowMode: '${validation.workflowMode}' → '${workflowMode}'`);
-    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${!allowParallelMeetings} → ${allowParallelMeetings}`);
-    if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${validation.phaseStatus}' → '${phaseStatus}'`);
+    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${validation.allowParallelMeetings} → ${allowParallelMeetings}`);
 
-    // ── 4. Log activity ──────────────────────────────────────────────
-    const { user, device, requestId } = auditContext || {};
-    logActivityTrackerEvent(
-      user,
-      device,
-      requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_VALIDATION,
-      `Validation updated: ${changeDesc.join(', ')}`,
-      { adminActions: { targetId: projectId } }
-    );
-
-    // ── 5. Manual version control (increment minor version) ──────────────
-    logWithTime(`[updateValidationService] Incrementing version for validation`);
-    await manualVersionControlService({
-      projectId,
-      currentPhase: Phases.VALIDATION,
-      action: `Validation updated: ${changeDesc.join(', ')}`,
-      performedBy: updatedBy,
-      auditContext
+    const result = await executePhaseUpdate({
+      phaseDocument: validation,
+      phase: Phases.VALIDATION,
+      phaseName: "Validation",
+      requestedPhaseStatus: phaseStatus,
+      phaseStatusChanged,
+      documentChanged,
+      updatedBy,
+      auditContext,
+      versionAction: "Validation update — version bump",
+      updateDocument: async currentValidation => {
+        if (workflowModeChanged) currentValidation.workflowMode = workflowMode;
+        if (allowParallelChanged) currentValidation.allowParallelMeetings = allowParallelMeetings;
+        currentValidation.updatedBy = updatedBy;
+        currentValidation.updatedAt = new Date();
+        await currentValidation.save();
+        const { user, device, requestId } = auditContext || {};
+        logActivityTrackerEvent(user, device, requestId, ACTIVITY_TRACKER_EVENTS.UPDATE_VALIDATION,
+          `Validation updated: ${changeDesc.join(', ')}`,
+          { adminActions: { targetId: projectId } });
+        return currentValidation;
+      }
     });
 
-    logWithTime(`✅ [updateValidationService] Validation updated with version control`);
-
-    return {
-      success: true,
-      message: "Validation updated successfully",
-      validation,
-    };
+    return { ...result, validation: result.phaseDocument };
   } catch (error) {
     console.error("[updateValidationService] Error:", error);
     return {

@@ -41,7 +41,9 @@ const createProjectController = async (req, res) => {
       projectCriticality,
       projectPriority,
       enablePhaseLevelGovernance,
-      workflowMode
+      workflowMode,
+      ownerId,
+      allowStabilizingRollback
     } = req.body;
 
     // ── Derive createdBy from authenticated admin ────────────────────
@@ -66,6 +68,8 @@ const createProjectController = async (req, res) => {
       projectPriority,
       enablePhaseLevelGovernance,
       workflowMode,
+      ownerId,
+      allowStabilizingRollback,
       auditContext: {
         user: req.admin,
         device: req.device,
@@ -121,7 +125,8 @@ const createProjectController = async (req, res) => {
         result.message === "One or more linked projects do not exist" ||
         result.message === "Only active, non-archived, non-deleted projects can be linked" ||
         result.message === "A project cannot be linked to itself" ||
-        result.message === "Linking these projects would create a circular reference"
+        result.message === "Linking these projects would create a circular reference" ||
+        result.message === "No Admin user found with the provided ownerId"
       ) {
         logWithTime(`❌ [createProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message);

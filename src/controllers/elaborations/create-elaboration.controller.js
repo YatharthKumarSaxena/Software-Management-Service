@@ -3,12 +3,14 @@
 const { elaborationServices } = require("@services/elaborations");
 const {
   throwConflictError,
+  throwBadRequestError,
+  throwDBResourceNotFoundError,
   throwInternalServerError,
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
 const { sendElaborationCreatedSuccess } = require("@/responses/success/elaboration.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CONFLICT } = require("@configs/http-status.config");
+const { BAD_REQUEST, CONFLICT, NOT_FOUND } = require("@configs/http-status.config");
 
 /**
  * POST /projects/:projectId/elaborations
@@ -26,9 +28,9 @@ const createElaborationController = async (req, res) => {
     // ── Call service ──────────────────────────────────────────────────
     const result = await elaborationServices.createElaborationService({
       projectId,
-      allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
-      workflowMode: typeof workflowMode === 'string' ? workflowMode : null,
-      phaseStatus: typeof phaseStatus === 'string' ? phaseStatus : null,
+      allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : undefined,
+      workflowMode: typeof workflowMode === 'string' ? workflowMode : undefined,
+      phaseStatus: typeof phaseStatus === 'string' ? phaseStatus : undefined,
       createdBy: req.admin.adminId,
       auditContext: {
         user: req.admin,
@@ -45,6 +47,8 @@ const createElaborationController = async (req, res) => {
         );
         return throwConflictError(res, result.message, "An active elaboration already exists for this project.");
       }
+      if (result.errorCode === NOT_FOUND) return throwDBResourceNotFoundError(res, "Project");
+      if (result.errorCode === BAD_REQUEST) return throwBadRequestError(res, result.message);
       logWithTime(`❌ [createElaborationController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwInternalServerError(res, new Error(result.message));
     }

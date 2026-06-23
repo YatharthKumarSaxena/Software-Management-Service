@@ -152,6 +152,14 @@ const startMeetingRateLimiter = createRateLimiter(perUserAndDevice.startMeeting)
 const endMeetingRateLimiter = createRateLimiter(perUserAndDevice.endMeeting);
 const freezeMeetingRateLimiter = createRateLimiter(perUserAndDevice.freezeMeeting);
 
+const createPhaseRateLimiter = createRateLimiter(perUserAndDevice.createPhase);
+const updatePhaseStatusRateLimiter = createRateLimiter(perUserAndDevice.updatePhaseStatus);
+const updatePhaseSettingsRateLimiter = createRateLimiter(perUserAndDevice.updatePhaseSettings);
+const deletePhaseRateLimiter = createRateLimiter(perUserAndDevice.deletePhase);
+const getPhaseRateLimiter = createRateLimiter(perUserAndDevice.getPhase);
+const getLatestPhaseRateLimiter = createRateLimiter(perUserAndDevice.getLatestPhase);
+const listPhasesRateLimiter = createRateLimiter(perUserAndDevice.listPhases);
+
 const createRequirementRateLimiter = createRateLimiter(perUserAndDevice.createRequirement);
 
 module.exports = {
@@ -283,5 +291,12 @@ module.exports = {
     startMeetingRateLimiter,
     endMeetingRateLimiter,
     freezeMeetingRateLimiter,
-    createRequirementRateLimiter
+    createPhaseRateLimiter,
+    updatePhaseStatusRateLimiter,
+    updatePhaseSettingsRateLimiter,
+    deletePhaseRateLimiter,
+    getPhaseRateLimiter,
+    getLatestPhaseRateLimiter,
+    listPhasesRateLimiter,
+    createRequirementRateLimiter,
 }

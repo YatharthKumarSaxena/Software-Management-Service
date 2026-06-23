@@ -7,6 +7,7 @@ const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.se
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { CONFLICT, INTERNAL_ERROR, NOT_FOUND, BAD_REQUEST } = require("@configs/http-status.config");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 /**
  * Soft-deletes an inception (sets isDeleted = true).
@@ -60,7 +61,7 @@ const deleteInceptionService = async (inception, params) => {
       };
     }
 
-    if (latestInception.isFrozen) {
+    if (isPhaseFrozen(latestInception)) {
       return {
         errorCode: CONFLICT,
         success: false,
@@ -79,7 +80,7 @@ const deleteInceptionService = async (inception, params) => {
 
     // ── 3. Guard: If NO frozen inception AND project type is DEVELOPMENT ──
     // (Only block if no frozen doc exists)
-    if (!latestInception.isFrozen && project.projectType === ProjectTypes.DEVELOPMENT && latestInception.version.major === 1) {
+    if (!isPhaseFrozen(latestInception) && project.projectType === ProjectTypes.DEVELOPMENT && latestInception.version.major === 1) {
       return {
         errorCode: BAD_REQUEST,
         success: false,

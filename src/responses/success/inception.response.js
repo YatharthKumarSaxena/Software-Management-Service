@@ -83,10 +83,10 @@ const sendInceptionFrozenSuccess = (res, message) => {
   });
 };
 
-const sendInceptionUpdatedSuccess = (res, inception) => {
+const sendInceptionUpdatedSuccess = (res, inception, message = "Inception updated successfully.") => {
   return res.status(OK).json({
     success: true,
-    message: "Inception updated successfully.",
+    message,
     data: { inception }
   });
 };

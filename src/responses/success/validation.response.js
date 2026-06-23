@@ -24,10 +24,10 @@ const sendValidationCreatedSuccess = (res, validation) => {
  * @param {Object} res - Express response object
  * @param {Object} validation - Updated validation document
  */
-const sendValidationUpdatedSuccess = (res, validation) => {
+const sendValidationUpdatedSuccess = (res, validation, message = "Validation updated successfully.") => {
   return res.status(OK).json({
     success: true,
-    message: "Validation updated successfully.",
+    message,
     data: { validation },
   });
 };

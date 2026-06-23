@@ -20,7 +20,7 @@ const {
   sendApproverRemovedSuccess,
   sendApproversListSuccess,
   sendApproverFetchSuccess
-} = require("@/responses/success/phase-roles.response");
+} = require("@/responses/success/phase.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CONFLICT, NOT_FOUND } = require("@configs/http-status.config");
 

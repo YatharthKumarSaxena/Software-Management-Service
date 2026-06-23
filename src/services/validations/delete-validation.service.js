@@ -9,6 +9,7 @@ const {
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
 const { logWithTime } = require("@/utils/time-stamps.util");
+const { isPhaseFrozen } = require("@utils/phase-status.util");
 
 const deleteValidationService = async ({
   projectId,
@@ -45,7 +46,7 @@ const deleteValidationService = async ({
       };
     }
 
-    if (latestValidation.isFrozen) {
+    if (isPhaseFrozen(latestValidation)) {
       return {
         success: false,
         message: "Frozen phases cannot be deleted.",

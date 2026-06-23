@@ -2,13 +2,12 @@
 
 const { ProjectModel } = require("../../models");
 const { NegotiationModel } = require("../../models");
-const { manualVersionControlService } = require("@services/common/version.service");
+const { executePhaseUpdate } = require("@services/common/phase-update.service");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
-const { logWithTime } = require("@utils/time-stamps.util");
 const { Phases } = require("@configs/enums.config");
 
 const updateNegotiationService = async ({
@@ -49,13 +48,7 @@ const updateNegotiationService = async ({
     const allowParallelChanged = allowParallelMeetings !== undefined && negotiation.allowParallelMeetings !== allowParallelMeetings;
     const phaseStatusChanged = phaseStatus !== undefined && negotiation.phaseStatus !== phaseStatus;
 
-    if (!workflowModeChanged && !allowParallelChanged && !phaseStatusChanged) {
-      return {
-        success: true,
-        message: "No changes detected",
-        negotiation,
-      };
-    }
+    const documentChanged = workflowModeChanged || allowParallelChanged;
 
     // ── 2. If toggling allowParallelMeetings from true to false, validate meetings ────────
     if (allowParallelChanged && negotiation.allowParallelMeetings === true && allowParallelMeetings === false) {
@@ -85,53 +78,35 @@ const updateNegotiationService = async ({
       }
     }
 
-    // ── 3. Update negotiation with new values ────────────────────────
-    if (workflowModeChanged) {
-      negotiation.workflowMode = workflowMode;
-    }
-    if (allowParallelChanged) {
-      negotiation.allowParallelMeetings = allowParallelMeetings;
-    }
-    if (phaseStatusChanged) {
-      negotiation.phaseStatus = phaseStatus;
-    }
-    negotiation.updatedBy = updatedBy;
-    negotiation.updatedAt = new Date();
-
-    await negotiation.save();
-
-    // ── 4. Log activity ──────────────────────────────────────────────
-    const { user, device, requestId } = auditContext || {};
-    let changeDesc = [];
+    const changeDesc = [];
     if (workflowModeChanged) changeDesc.push(`workflowMode: '${negotiation.workflowMode}' → '${workflowMode}'`);
-    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${!allowParallelMeetings} → ${allowParallelMeetings}`);
-    if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${negotiation.phaseStatus}' → '${phaseStatus}'`);
-    logActivityTrackerEvent(
-      user,
-      device,
-      requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_NEGOTIATION,
-      `Negotiation updated: ${changeDesc.join(', ')}`,
-      { adminActions: { targetId: projectId } }
-    );
+    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${negotiation.allowParallelMeetings} → ${allowParallelMeetings}`);
 
-    // ── 5. Manual version control (increment minor version) ──────────────
-    logWithTime(`[updateNegotiationService] Incrementing version for negotiation`);
-    await manualVersionControlService({
-      projectId,
-      currentPhase: Phases.NEGOTIATION,
-      action: `Negotiation updated - allowParallelMeetings toggled — version bump`,
-      performedBy: updatedBy,
-      auditContext
+    const result = await executePhaseUpdate({
+      phaseDocument: negotiation,
+      phase: Phases.NEGOTIATION,
+      phaseName: "Negotiation",
+      requestedPhaseStatus: phaseStatus,
+      phaseStatusChanged,
+      documentChanged,
+      updatedBy,
+      auditContext,
+      versionAction: "Negotiation update — version bump",
+      updateDocument: async currentNegotiation => {
+        if (workflowModeChanged) currentNegotiation.workflowMode = workflowMode;
+        if (allowParallelChanged) currentNegotiation.allowParallelMeetings = allowParallelMeetings;
+        currentNegotiation.updatedBy = updatedBy;
+        currentNegotiation.updatedAt = new Date();
+        await currentNegotiation.save();
+        const { user, device, requestId } = auditContext || {};
+        logActivityTrackerEvent(user, device, requestId, ACTIVITY_TRACKER_EVENTS.UPDATE_NEGOTIATION,
+          `Negotiation updated: ${changeDesc.join(', ')}`,
+          { adminActions: { targetId: projectId } });
+        return currentNegotiation;
+      }
     });
 
-    logWithTime(`✅ [updateNegotiationService] Negotiation updated with version control`);
-
-    return {
-      success: true,
-      message: "Negotiation updated successfully",
-      negotiation,
-    };
+    return { ...result, negotiation: result.phaseDocument };
   } catch (error) {
     console.error("[updateNegotiationService] Error:", error);
     return {

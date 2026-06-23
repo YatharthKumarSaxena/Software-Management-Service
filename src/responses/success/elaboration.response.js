@@ -24,10 +24,10 @@ const sendElaborationCreatedSuccess = (res, elaboration) => {
  * @param {Object} res - Express response object
  * @param {Object} elaboration - Updated elaboration document
  */
-const sendElaborationUpdatedSuccess = (res, elaboration) => {
+const sendElaborationUpdatedSuccess = (res, elaboration, message = "Elaboration updated successfully.") => {
   return res.status(OK).json({
     success: true,
-    message: "Elaboration updated successfully.",
+    message,
     data: { elaboration },
   });
 };

@@ -1,4 +1,4 @@
-const { ProjectModel } = require("@models/index");
+const { ProjectModel, AdminModel } = require("@models/index");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
@@ -36,7 +36,9 @@ const updateProjectService = async (existingProject, updates) => {
       "projectCriticality",
       "projectPriority",
       "enablePhaseLevelGovernance",
-      "workflowMode"
+      "workflowMode",
+      "ownerId",
+      "allowStabilizingRollback"
     ];
 
     const updatePayload = {};
@@ -53,6 +55,26 @@ const updateProjectService = async (existingProject, updates) => {
 
     if (updatePayload.description !== undefined) {
       updatePayload.description = updatePayload.description.trim();
+    }
+
+    const ownerChanged =
+      updatePayload.ownerId !== undefined &&
+      String(updatePayload.ownerId) !== String(existingProject.ownerId);
+
+    if (ownerChanged) {
+      const newOwner = await AdminModel.findOne({ adminId: updatePayload.ownerId });
+      if (!newOwner) {
+        return {
+          success: false,
+          message: "No Admin user found with the provided ownerId"
+        };
+      }
+      updatePayload.ownerChangedAt = new Date();
+      updatePayload.ownerChangedBy = updates.updatedBy;
+      updatePayload.ownerChangeReasonType = updates.ownerChangeReasonType ?? null;
+      updatePayload.ownerChangeReasonDescription = updates.ownerChangeReasonDescription ?? null;
+    } else {
+      delete updatePayload.ownerId;
     }
 
     /* ───────── Organization Handling ───────── */
@@ -184,6 +206,8 @@ const updateProjectService = async (existingProject, updates) => {
     const hasActualChanges =
       hasOrgChanges ||
       hasLinkedProjectChanges ||
+      ownerChanged ||
+      allowStabilizingRollbackChanged ||
       allowedFields.some(field =>
         updatePayload[field] !== undefined &&
         updatePayload[field] !== existingProject[field]

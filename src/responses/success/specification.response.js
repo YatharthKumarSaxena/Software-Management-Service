@@ -24,10 +24,10 @@ const sendSpecificationCreatedSuccess = (res, specification) => {
  * @param {Object} res - Express response object
  * @param {Object} specification - Updated specification document
  */
-const sendSpecificationUpdatedSuccess = (res, specification) => {
+const sendSpecificationUpdatedSuccess = (res, specification, message = "Specification updated successfully.") => {
   return res.status(OK).json({
     success: true,
-    message: "Specification updated successfully.",
+    message,
     data: { specification },
   });
 };

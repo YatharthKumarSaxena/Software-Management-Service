@@ -1,12 +1,12 @@
 // services/elicitations/update-elicitation.service.js
 
 const { ElicitationModel } = require("@models/elicitation.model");
-const { manualVersionControlService } = require("@services/common/version.service");
+const { executePhaseUpdate } = require("@services/common/phase-update.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { Phases, PhaseStatus } = require("@configs/enums.config");
+const { Phases } = require("@configs/enums.config");
 
 /**
  * Updates an elicitation's mode, and/or allowParallelMeetings.
@@ -46,15 +46,7 @@ const updateElicitationService = async (
     const allowParallelChanged = allowParallelMeetings !== undefined && elicitation.allowParallelMeetings !== allowParallelMeetings;
     const phaseStatusChanged = phaseStatus !== undefined && elicitation.phaseStatus !== phaseStatus;
 
-    if (!workflowModeChanged && !allowParallelChanged && !phaseStatusChanged) {
-      logWithTime(
-        `⚠️ [updateElicitationService] No changes detected.`
-      );
-      return {
-        success: true,
-        message: "No changes detected"
-      };
-    }
+    const documentChanged = workflowModeChanged || allowParallelChanged;
 
     // ── 2. If toggling allowParallelMeetings from true to false, validate meetings ────────
     if (allowParallelChanged && elicitation.allowParallelMeetings === true && allowParallelMeetings === false) {
@@ -87,65 +79,37 @@ const updateElicitationService = async (
       }
     }
 
-    // ── 3. Build update payload ────────────────────────────────────────
-    const updatePayload = { updatedBy, updatedAt: new Date() };
+    const changeDesc = [];
+    if (workflowModeChanged) changeDesc.push(`workflowMode: '${elicitation.workflowMode}' → '${workflowMode}'`);
+    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${elicitation.allowParallelMeetings} → ${allowParallelMeetings}`);
 
-    if (workflowModeChanged) {
-      updatePayload.workflowMode = workflowMode;
-    }
+    const result = await executePhaseUpdate({
+      phaseDocument: elicitation,
+      phase: Phases.ELICITATION,
+      phaseName: "Elicitation",
+      requestedPhaseStatus: phaseStatus,
+      phaseStatusChanged,
+      documentChanged,
+      updatedBy,
+      auditContext,
+      versionAction: "Elicitation update — version bump",
+      updateDocument: async currentElicitation => {
+        const updatePayload = { updatedBy, updatedAt: new Date() };
+        if (workflowModeChanged) updatePayload.workflowMode = workflowMode;
+        if (allowParallelChanged) updatePayload.allowParallelMeetings = allowParallelMeetings;
 
-    if (allowParallelChanged) {
-      updatePayload.allowParallelMeetings = allowParallelMeetings;
-    }
+        const updatedElicitation = await ElicitationModel.findByIdAndUpdate(
+          currentElicitation._id, { $set: updatePayload }, { new: true }
+        );
+        const { user, device, requestId } = auditContext || {};
+        const { oldData, newData } = prepareAuditData(currentElicitation, updatedElicitation);
+        logActivityTrackerEvent(user, device, requestId, ACTIVITY_TRACKER_EVENTS.UPDATE_ELICITATION,
+          `Elicitation updated: ${changeDesc.join(', ')}`, { oldData, newData });
+        return updatedElicitation;
+      }
+    });
 
-    if (phaseStatusChanged) {
-      updatePayload.phaseStatus = phaseStatus;
-    }
-
-    // ── 4. Update via atomic findByIdAndUpdate ────────────────────
-    const updatedElicitation = await ElicitationModel.findByIdAndUpdate(
-      elicitation._id,
-      { $set: updatePayload },
-      { new: true }
-    );
-
-    // ── 5. Log activity tracker event (only if changed) ────────────
-    if (updatedElicitation) {
-      const { user, device, requestId } = auditContext || {};
-      const { oldData, newData } = prepareAuditData(elicitation, updatedElicitation);
-
-      let changeDesc = [];
-      if (workflowModeChanged) changeDesc.push(`workflowMode: '${elicitation.workflowMode}' → '${workflowMode}'`);
-      if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${elicitation.allowParallelMeetings} → ${allowParallelMeetings}`);
-      if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${elicitation.phaseStatus}' → '${phaseStatus}'`);
-      
-      logActivityTrackerEvent(
-        user,
-        device,
-        requestId,
-        ACTIVITY_TRACKER_EVENTS.UPDATE_ELICITATION,
-        `Elicitation updated: ${changeDesc.join(', ')}`,
-        { oldData, newData }
-      );
-
-      logWithTime(
-        `✅ [updateElicitationService] Elicitation updated: ${elicitation._id}`
-      );
-
-      // ── 6. Manual version control (increment minor version) ──────────────
-      await manualVersionControlService({
-        projectId: elicitation.projectId,
-        currentPhase: Phases.ELICITATION,
-        action: `Elicitation updated: ${changeDesc.join(', ')} — version bump`,
-        performedBy: updatedBy,
-        auditContext
-      });
-    }
-
-    return {
-      success: true,
-      elicitation: updatedElicitation
-    };
+    return { ...result, elicitation: result.phaseDocument };
 
   } catch (error) {
     logWithTime(`❌ [updateElicitationService] Error: ${error.message}`);

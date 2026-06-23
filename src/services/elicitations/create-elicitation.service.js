@@ -1,11 +1,10 @@
 // services/elicitations/create-elicitation.service.js
 
 const { ProjectModel } = require("@models/project.model");
-const { ElicitationModel } = require("@models/elicitation.model");
 const { Phases, WorkflowModes, PhaseStatus } = require("@configs/enums.config");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 /**
  * Creates a new elicitation document in the database.
@@ -35,22 +34,7 @@ const createElicitationService = async ({
       return { success: false, message: "Project not found", errorCode: NOT_FOUND };
     }
 
-    // ── Step 2: Check if elicitation already exists ───────────────────
-    const existingElicitation = await ElicitationModel.findOne({
-      projectId,
-      isDeleted: false,
-      phaseStatus: { $in: [PhaseStatus.OPEN, PhaseStatus.STABILIZING] }
-    });
-
-    if (existingElicitation) {
-      logWithTime(`❌ [createElicitationService] Elicitation already exists for project ${projectId}`);
-      return { success: false, message: "An active elicitation already exists for this project", errorCode: CONFLICT };
-    }
-
-    // ── Step 3: Update project's currentPhase to ELICITATION ─────────
-    logWithTime(`[createElicitationService] Updating project phase to ELICITATION for ${projectId}`);
-
-    // ── Step 4: Create phase WITH version management AND additional data ─
+    // ── Step 2: Create phase with common validation/version management ─
     logWithTime(`[createElicitationService] Creating ELICITATION phase document`);
     
     // Pass both mode and allowParallelMeetings to the phase management service
@@ -60,16 +44,14 @@ const createElicitationService = async ({
       createdBy,
       auditContext,
       additionalData: { 
-        workflowMode: workflowMode || WorkflowModes.OPEN,
-        allowParallelMeetings: allowParallelMeetings || false
+        workflowMode: workflowMode ?? WorkflowModes.OPEN,
+        allowParallelMeetings: allowParallelMeetings ?? false,
+        phaseStatus: phaseStatus ?? PhaseStatus.OPEN
       }
     });
 
     if (!phaseResult.success) {
       logWithTime(`❌ [createElicitationService] Failed to create phase: ${phaseResult.message}`);
-      
-      // OPTIONAL BUT RECOMMENDED: Agar phase banne mein error aaye, 
-      // toh Project ka phase wapas Inception par revert karne ka logic yahan likh sakte ho (Manual Rollback).
       
       return {
         success: false,
@@ -77,8 +59,6 @@ const createElicitationService = async ({
         errorCode: phaseResult.errorCode || INTERNAL_ERROR
       };
     }
-
-    // ── Step 5: DELETED! (Because phaseResult.phase ALREADY contains the new document) ──
 
     logWithTime(`✅ [createElicitationService] Elicitation created with ID: ${phaseResult.phase._id} and workflowMode: ${workflowMode || 'OPEN'}`);
     
@@ -88,9 +68,9 @@ const createElicitationService = async ({
   } catch (error) {
     logWithTime(`❌ [createElicitationService] Error: ${error.message}`);
     if (error.name === "ValidationError") {
-      return { success: false, message: "Validation error", error: error.message };
+      return { success: false, message: "Validation error", error: error.message, errorCode: 400 };
     }
-    return { success: false, message: "Internal error while creating elicitation", error: error.message };
+    return { success: false, message: "Internal error while creating elicitation", error: error.message, errorCode: INTERNAL_ERROR };
   }
 };
 

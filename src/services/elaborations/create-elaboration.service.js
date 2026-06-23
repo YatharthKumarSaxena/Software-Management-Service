@@ -1,11 +1,10 @@
 // services/elaborations/create-elaboration.service.js
 
 const { ProjectModel } = require("@models/project.model");
-const { ElaborationModel } = require("@models/elaboration.model");
 const { Phases, WorkflowModes, PhaseStatus } = require("@configs/enums.config");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 /**
  * Creates a new elaboration document in the database.
@@ -35,23 +34,8 @@ const createElaborationService = async ({
       return { success: false, message: "Project not found", errorCode: NOT_FOUND };
     }
 
-    // ── Step 2: Check if elaboration already exists ───────────────────
-    const existingElaboration = await ElaborationModel.findOne({
-      projectId,
-      isDeleted: false,
-      phaseStatus: { $in: [PhaseStatus.OPEN, PhaseStatus.STABILIZING] }
-    });
-
-    if (existingElaboration) {
-      logWithTime(`❌ [createElaborationService] Elaboration already exists for project ${projectId}`);
-      return { success: false, message: "An active elaboration already exists for this project", errorCode: CONFLICT };
-    }
-
-    // ── Step 3: Update project's currentPhase to ELABORATION ─────────
-    logWithTime(`[createElaborationService] Updating project phase to ELABORATION for ${projectId}`);
-
-    // ── Step 4: Create phase WITH version management AND additional data ─
-    logWithTime(`[createElaborationService] Creating ELABORATION phase document`);
+    // Step 2: Create elaboration phase with version management
+    logWithTime(`[createElaborationService] Creating ELABORATION phase for project ${projectId}`);
     
     const phaseResult = await createPhaseWithVersionManagement({
       project,
@@ -59,8 +43,9 @@ const createElaborationService = async ({
       createdBy,
       auditContext,
       additionalData: { 
-        workflowMode: workflowMode || WorkflowModes.OPEN,
-        allowParallelMeetings: allowParallelMeetings || false
+        workflowMode: workflowMode ?? WorkflowModes.OPEN,
+        allowParallelMeetings: allowParallelMeetings ?? false,
+        phaseStatus: phaseStatus ?? PhaseStatus.OPEN
       }
     });
 
@@ -81,9 +66,9 @@ const createElaborationService = async ({
   } catch (error) {
     logWithTime(`❌ [createElaborationService] Error: ${error.message}`);
     if (error.name === "ValidationError") {
-      return { success: false, message: "Validation error", error: error.message };
+      return { success: false, message: "Validation error", error: error.message, errorCode: 400 };
     }
-    return { success: false, message: "Internal error while creating elaboration", error: error.message };
+    return { success: false, message: "Internal error while creating elaboration", error: error.message, errorCode: INTERNAL_ERROR };
   }
 };
 

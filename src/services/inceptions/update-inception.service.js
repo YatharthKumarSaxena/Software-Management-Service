@@ -1,6 +1,6 @@
 // services/inceptions/update-inception.service.js
 
-const { manualVersionControlService } = require("@services/common/version.service");
+const { executePhaseUpdate } = require("@services/common/phase-update.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
@@ -46,15 +46,7 @@ const updateInceptionService = async (
     const workflowModeChanged = workflowMode !== undefined && inception.workflowMode !== workflowMode;
     const phaseStatusChanged = phaseStatus !== undefined && inception.phaseStatus !== phaseStatus;
 
-    if (!allowParallelChanged && !workflowModeChanged && !phaseStatusChanged) {
-      logWithTime(
-        `⚠️ [updateInceptionService] No changes detected.`
-      );
-      return {
-        success: true,
-        message: "No changes detected"
-      };
-    }
+    const documentChanged = allowParallelChanged || workflowModeChanged;
 
     // ── 2. If toggling allowParallelMeetings from true to false, validate meetings ────────
     if (allowParallelChanged && inception.allowParallelMeetings === true && allowParallelMeetings === false) {
@@ -87,63 +79,39 @@ const updateInceptionService = async (
       }
     }
 
-    // ── 3. Build update payload ────────────────────────────────────────
-    const updatePayload = { updatedBy, updatedAt: new Date() };
-    
-    if (allowParallelChanged) {
-      updatePayload.allowParallelMeetings = allowParallelMeetings;
-    }
-    if (workflowModeChanged) {
-      updatePayload.workflowMode = workflowMode;
-    }
-    if (phaseStatusChanged) {
-      updatePayload.phaseStatus = phaseStatus;
-    }
+    const changeDesc = [];
+    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${inception.allowParallelMeetings} → ${allowParallelMeetings}`);
+    if (workflowModeChanged) changeDesc.push(`workflowMode: '${inception.workflowMode}' → '${workflowMode}'`);
 
-    // ── 4. Update via atomic findByIdAndUpdate ────────────────────
-    const updatedInception = await InceptionModel.findByIdAndUpdate(
-      inception._id,
-      { $set: updatePayload },
-      { new: true }
-    );
+    const result = await executePhaseUpdate({
+      phaseDocument: inception,
+      phase: Phases.INCEPTION,
+      phaseName: "Inception",
+      requestedPhaseStatus: phaseStatus,
+      phaseStatusChanged,
+      documentChanged,
+      updatedBy,
+      auditContext,
+      versionAction: `Inception update — version bump`,
+      updateDocument: async currentInception => {
+        const updatePayload = { updatedBy, updatedAt: new Date() };
+        if (allowParallelChanged) updatePayload.allowParallelMeetings = allowParallelMeetings;
+        if (workflowModeChanged) updatePayload.workflowMode = workflowMode;
 
-    // ── 5. Log activity tracker event (only if changed) ────────────
-    if (updatedInception) {
-      const { user, device, requestId } = auditContext || {};
-      const { oldData, newData } = prepareAuditData(inception, updatedInception);
+        const updatedInception = await InceptionModel.findByIdAndUpdate(
+          currentInception._id,
+          { $set: updatePayload },
+          { new: true }
+        );
+        const { user, device, requestId } = auditContext || {};
+        const { oldData, newData } = prepareAuditData(currentInception, updatedInception);
+        logActivityTrackerEvent(user, device, requestId, ACTIVITY_TRACKER_EVENTS.UPDATE_INCEPTION,
+          `Inception updated: ${changeDesc.join(', ')}`, { oldData, newData });
+        return updatedInception;
+      }
+    });
 
-      let changeDesc = [];
-      if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${inception.allowParallelMeetings} → ${allowParallelMeetings}`);
-      if (workflowModeChanged) changeDesc.push(`workflowMode: '${inception.workflowMode}' → '${workflowMode}'`);
-      if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${inception.phaseStatus}' → '${phaseStatus}'`);
-
-      logActivityTrackerEvent(
-        user,
-        device,
-        requestId,
-        ACTIVITY_TRACKER_EVENTS.UPDATE_INCEPTION,
-        `Inception updated: ${changeDesc.join(', ')}`,
-        { oldData, newData }
-      );
-
-      logWithTime(
-        `✅ [updateInceptionService] Inception updated: ${inception._id}`
-      );
-
-      // ── 6. Manual version control (increment minor version) ────────────────────
-      await manualVersionControlService({
-        projectId: inception.projectId,
-        currentPhase: Phases.INCEPTION,
-        action: `Inception updated: ${changeDesc.join(', ')} — version bump`,
-        performedBy: updatedBy,
-        auditContext
-      });
-    }
-
-    return {
-      success: true,
-      inception: updatedInception
-    };
+    return { ...result, inception: result.phaseDocument };
 
   } catch (error) {
     logWithTime(`❌ [updateInceptionService] Error: ${error.message}`);

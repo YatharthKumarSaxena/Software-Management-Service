@@ -1,11 +1,10 @@
 // services/inceptions/create-inception.service.js
 
 const { ProjectModel } = require("@models/project.model");
-const { InceptionModel } = require("@models/inception.model");
 const { Phases, PhaseStatus } = require("@configs/enums.config");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 /**
  * Creates a new inception document in the database.
@@ -34,23 +33,7 @@ const createInceptionService = async ({
       return { success: false, message: "Project not found", errorCode: NOT_FOUND };
     }
 
-    // ── Step 2: Check if inception already exists ─────────────────────
-    const existingInception = await InceptionModel.findOne({
-      projectId,
-      isDeleted: false,
-      phaseStatus: { $in: [PhaseStatus.OPEN, PhaseStatus.STABILIZING] }
-    });
-
-    if (existingInception) {
-      logWithTime(`❌ [createInceptionService] Inception already exists for project ${projectId}`);
-      return { success: false, message: "An active inception already exists for this project", errorCode: CONFLICT };
-    }
-
-    // ── Step 3: Ensure project is in INCEPTION phase ──────────────────
-    // Inception is the starting phase, so project should stay at INCEPTION
-    logWithTime(`[createInceptionService] Ensuring project phase is INCEPTION for ${projectId}`);
-
-    // ── Step 4: Create phase with version management ──────────────────
+    // ── Step 2: Create phase with common validation/version management ─
     // This handles version management and activity tracking automatically
     logWithTime(`[createInceptionService] Creating INCEPTION phase with version management`);
     const phaseResult = await createPhaseWithVersionManagement({
@@ -58,7 +41,11 @@ const createInceptionService = async ({
       targetPhase: Phases.INCEPTION,
       createdBy,
       auditContext,
-      additionalData: {allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false}
+      additionalData: {
+        allowParallelMeetings: allowParallelMeetings ?? false,
+        ...(workflowMode !== undefined && workflowMode !== null && { workflowMode }),
+        phaseStatus: phaseStatus ?? PhaseStatus.OPEN
+      }
     });
 
     if (!phaseResult.success) {
@@ -78,9 +65,9 @@ const createInceptionService = async ({
   } catch (error) {
     logWithTime(`❌ [createInceptionService] Error: ${error.message}`);
     if (error.name === "ValidationError") {
-      return { success: false, message: "Validation error", error: error.message };
+      return { success: false, message: "Validation error", error: error.message, errorCode: 400 };
     }
-    return { success: false, message: "Internal error while creating inception", error: error.message };
+    return { success: false, message: "Internal error while creating inception", error: error.message, errorCode: INTERNAL_ERROR };
   }
 };
 

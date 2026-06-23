@@ -24,10 +24,10 @@ const sendElicitationCreatedSuccess = (res, elicitation) => {
  * @param {Object} res - Express response object
  * @param {Object} elicitation - Updated elicitation document
  */
-const sendElicitationUpdatedSuccess = (res, elicitation) => {
+const sendElicitationUpdatedSuccess = (res, elicitation, message = "Elicitation updated successfully.") => {
   return res.status(OK).json({
     success: true,
-    message: "Elicitation updated successfully.",
+    message,
     data: { elicitation },
   });
 };

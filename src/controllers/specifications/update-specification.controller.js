@@ -9,10 +9,7 @@ const {
   throwInternalServerError,
   throwDBResourceNotFoundError,
 } = require("@/responses/common/error-handler.response");
-const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
-
-const { OK } = require("@configs/http-status.config");
-const { logWithTime } = require("@/utils/time-stamps.util");
+const { CONFLICT, NOT_FOUND } = require("@configs/http-status.config");
 
 const updateSpecificationController = async (req, res) => {
   const { projectId } = req.params;
@@ -42,15 +39,7 @@ const updateSpecificationController = async (req, res) => {
     return throwInternalServerError(res, new Error(result.message));
   }
 
-  if (result.message === "No changes detected") {
-    logWithTime(`⚠️ No changes detected for Specification update in project ${projectId}`);
-    return res.status(OK).json({
-      success: true,
-      message: "No changes detected. Specification remains unchanged."
-    });
-  }
-
-  return sendSpecificationUpdatedSuccess(res, result.specification);
+  return sendSpecificationUpdatedSuccess(res, result.specification, result.message);
 };
 
 module.exports = { updateSpecificationController };

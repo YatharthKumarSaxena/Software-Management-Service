@@ -1,6 +1,6 @@
 
 const mongoose = require("mongoose");
-const { ProjectModel } = require("@models/project.model");
+const { ProjectModel, AdminModel } = require("@models/project.model");
 const { createStakeholderService } = require("@services/stakeholders/create-stakeholder.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
@@ -47,6 +47,8 @@ const createProjectService = async ({
   projectPriority,
   enablePhaseLevelGovernance,
   workflowMode,
+  ownerId,
+  allowStabilizingRollback,
   auditContext
 }) => {
   try {
@@ -99,6 +101,17 @@ const createProjectService = async ({
       };
     }
 
+    const isNewAdmin = createdBy != ownerId;
+    if (isNewAdmin) {
+      const newOwner = await AdminModel.findOne({ adminId: ownerId });
+      if (!newOwner) {
+        return {
+          success: false,
+          message: "No Admin user found with the provided ownerId"
+         };
+       }
+    }
+
     const projectId = new mongoose.Types.ObjectId();
 
     const linkedProjectsValidation = await validateLinkedProjectIds({
@@ -134,6 +147,8 @@ const createProjectService = async ({
       ...(projectPriority !== undefined && { projectPriority }),
       ...(enablePhaseLevelGovernance !== undefined && { enablePhaseLevelGovernance }),
       ...(workflowMode !== undefined && { workflowMode }),
+      ...(ownerId !== undefined && { ownerId }),
+      ...(allowStabilizingRollback !== undefined && { allowStabilizingRollback }),
     });
 
     logActivityTrackerEvent(

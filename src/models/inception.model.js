@@ -1,7 +1,7 @@
 const { customIdRegex } = require("@/configs/regex.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { descriptionLength, productVisionLength } = require("@/configs/fields-length.config");
-const { InceptionDeletionReason, PhaseStatus } = require("@/configs/enums.config");
+const { InceptionDeletionReason, PhaseStatus, WorkflowModes } = require("@/configs/enums.config");
 const mongoose = require("mongoose");
 
 const inceptionSchema = new mongoose.Schema({
@@ -21,6 +21,12 @@ const inceptionSchema = new mongoose.Schema({
   allowParallelMeetings: {
     type: Boolean,
     default: false
+  },
+
+  workflowMode: {
+    type: String,
+    enum: Object.values(WorkflowModes),
+    default: WorkflowModes.OPEN
   },
 
   productVision: {

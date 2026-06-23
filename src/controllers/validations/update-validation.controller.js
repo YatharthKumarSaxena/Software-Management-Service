@@ -9,10 +9,7 @@ const {
   throwInternalServerError,
   throwDBResourceNotFoundError,
 } = require("@/responses/common/error-handler.response");
-const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
-
-const { OK } = require("@configs/http-status.config");
-const { logWithTime } = require("@/utils/time-stamps.util");
+const { CONFLICT, NOT_FOUND } = require("@configs/http-status.config");
 
 const updateValidationController = async (req, res) => {
   const { projectId } = req.params;
@@ -42,15 +39,7 @@ const updateValidationController = async (req, res) => {
     return throwInternalServerError(res, new Error(result.message));
   }
 
-  if (result.message === "No changes detected") {
-    logWithTime(`⚠️ No changes detected for Validation update in project ${projectId}`);
-    return res.status(OK).json({
-      success: true,
-      message: "No changes detected. Validation remains unchanged."
-    });
-  }
-
-  return sendValidationUpdatedSuccess(res, result.validation);
+  return sendValidationUpdatedSuccess(res, result.validation, result.message);
 };
 
 module.exports = { updateValidationController };

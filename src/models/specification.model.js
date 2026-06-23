@@ -1,6 +1,6 @@
 const { customIdRegex } = require("@/configs/regex.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
-const { PhaseDeletionReason, PhaseStatus } = require("@/configs/enums.config");
+const { PhaseDeletionReason, PhaseStatus, WorkflowModes } = require("@/configs/enums.config");
 const { descriptionLength } = require("@/configs/fields-length.config");
 const mongoose = require("mongoose");
 
@@ -21,6 +21,12 @@ const specificationSchema = new mongoose.Schema({
   allowParallelMeetings: {
     type: Boolean,
     default: false
+  },
+
+  workflowMode: {
+    type: String,
+    enum: Object.values(WorkflowModes),
+    default: WorkflowModes.OPEN
   },
   
   version: {

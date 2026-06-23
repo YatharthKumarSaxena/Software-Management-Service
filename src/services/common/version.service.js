@@ -164,7 +164,8 @@ const manualVersionControlService = async ({
   currentPhase,
   action,
   performedBy,
-  auditContext
+  auditContext,
+  phaseDocument
 }) => {
 
   // currentPhase should be a specific phase (string), not an array
@@ -176,8 +177,16 @@ const manualVersionControlService = async ({
   // fake minimal project object (reuse existing flow)
   const project = { _id: projectId };
 
-  const { version: nextVersion, existingPhaseDoc } =
-    await determineNextVersion(project, PhaseModel);
+  const versionSource = phaseDocument || null;
+  const { version: nextVersion, existingPhaseDoc } = versionSource
+    ? {
+        version: {
+          major: versionSource.version.major,
+          minor: versionSource.version.minor + 1
+        },
+        existingPhaseDoc: versionSource
+      }
+    : await determineNextVersion(project, PhaseModel);
 
   if (!existingPhaseDoc) {
     logWithTime(
@@ -212,7 +221,8 @@ const manualVersionControlService = async ({
 
   return {
     success: true,
-    newVersion: `v${nextVersion.major}.${nextVersion.minor}`
+    newVersion: `v${nextVersion.major}.${nextVersion.minor}`,
+    phaseDocument: updatedDoc
   };
 };
 

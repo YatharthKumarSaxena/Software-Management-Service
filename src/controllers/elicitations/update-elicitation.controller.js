@@ -8,7 +8,6 @@ const {
 } = require("@/responses/common/error-handler.response");
 const { sendElicitationUpdatedSuccess } = require("@/responses/success/elicitation.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { OK } = require("@configs/http-status.config");
 
 /**
  * PUT /projects/:projectId/elicitations/:elicitationId
@@ -27,9 +26,9 @@ const updateElicitationController = async (req, res) => {
     const result = await elicitationServices.updateElicitationService(
       elicitation,
       {
-        allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
-        workflowMode: typeof workflowMode === 'string' ? workflowMode : null,
-        phaseStatus: typeof phaseStatus === 'string' ? phaseStatus : null,
+        allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : undefined,
+        workflowMode: typeof workflowMode === 'string' ? workflowMode : undefined,
+        phaseStatus: typeof phaseStatus === 'string' ? phaseStatus : undefined,
         updatedBy: req.admin.adminId,
         auditContext: {
           user: req.admin,
@@ -45,17 +44,9 @@ const updateElicitationController = async (req, res) => {
       return throwBadRequestError(res, result.message);
     }
 
-    if (result.message === "No changes detected") {
-
-      return res.status(OK).json({
-        success: true,
-        message: "No changes detected. Elicitation mode remains unchanged."
-      });
-    }
-
     // ── Return success response ───────────────────────────────────────
     logWithTime(`✅ [updateElicitationController] Elicitation updated successfully | ${getLogIdentifiers(req)}`);
-    return sendElicitationUpdatedSuccess(res, result.elicitation);
+    return sendElicitationUpdatedSuccess(res, result.elicitation, result.message);
 
   } catch (error) {
     logWithTime(`❌ [updateElicitationController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);

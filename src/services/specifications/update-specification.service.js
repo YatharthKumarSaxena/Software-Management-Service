@@ -2,13 +2,12 @@
 
 const { ProjectModel } = require("../../models");
 const { SpecificationModel } = require("../../models");
-const { manualVersionControlService } = require("@services/common/version.service");
+const { executePhaseUpdate } = require("@services/common/phase-update.service");
 const {
   logActivityTrackerEvent,
 } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { NOT_FOUND, CONFLICT, INTERNAL_ERROR } = require("@configs/http-status.config");
-const { logWithTime } = require("@utils/time-stamps.util");
 const { Phases } = require("@configs/enums.config");
 
 const updateSpecificationService = async ({
@@ -49,13 +48,7 @@ const updateSpecificationService = async ({
     const workflowModeChanged = workflowMode !== undefined && specification.workflowMode !== workflowMode;
     const phaseStatusChanged = phaseStatus !== undefined && specification.phaseStatus !== phaseStatus;
 
-    if (!allowParallelChanged && !workflowModeChanged && !phaseStatusChanged) {
-      return {
-        success: true,
-        message: "No changes detected",
-        specification,
-      };
-    }
+    const documentChanged = allowParallelChanged || workflowModeChanged;
 
     // ── 2. If toggling allowParallelMeetings from true to false, validate meetings ────────
     if (allowParallelChanged && specification.allowParallelMeetings === true && allowParallelMeetings === false) {
@@ -85,53 +78,35 @@ const updateSpecificationService = async ({
       }
     }
 
-    // ── 3. Update specification with allowParallelMeetings toggle ────────
-    if (workflowModeChanged) {
-      specification.workflowMode = workflowMode;
-    }
-    if (allowParallelChanged) {
-      specification.allowParallelMeetings = allowParallelMeetings;
-    }
-    if (phaseStatusChanged) {
-      specification.phaseStatus = phaseStatus;
-    }
-    specification.updatedBy = updatedBy;
-    specification.updatedAt = new Date();
-
-    await specification.save();
-
-    let changeDesc = [];
+    const changeDesc = [];
     if (workflowModeChanged) changeDesc.push(`workflowMode: '${specification.workflowMode}' → '${workflowMode}'`);
-    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${!allowParallelMeetings} → ${allowParallelMeetings}`);
-    if (phaseStatusChanged) changeDesc.push(`phaseStatus: '${specification.phaseStatus}' → '${phaseStatus}'`);
-    // ── 4. Log activity ──────────────────────────────────────────────
-    const { user, device, requestId } = auditContext || {};
-    logActivityTrackerEvent(
-      user,
-      device,
-      requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_SPECIFICATION,
-      `Specification updated: ${changeDesc.join(', ')}`,
-      { adminActions: { targetId: projectId } }
-    );
+    if (allowParallelChanged) changeDesc.push(`allowParallelMeetings: ${specification.allowParallelMeetings} → ${allowParallelMeetings}`);
 
-    // ── 5. Manual version control (increment minor version) ──────────────
-    logWithTime(`[updateSpecificationService] Incrementing version for specification`);
-    await manualVersionControlService({
-      projectId,
-      currentPhase: Phases.SPECIFICATION,
-      action: `Specification updated: ${changeDesc.join(', ')}`,
-      performedBy: updatedBy,
-      auditContext
+    const result = await executePhaseUpdate({
+      phaseDocument: specification,
+      phase: Phases.SPECIFICATION,
+      phaseName: "Specification",
+      requestedPhaseStatus: phaseStatus,
+      phaseStatusChanged,
+      documentChanged,
+      updatedBy,
+      auditContext,
+      versionAction: "Specification update — version bump",
+      updateDocument: async currentSpecification => {
+        if (workflowModeChanged) currentSpecification.workflowMode = workflowMode;
+        if (allowParallelChanged) currentSpecification.allowParallelMeetings = allowParallelMeetings;
+        currentSpecification.updatedBy = updatedBy;
+        currentSpecification.updatedAt = new Date();
+        await currentSpecification.save();
+        const { user, device, requestId } = auditContext || {};
+        logActivityTrackerEvent(user, device, requestId, ACTIVITY_TRACKER_EVENTS.UPDATE_SPECIFICATION,
+          `Specification updated: ${changeDesc.join(', ')}`,
+          { adminActions: { targetId: projectId } });
+        return currentSpecification;
+      }
     });
 
-    logWithTime(`✅ [updateSpecificationService] Specification updated with version control`);
-
-    return {
-      success: true,
-      message: "Specification updated successfully",
-      specification,
-    };
+    return { ...result, specification: result.phaseDocument };
   } catch (error) {
     console.error("[updateSpecificationService] Error:", error);
     return {

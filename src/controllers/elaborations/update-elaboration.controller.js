@@ -9,10 +9,7 @@ const {
   throwInternalServerError,
   throwDBResourceNotFoundError,
 } = require("@/responses/common/error-handler.response");
-const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
-
-const { OK } = require("@configs/http-status.config");
-const { logWithTime } = require("@/utils/time-stamps.util");
+const { CONFLICT, NOT_FOUND } = require("@configs/http-status.config");
 
 const updateElaborationController = async (req, res) => {
   const { projectId } = req.params;
@@ -20,9 +17,9 @@ const updateElaborationController = async (req, res) => {
 
   const result = await updateElaborationService({
     projectId,
-    allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : false,
-    workflowMode: typeof workflowMode === 'string' ? workflowMode : null,
-    phaseStatus: typeof phaseStatus === 'string' ? phaseStatus : null,
+    allowParallelMeetings: typeof allowParallelMeetings === 'boolean' ? allowParallelMeetings : undefined,
+    workflowMode: typeof workflowMode === 'string' ? workflowMode : undefined,
+    phaseStatus: typeof phaseStatus === 'string' ? phaseStatus : undefined,
     updatedBy: req.admin.adminId,
     auditContext: {
       user: req.admin,
@@ -42,15 +39,7 @@ const updateElaborationController = async (req, res) => {
     return throwInternalServerError(res, new Error(result.message));
   }
 
-  if (result.message === "No changes detected") {
-    logWithTime(`⚠️ No changes detected for Elaboration update in project ${projectId}`);
-    return res.status(OK).json({
-      success: true,
-      message: "No changes detected. Elaboration remains unchanged."
-    });
-  }
-
-  return sendElaborationUpdatedSuccess(res, result.elaboration);
+  return sendElaborationUpdatedSuccess(res, result.elaboration, result.message);
 };
 
 module.exports = { updateElaborationController };

@@ -1,11 +1,10 @@
 // services/negotiations/create-negotiation.service.js
 
 const { ProjectModel } = require("@models/project.model");
-const { NegotiationModel } = require("@models/negotiation.model");
 const { Phases, WorkflowModes, PhaseStatus } = require("@configs/enums.config");
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CONFLICT, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
 
 /**
  * Creates a new negotiation document in the database.
@@ -35,22 +34,7 @@ const createNegotiationService = async ({
       return { success: false, message: "Project not found", errorCode: NOT_FOUND };
     }
 
-    // ── Step 2: Check if negotiation already exists ───────────────────
-    const existingNegotiation = await NegotiationModel.findOne({
-      projectId,
-      isDeleted: false,
-      phaseStatus: { $in: [PhaseStatus.OPEN, PhaseStatus.STABILIZING] }
-    });
-
-    if (existingNegotiation) {
-      logWithTime(`❌ [createNegotiationService] Negotiation already exists for project ${projectId}`);
-      return { success: false, message: "An active negotiation already exists for this project", errorCode: CONFLICT };
-    }
-
-    // ── Step 3: Update project's currentPhase to NEGOTIATION ─────────
-    logWithTime(`[createNegotiationService] Updating project phase to NEGOTIATION for ${projectId}`);
-
-    // ── Step 4: Create phase WITH version management AND additional data ─
+    // ── Step 2: Create phase with common validation/version management ─
     logWithTime(`[createNegotiationService] Creating NEGOTIATION phase document`);
     
     const phaseResult = await createPhaseWithVersionManagement({
@@ -59,8 +43,9 @@ const createNegotiationService = async ({
       createdBy,
       auditContext,
       additionalData: { 
-        workflowMode: workflowMode || WorkflowModes.OPEN,
-        allowParallelMeetings: allowParallelMeetings || false
+        workflowMode: workflowMode ?? WorkflowModes.OPEN,
+        allowParallelMeetings: allowParallelMeetings ?? false,
+        phaseStatus: phaseStatus ?? PhaseStatus.OPEN
       }
     });
 
@@ -81,9 +66,9 @@ const createNegotiationService = async ({
   } catch (error) {
     logWithTime(`❌ [createNegotiationService] Error: ${error.message}`);
     if (error.name === "ValidationError") {
-      return { success: false, message: "Validation error", error: error.message };
+      return { success: false, message: "Validation error", error: error.message, errorCode: 400 };
     }
-    return { success: false, message: "Internal error while creating negotiation", error: error.message };
+    return { success: false, message: "Internal error while creating negotiation", error: error.message, errorCode: INTERNAL_ERROR };
   }
 };
 

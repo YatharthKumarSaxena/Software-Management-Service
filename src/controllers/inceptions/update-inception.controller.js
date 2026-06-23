@@ -8,7 +8,6 @@ const {
 } = require("@/responses/common/error-handler.response");
 const { sendInceptionUpdatedSuccess } = require("@/responses/success/inception.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { OK } = require("@configs/http-status.config");
 
 /**
  * PUT /projects/:projectId/inceptions/:inceptionId
@@ -45,17 +44,9 @@ const updateInceptionController = async (req, res) => {
       return throwBadRequestError(res, result.message);
     }
 
-    if (result.message === "No changes detected") {
-        logWithTime(`⚠️ No changes detected for Inception update in project ${inception.projectId}`);
-      return res.status(OK).json({
-        success: true,
-        message: "No changes detected. Inception mode remains unchanged."
-      });
-    }
-
     // ── Return success response ───────────────────────────────────────
     logWithTime(`✅ [updateInceptionController] Inception updated successfully | ${getLogIdentifiers(req)}`);
-    return sendInceptionUpdatedSuccess(res, result.inception);
+    return sendInceptionUpdatedSuccess(res, result.inception, result.message);
 
   } catch (error) {
     logWithTime(`❌ [updateInceptionController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
