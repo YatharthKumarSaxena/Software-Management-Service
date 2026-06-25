@@ -41,6 +41,16 @@ const projectSchema = new mongoose.Schema(
       maxlength: [descriptionLength.max, `Description must not exceed ${descriptionLength.max} characters.`],
     },
 
+    sequence: {
+      type: Number,
+      required: true
+    },
+
+    id: {
+      type: String,
+      required: true
+    },
+
     problemStatement: {
       type: String,
       required: [true, "Problem statement is required."],
@@ -433,6 +443,45 @@ const projectSchema = new mongoose.Schema(
     versionKey: false,  // disable __v (we have our own `version` field)
     collection: DB_COLLECTIONS.PROJECTS,
   }
+);
+
+projectSchema.index({ id: 1 }, { unique: true });
+
+projectSchema.index({
+    name: 1,
+    isDeleted: 1
+});
+
+projectSchema.index({
+    ownerId: 1,
+    isDeleted: 1
+});
+
+projectSchema.index({
+    createdBy: 1,
+    isDeleted: 1
+});
+
+projectSchema.index({
+    currentPhase: 1,
+    isDeleted: 1
+});
+
+projectSchema.index({
+    projectStatus: 1,
+    isDeleted: 1
+});
+
+projectSchema.index(
+    {
+        name: 1
+    },
+    {
+        unique: true,
+        partialFilterExpression: {
+            isDeleted: false
+        }
+    }
 );
 
 projectSchema.pre("validate", async function () {
