@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { RequestStatus } = require("@configs/enums.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CREATED, BAD_REQUEST, INTERNAL_ERROR, CONFLICT } = require("@configs/http-status.config");
+const { counterServices } = require("@services/common/counter.service");
 
 /**
  * Creates a new product request document in the database.
@@ -43,7 +44,7 @@ const createProductRequestService = async ({
 
     const requesterId = requestedBy._id;
     const clientId = requestedBy.clientId;
-    
+
     const existingRequest = await ProductRequestModel.findOne({
       requestedBy: requesterId,
       title: normalizedTitle,
@@ -99,11 +100,31 @@ const createProductRequestService = async ({
       }
     }
 
+    // ── Generate Product Request Sequence & ID ─────────────────────────
+
+    const counterResult =
+      await counterServices.productRequestCounterService();
+
+    if (!counterResult.success) {
+
+      logWithTime(
+        `❌ [createProductRequestService] Error generating Product Request sequence`
+      );
+
+      return {
+        errorCode: INTERNAL_ERROR,
+        isSuccess: false,
+        description: "Failed to generate Product Request sequence"
+      };
+    }
+
     // ── Create the product request ────────────────────────────────────
     const productRequestId = new mongoose.Types.ObjectId();
 
     const productRequest = await ProductRequestModel.create({
       _id: productRequestId,
+      sequence: counterResult.sequence,
+      id: counterResult.generatedId,
       title: normalizedTitle,
       description: normalizedDescription,
       projectType,

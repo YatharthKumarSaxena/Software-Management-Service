@@ -24,7 +24,7 @@ const { getRequirementToHlfService } = require("../hlf-requirement/get-requireme
 const { listRequirementToHlfService } = require("../hlf-requirement/list-requirement-to-hlf.service");
 const { unlinkRequirementToHlfService } = require("../hlf-requirement/unlink-requirement-to-hlf.service");
 const { startReviewRequirementService } = require("./start-review-requirement.service");
-const { filterRequirementsService } = require("./filter-requirements.service");
+const { getRequirementService } = require("./get-requirements.service");
 const { assignContributorService } = require("./assign-collaborator.service");
 const { unassignContributorService } = require("./unassign-collaborator.service");
 const { updateLinkedRequirementService } = require("./update-linked-requirement.service");
@@ -51,7 +51,7 @@ const requirementServices = {
   getRequirementToHlfService,
   listRequirementToHlfService,
   unlinkRequirementToHlfService,
-  filterRequirementsService,
+  getRequirementService,
   unassignRequirementService,
   assignContributorService,
   unassignContributorService,

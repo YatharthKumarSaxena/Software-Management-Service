@@ -10,6 +10,8 @@ const { validateLinkedProjectIds } = require("@/services/projects/linked-project
 const { createPhaseWithVersionManagement } = require("@services/common/phase-management.service");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { getMyEnvAsBool } = require("@/utils/env.util");
+const { counterServices } = require("@services/common/counter.service");
+const { INTERNAL_ERROR } = require("@configs/http-status.config");
 
 /**
  * Creates a new project document in the database.
@@ -146,8 +148,28 @@ const createProjectService = async ({
     // ── Persist ───────────────────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
 
+    // ── Generate Project Sequence & ID ─────────────────────────
+
+    const counterResult =
+      await counterServices.projectCounterService();
+
+    if (!counterResult.success) {
+
+      logWithTime(
+        `❌ [createProjectService] Error generating Project sequence`
+      );
+
+      return {
+        success: false,
+        message: "Failed to generate Project sequence",
+        errorCode: INTERNAL_ERROR
+      };
+    }
+
     const project = await ProjectModel.create({
       _id: projectId,
+      sequence: counterResult.sequence,
+      id: counterResult.generatedId,
       name: normalizedName,
       description: normalizedDescription,
       problemStatement,
