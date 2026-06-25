@@ -119,6 +119,9 @@ const getLatestPhaseRateLimiter = createRateLimiter(perUserAndDevice.getLatestPh
 const listPhasesRateLimiter = createRateLimiter(perUserAndDevice.listPhases);
 
 const createRequirementRateLimiter = createRateLimiter(perUserAndDevice.createRequirement);
+const listRequirementsRateLimiter = createRateLimiter(perUserAndDevice.listRequirements);
+const getRequirementRateLimiter = createRateLimiter(perUserAndDevice.getRequirement)
+
 
 module.exports = {
     welcomeAdminRateLimiter,
@@ -221,4 +224,6 @@ module.exports = {
     getLatestPhaseRateLimiter,
     listPhasesRateLimiter,
     createRequirementRateLimiter,
+    listRequirementsRateLimiter,
+    getRequirementRateLimiter
 }

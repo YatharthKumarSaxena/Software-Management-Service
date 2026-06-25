@@ -8,13 +8,19 @@ const { baseAuthClientOrAdminMiddlewares } = require("./middleware.gateway.route
 
 const { requirementControllers } = require("@controllers/requirements");
 const { requirementMiddlewares } = require("@/middlewares/requirements");
-const { createRequirementRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
+const { createRequirementRateLimiter, getRequirementRateLimiter, listRequirementsRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { commonMiddlewares } = require("@/middlewares/common");
 
+const {
+  CREATE_REQUIREMENT,
+  GET_REQUIREMENT,
+  LIST_REQUIREMENTS
+} = REQUIREMENT_ROUTES;
+
 // Create Requirement
 requirementRouter.post(
-  REQUIREMENT_ROUTES.CREATE_REQUIREMENT,
+  CREATE_REQUIREMENT,
   [
     ...baseAuthClientOrAdminMiddlewares,
     createRequirementRateLimiter,
@@ -26,6 +32,30 @@ requirementRouter.post(
     requirementMiddlewares.createRequirementValidationMiddleware
   ],
   requirementControllers.createRequirementController
+);
+
+// Get Requirement
+requirementRouter.get(
+  GET_REQUIREMENT,
+  [
+    ...baseAuthClientOrAdminMiddlewares,
+    getRequirementRateLimiter,
+    requirementMiddlewares.fetchRequirementMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
+    commonMiddlewares.checkUserIsStakeholder
+  ],
+  requirementControllers.getRequirementController
+);
+
+requirementRouter.get(
+  LIST_REQUIREMENTS,
+  [
+    ...baseAuthClientOrAdminMiddlewares,
+    listRequirementsRateLimiter,
+    projectMiddlewares.fetchProjectMiddleware,
+    commonMiddlewares.checkUserIsStakeholder
+  ],
+  requirementControllers.listRequirementsController
 );
 
 module.exports = {

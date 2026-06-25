@@ -31,6 +31,16 @@ const productRequestSchema = new mongoose.Schema(
       maxlength: descriptionLength.max
     },
 
+    sequence: {
+      type: Number,
+      required: true
+    },
+
+    id: {
+      type: String,
+      required: true
+    },
+
     projectType: {
       type: String,
       enum: ProjectTypes,
@@ -47,8 +57,7 @@ const productRequestSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: DB_COLLECTIONS.CLIENTS,
       required: true,
-      immutable: true,
-      index: true
+      immutable: true
     },
 
     priority: {
@@ -72,8 +81,7 @@ const productRequestSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: RequestStatus,
-      default: RequestStatus.PENDING,
-      index: true
+      default: RequestStatus.PENDING
     },
 
     isDeleted: {
@@ -97,7 +105,30 @@ const productRequestSchema = new mongoose.Schema(
   }
 );
 
-productRequestSchema.index({ requestedBy: 1, status: 1, isDeleted: 1 });
+productRequestSchema.index(
+    { id: 1 },
+    { unique: true }
+);
+
+productRequestSchema.index(
+    { sequence: 1 },
+    { unique: true }
+);
+
+productRequestSchema.index(
+    {
+        requestedBy: 1,
+        status: 1,
+        isDeleted: 1
+    }
+);
+
+productRequestSchema.index(
+    {
+        status: 1,
+        createdAt: -1
+    }
+);
 
 const ProductRequestModel = mongoose.model(DB_COLLECTIONS.PRODUCT_REQUESTS, productRequestSchema);
 

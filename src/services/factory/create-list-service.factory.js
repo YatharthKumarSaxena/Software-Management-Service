@@ -1,12 +1,13 @@
-// services/common/factories/create-list-service.factory.js
-
 const { queryEngineService } = require(
     "@/services/common/query-engine.service"
 );
 
 const createListService = ({
     model,
-    hiddenFields = []
+    hiddenFields = [],
+    filterableFields = [],
+    sortableFields = [],
+    searchableFields = []
 }) => {
 
     return async ({
@@ -24,6 +25,12 @@ const createListService = ({
 
             hiddenFields,
 
+            accessControl: {
+                filterableFields,
+                sortableFields,
+                searchableFields
+            },
+
             query,
 
             selectFields,
@@ -36,7 +43,9 @@ const createListService = ({
 
             sortOrder
         });
+
     };
+
 };
 
 module.exports = {

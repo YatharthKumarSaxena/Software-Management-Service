@@ -1,56 +1,97 @@
-// controllers/requirements/list-requirements.controller.js
-
 const { requirementServices } = require("@services/requirements");
+
 const {
-  throwInternalServerError,
-  getLogIdentifiers,
-} = require("@/responses/common/error-handler.response");
-const { sendRequirementsListSuccess } = require("@/responses/success/requirement.response");
+    throwBadRequestError,
+    throwInternalServerError
+} = require("@responses/common/error-handler.response");
+
+const {
+    sendRequirementsListSuccess
+} = require("@responses/success/requirement.response");
+
 const { logWithTime } = require("@utils/time-stamps.util");
+
+const {
+    validateAndParseJson
+} = require("@/utils/validate-json-query.util");
+
+const {
+    BAD_REQUEST
+} = require("@configs/http-status.config");
+
+const {
+    parseListFilters
+} = require("@utils/parse-list-filters.util");
+
 const { UserTypes } = require("@configs/enums.config");
 
-/**
- * GET /projects/:projectId/elicitations/:elicitationId/requirements
- * List requirements with pagination and optional status filtering.
- */
 const listRequirementsController = async (req, res) => {
-  try {
-    const { elicitationId } = req.params;
-    const { limit = 10, skip = 0, sortBy = '-createdAt', status } = req.query;
+    try {
 
-    logWithTime(
-      `📍 [listRequirementsController] Listing requirements for elicitation: ${elicitationId} | ${getLogIdentifiers(req)}`
-    );
+        if (req.query?.query) {
+            const isQueryValidResult = validateAndParseJson(
+                req.query.query,
+                "query"
+            );
 
-    const user = req?.admin || req?.client;
-    const userId = user?.adminId || user?.clientId;
-    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
+            if (!isQueryValidResult.success) {
+                return throwBadRequestError(
+                    res,
+                    isQueryValidResult.message
+                );
+            }
+        }
 
-    // ── Call service ──────────────────────────────────────────────────
-    const result = await requirementServices.listRequirementsService({
-      elicitationId,
-      limit: parseInt(limit, 10),
-      skip: parseInt(skip, 10),
-      sortBy,
-      status,
-      userType,
-      userId
-    });
+        const filters = parseListFilters(req.query);
+        const projectId = req.project._id;
 
-    // ── Handle error response ─────────────────────────────────────────
-    if (!result.success) {
-      logWithTime(`❌ [listRequirementsController] ${result.message} | ${getLogIdentifiers(req)}`);
-      return throwInternalServerError(res, new Error(result.message));
+        const userType =
+            req.admin
+                ? UserTypes.USER
+                : UserTypes.CLIENT;
+
+        const result =
+            await requirementServices.listRequirementsService({
+                projectId,
+                filters,
+                userType
+            });
+
+        if (!result.success) {
+
+            if (result.errorCode === BAD_REQUEST) {
+                return throwBadRequestError(
+                    res,
+                    result.message
+                );
+            }
+
+            return throwInternalServerError(
+                res,
+                new Error(result.message)
+            );
+        }
+
+        logWithTime(
+            `✅ ${result.pagination.totalCount} requirement(s) fetched successfully`
+        );
+
+        return sendRequirementsListSuccess(
+            res,
+            result.data,
+            result.pagination
+        );
+
+    } catch (error) {
+
+        return throwInternalServerError(
+            res,
+            error
+        );
+
     }
-
-    // ── Return success response ───────────────────────────────────────
-    logWithTime(`✅ [listRequirementsController] Requirements listed successfully | ${getLogIdentifiers(req)}`);
-    return sendRequirementsListSuccess(res, result.requirements, result.pagination);
-
-  } catch (error) {
-    logWithTime(`❌ [listRequirementsController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
-    return throwInternalServerError(res, error);
-  }
 };
 
-module.exports = { listRequirementsController };
+module.exports = {
+    listRequirementsController
+};

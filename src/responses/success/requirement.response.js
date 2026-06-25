@@ -58,14 +58,12 @@ const sendRequirementFetchSuccess = (res, requirement) => {
 
 // ── LIST ───────────────────────────────────────────────────────────
 const sendRequirementsListSuccess = (res, requirements, pagination) => {
-  logWithTime(`✅ [sendRequirementsListSuccess] Listed ${requirements.length} requirements`);
+  logWithTime(`✅ [sendRequirementsListSuccess] Listed ${requirements?.length || 0} requirements`);
   return res.status(OK).json({
     success: true,
     message: "Requirements listed successfully",
-    data: {
-      requirements,
-      pagination
-    }
+    data: requirements,
+    pagination
   });
 };
 

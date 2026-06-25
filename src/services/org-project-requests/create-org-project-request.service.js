@@ -7,6 +7,7 @@ const { NOT_FOUND, BAD_REQUEST, CONFLICT, INTERNAL_ERROR } = require("@configs/h
 const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
+const { counterServices } = require("@services/common/counter.service");
 
 /**
  * Creates an org project request for a client
@@ -96,16 +97,36 @@ const createOrgProjectRequestService = async ({
 
     if (existingRequest) {
       logWithTime(`❌ [createOrgProjectRequestService] Existing request found with status ${existingRequest.status}`);
-      return { 
-        success: false, 
+      return {
+        success: false,
         message: `An active request already exists with status: ${existingRequest.status}`,
         errorCode: CONFLICT
+      };
+    }
+
+    // ── Generate Org Project Request Sequence & ID ──────────────────────
+
+    const counterResult =
+      await counterServices.orgProjectRequestCounterService();
+
+    if (!counterResult.success) {
+
+      logWithTime(
+        `❌ [createOrgProjectRequestService] Error generating Org Project Request sequence`
+      );
+
+      return {
+        success: false,
+        message: "Failed to generate Org Project Request sequence",
+        errorCode: INTERNAL_ERROR
       };
     }
 
     /* ── Create OrgProjectRequest ────────────────────────────────────── */
     const orgProjectRequest = new OrgProjectRequest({
       projectId: project._id,
+      sequence: counterResult.sequence,
+      id: counterResult.generatedId,
       clientId: client._id,
       organizationId: organizationId,
       status: RequestStatus.PENDING,
@@ -124,12 +145,12 @@ const createOrgProjectRequestService = async ({
         auditRequestId,
         ACTIVITY_TRACKER_EVENTS.CREATE_ORG_PROJECT_REQUEST,
         `Organization project join request created. Project: ${project._id}, Organization: ${organizationId}`,
-        { 
-          adminActions: { 
+        {
+          adminActions: {
             targetId: orgProjectRequest._id.toString(),
             clientId: client._id.toString(),
             projectId: project._id.toString()
-          } 
+          }
         }
       );
     } catch (trackerError) {

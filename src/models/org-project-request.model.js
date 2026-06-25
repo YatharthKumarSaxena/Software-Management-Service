@@ -11,23 +11,30 @@ const orgProjectRequestSchema = new mongoose.Schema(
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: DB_COLLECTIONS.PROJECTS,
-      required: [true, "projectId is required."],
-      index: true
+      required: [true, "projectId is required."]
+    },
+
+    sequence: {
+      type: Number,
+      required: true
+    },
+
+    id: {
+      type: String,
+      required: true
     },
 
     clientId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: DB_COLLECTIONS.CLIENTS,
       required: [true, "clientId is required."],
-      immutable: true,
-      index: true
+      immutable: true
     },
 
     organizationId: {
       type: String,
       match: [mongoIdRegex, "organizationId must be a valid MongoDB ObjectId."],
-      required: [true, "organizationId is required."],
-      index: true
+      required: [true, "organizationId is required."]
     },
 
     /* ── Status & Lifecycle ─────────────────────────────────────── */
@@ -38,8 +45,7 @@ const orgProjectRequestSchema = new mongoose.Schema(
         values: Object.values(RequestStatus),
         message: `status must be one of: ${Object.values(RequestStatus).join(", ")}`
       },
-      default: RequestStatus.PENDING,
-      index: true
+      default: RequestStatus.PENDING
     },
 
     /* ── Approval Reason ────────────────────────────────────────── */
@@ -114,8 +120,44 @@ const orgProjectRequestSchema = new mongoose.Schema(
 );
 
 /* ── Compound Indexes ──────────────────────────────────────── */
-orgProjectRequestSchema.index({ projectId: 1, clientId: 1, status: 1 });
-orgProjectRequestSchema.index({ clientId: 1, status: 1 });
+orgProjectRequestSchema.index(
+    { id: 1 },
+    { unique: true }
+);
+
+orgProjectRequestSchema.index(
+    { sequence: 1 },
+    { unique: true }
+);
+
+orgProjectRequestSchema.index(
+    {
+        projectId: 1,
+        clientId: 1,
+        status: 1
+    }
+);
+
+orgProjectRequestSchema.index(
+    {
+        clientId: 1,
+        status: 1
+    }
+);
+
+orgProjectRequestSchema.index(
+    {
+        organizationId: 1,
+        status: 1
+    }
+);
+
+orgProjectRequestSchema.index(
+    {
+        status: 1,
+        createdAt: -1
+    }
+);
 
 const OrgProjectRequest = mongoose.model(DB_COLLECTIONS.ORG_PROJECT_REQUESTS, orgProjectRequestSchema);
 
