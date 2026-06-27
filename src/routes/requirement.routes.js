@@ -11,6 +11,7 @@ const { requirementMiddlewares } = require("@/middlewares/requirements");
 const { createRequirementRateLimiter, getRequirementRateLimiter, listRequirementsRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { commonMiddlewares } = require("@/middlewares/common");
+const { getDataMiddleware, listDataMiddleware } = require("@middlewares/common/fetch-data.middleware");
 
 const {
   CREATE_REQUIREMENT,
@@ -40,6 +41,7 @@ requirementRouter.get(
   [
     ...baseAuthClientOrAdminMiddlewares,
     getRequirementRateLimiter,
+    getDataMiddleware,
     requirementMiddlewares.fetchRequirementMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder
@@ -52,6 +54,7 @@ requirementRouter.get(
   [
     ...baseAuthClientOrAdminMiddlewares,
     listRequirementsRateLimiter,
+    listDataMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder
   ],

@@ -4,16 +4,11 @@ const { requirementServices } = require("@services/requirements");
 const {
   throwInternalServerError,
   getLogIdentifiers,
-  throwSpecificInternalServerError,
-  throwBadRequestError
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { sendRequirementFetchSuccess } = require("@/responses/success/requirement.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { UserTypes } = require("@configs/enums.config");
-
-const {
-    validateAndParseJson
-} = require("@utils/validate-json-query.util");
 
 const {
     parseListFilters
@@ -22,19 +17,6 @@ const {
 
 const getRequirementController = async (req, res) => {
   try {
-    if (req.query?.selectFields) {
-      const validationResult = validateAndParseJson(
-        req.query.selectFields,
-        "selectFields"
-      );
-
-      if (!validationResult.success) {
-        return throwBadRequestError(
-          res,
-          validationResult.message
-        );
-      }
-    }
 
     const filters = parseListFilters(req.query);
 

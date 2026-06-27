@@ -19,6 +19,7 @@ const { phaseControllers } = require("@controllers/phases");
 const { phaseMiddlewares } = require("@middlewares/phases");
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { checkUserIsStakeholder } = require("@/middlewares/stakeholders/check-user-is-stakeholder.middleware");
+const { getDataMiddleware, listDataMiddleware } = require("@middlewares/common/fetch-data.middleware");
 const { stakeholderRoleAccessMiddlewares } = require("@/middlewares/stakeholders/api-stakeholder-role-access.middleware");
 
 const {
@@ -123,6 +124,7 @@ phaseRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     listPhasesRateLimiter,
+    listDataMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder
   ],
