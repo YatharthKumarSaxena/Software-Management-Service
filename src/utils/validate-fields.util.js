@@ -28,4 +28,67 @@ const validateMissingFields = (data, requiredFields) => {
     };
 };
 
-module.exports = { validateMissingFields };
+/**
+ * Validate Required Columns in CSV/Excel
+ *
+ * @param {string[]} headers
+ * @param {string[]} requiredColumns
+ *
+ * @returns {{
+ *   isValid: boolean,
+ *   missingColumns: string[],
+ *   cleanedHeaders: string[]
+ * }}
+ */
+const validateRequiredColumns = (
+    headers = [],
+    requiredColumns = [],
+    {
+        ignoreCase = true,
+        trim = true
+    } = {}
+) => {
+
+    const normalize = (value) => {
+
+        value = String(value);
+
+        if (trim) {
+            value = value.trim();
+        }
+
+        if (ignoreCase) {
+            value = value.toLowerCase();
+        }
+
+        return value;
+    };
+
+    const normalizedHeaders = headers.map(normalize);
+
+    const headerSet = new Set(normalizedHeaders);
+
+    const missingColumns = requiredColumns.filter(
+        column => !headerSet.has(normalize(column))
+    );
+
+    const duplicateColumns = [
+        ...new Set(
+            normalizedHeaders.filter(
+                (header, index) => normalizedHeaders.indexOf(header) !== index
+            )
+        )
+    ];
+
+    return {
+        isValid: missingColumns.length === 0 && duplicateColumns.length === 0,
+        missingColumns,
+        duplicateColumns,
+        cleanedHeaders: headers
+    };
+};
+
+module.exports = {
+    validateMissingFields,
+    validateRequiredColumns
+};

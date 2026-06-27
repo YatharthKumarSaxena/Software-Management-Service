@@ -2,8 +2,8 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 
 const { globalLimiter } = require("@rate-limiters/global.rate-limiter");
-const { malformedJsonHandler } = require("@middlewares/handlers/malformed-json-handler.middleware");
-const { unknownRouteHandler } = require("@middlewares/handlers/unknown-route-handler.middleware");
+const { handlers } = require("@/middlewares/handlers/index");
+const { unknownRouteHandler, malformedJsonHandler, duplicateQueryParameterHandler } = handlers;
 const { corsMiddleware } = require("@middlewares/common/cors.middleware");
 
 const app = express();
@@ -12,25 +12,28 @@ const jsonParser = express.json;
 
 // Order is VERY IMPORTANT
 
-// 1. CORS middleware (must be FIRST before everything else)
+// 1. CORS
 app.use(corsMiddleware);
 
-// 2. Global rate limiter (protect entire server)
+// 2. Global rate limiter
 app.use(globalLimiter);
 
-// 3. JSON body parser (must be before routes)
+// 3. JSON parser
 app.use(jsonParser());
 
 // 4. Cookie parser
 app.use(cookieParser());
 
-// 5. Malformed JSON handler (should come AFTER express.json)
+// 5. Malformed JSON handler
 app.use(malformedJsonHandler);
 
-// 6. Routes
+// 6. Duplicate query parameter handler
+app.use(duplicateQueryParameterHandler);
+
+// 7. Routes
 require("@routes/index")(app);
 
-// 7. Unknown route fallback
+// 8. Unknown route handler
 app.use(unknownRouteHandler);
 
 module.exports = { app };

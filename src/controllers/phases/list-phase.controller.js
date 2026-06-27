@@ -14,12 +14,6 @@ const {
 const { logWithTime } = require("@utils/time-stamps.util");
 
 const {
-    validateAndParseJson
-} = require(
-    "@/utils/validate-json-query.util"
-);
-
-const {
     BAD_REQUEST
 } = require("@configs/http-status.config");
 
@@ -29,20 +23,6 @@ const {
 
 const listPhaseController = async (req, res) => {
     try {
-
-        if (req.query?.query) {
-            const isQueryValidResult = validateAndParseJson(
-                req.query.query,
-                "query"
-            );
-
-            if (!isQueryValidResult.success) {
-                return throwBadRequestError(
-                    res,
-                    isQueryValidResult.message
-                );
-            }
-        }
 
         const filters = parseListFilters(req.query);
 
