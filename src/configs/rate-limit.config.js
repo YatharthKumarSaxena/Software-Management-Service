@@ -16,6 +16,14 @@ module.exports = {
       prefix: "unknown_route",
       reason: "Unknown route access",
       message: "Too many invalid or unauthorized requests."
+    },
+
+    duplicateQueryParameter: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "duplicate_query_parameter",
+      reason: "Duplicate query parameter detected",
+      message: "Too many requests containing duplicate query parameters."
     }
 
   },
