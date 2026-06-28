@@ -22,6 +22,7 @@ const { ProductRequestModel } = require("./product-request.model");
 const { OrgProjectRequest } = require("./org-project-request.model");
 const { FeatureRequirementMapModel } = require("./feature-requirement-map.model");
 const { CounterModel } = require("./counter.model");
+const { BulkImportModel } = require("./bulk-import.model");
 
 const models = {
     ActivityTrackerModel,
@@ -47,7 +48,8 @@ const models = {
     ProductRequestModel,
     OrgProjectRequest,
     FeatureRequirementMapModel,
-    CounterModel
+    CounterModel,
+    BulkImportModel
 }
 
 module.exports = {
