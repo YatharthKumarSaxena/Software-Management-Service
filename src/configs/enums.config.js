@@ -421,8 +421,28 @@ const RequirementStatuses = Object.freeze({
 
 const RequirementSources = Object.freeze({
   MANUAL: "MANUAL",
-  CSV_UPLOAD: "CSV_UPLOAD",
+  BULK_IMPORT: "BULK_IMPORT",
   API: "API"
+});
+
+const BulkImportStatuses = Object.freeze({
+  COMPLETED: "COMPLETED",
+  PARTIALLY_COMPLETED: "PARTIALLY_COMPLETED",
+  FAILED: "FAILED"
+});
+
+const BulkImportFileTypes = Object.freeze({
+  ORIGINAL: "original",
+  PROCESSED: "processed"
+});
+
+const ImportColumns = Object.freeze({
+  STATUS: "Import Status",
+  ERROR: "Import Error",
+});
+
+const BulkImportCategories = Object.freeze({
+  REQUIREMENTS: DB_COLLECTIONS.REQUIREMENTS
 });
 
 const ParticipantTypes = Object.freeze({
@@ -717,5 +737,9 @@ module.exports = {
   MappingStatuses,
   ReviewNoteEntityTypes,
   AllowedPhaseTypes,
-  AuthorityTypes
+  AuthorityTypes,
+  BulkImportStatuses,
+  BulkImportCategories,
+  BulkImportFileTypes,
+  ImportColumns
 };
