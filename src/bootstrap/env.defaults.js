@@ -45,6 +45,37 @@ process.env.AUDIT_MODE ||= "CHANGED_ONLY";
 // STABILIZING -> FROZEN
 process.env.DEFAULT_ALLOW_STABILIZING_ROLLBACK ||= "true";
 
+// Redis Defaults
+process.env.REDIS_HOST ||= "127.0.0.1";
+process.env.REDIS_PORT ||= "6379";
+process.env.REDIS_DB ||= "0";
+process.env.REDIS_MAX_RETRY_ATTEMPTS ||= "10";
+process.env.REDIS_RETRY_INITIAL_DELAY ||= "100";
+process.env.REDIS_RETRY_MAX_DELAY ||= "2000";
+
+// Global Rate Limiter Defaults
+process.env.RATE_LIMIT_WINDOW ||= "10";
+process.env.RATE_LIMIT_MAX ||= "100";
+
+// Service Token
+process.env.SERVICE_TOKEN_EXPIRY ||= "3600";
+
+// Auth & Access
+process.env.AUTH_MODE ||= "EMAIL";
+process.env.FRONTEND_URL ||= "http://localhost:5500";
+process.env.ACCESS_TOKEN_EXPIRY ||= "6000";
+process.env.REFRESH_TOKEN_EXPIRY ||= "604800";
+
+// Bulk Import Defaults
+process.env.REQUIREMENT_BULK_IMPORT_MAX_FILES ||= "10";
+process.env.REQUIREMENT_BULK_IMPORT_MAX_FILE_SIZE_MB ||= "20";
+process.env.BULK_IMPORT_UPLOAD_ORIGINAL ||= "false";
+process.env.BULK_IMPORT_UPLOAD_PROCESSED ||= "true";
+process.env.BULK_IMPORT_MAX_CONCURRENT_UPLOADS ||= "5";
+
+// Supabase Defaults
+process.env.SUPABASE_SIGNED_URL_EXPIRY ||= "604800";
+
 }
 
 module.exports = {
