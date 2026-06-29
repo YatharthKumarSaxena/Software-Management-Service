@@ -29,6 +29,7 @@ const createRequirementService = async ({
   parentHlfId,
   relationType,
   relationshipNotes,
+  usedInBulkImport = false,
   auditContext
 }) => {
   try {
@@ -58,53 +59,71 @@ const createRequirementService = async ({
       }
     }
 
-    const phaseConfigMap = {
-      [Phases.ELICITATION]: {
-        context: elicitation,
-        entityId: elicitationId,
-        entityType: DB_COLLECTIONS.ELICITATIONS
-      },
+    let assignedPhase;
+    let phaseContext;
+    let entityId;
+    let entityType;
 
-      [Phases.ELABORATION]: {
-        context: elaboration,
-        entityId: elaborationId,
-        entityType: DB_COLLECTIONS.ELABORATIONS
+    if (usedInBulkImport) {
+
+      assignedPhase = Phases.ELICITATION;
+
+      phaseContext = elicitation;
+
+      entityId = elicitationId;
+
+      entityType = DB_COLLECTIONS.ELICITATIONS;
+
+    } else {
+      const phaseConfigMap = {
+        [Phases.ELICITATION]: {
+          context: elicitation,
+          entityId: elicitationId,
+          entityType: DB_COLLECTIONS.ELICITATIONS
+        },
+
+        [Phases.ELABORATION]: {
+          context: elaboration,
+          entityId: elaborationId,
+          entityType: DB_COLLECTIONS.ELABORATIONS
+        }
+      };
+
+      const phaseResult = resolveActivePhase({
+        activePhases: project.currentPhase,
+        supportedPhases: [
+          Phases.ELICITATION,
+          Phases.ELABORATION
+        ],
+        selectedPhase: phase
+      });
+
+      if (!phaseResult.success) {
+        return phaseResult;
       }
-    };
 
-    const phaseResult = resolveActivePhase({
-      activePhases: project.currentPhase,
-      supportedPhases: [
-        Phases.ELICITATION,
-        Phases.ELABORATION
-      ],
-      selectedPhase: phase
-    });
+      assignedPhase = phaseResult.phase;
 
-    if (!phaseResult.success) {
-      return phaseResult;
+      const phaseConfig = phaseConfigMap[assignedPhase];
+
+      const phaseValidation = validatePhaseContext({
+        phase: assignedPhase,
+        phaseContext: phaseConfig?.context,
+        userId: createdBy
+      });
+
+      if (!phaseValidation.success) {
+        return phaseValidation;
+      }
+
+      phaseContext = phaseValidation.phaseContext;
+
+      ({
+        entityId,
+        entityType
+      } = phaseConfig);
+
     }
-
-    const assignedPhase = phaseResult.phase;
-
-    const phaseConfig = phaseConfigMap[assignedPhase];
-
-    const phaseValidation = validatePhaseContext({
-      phase: assignedPhase,
-      phaseContext: phaseConfig?.context,
-      userId: createdBy
-    });
-
-    if (!phaseValidation.success) {
-      return phaseValidation;
-    }
-
-    const phaseContext = phaseValidation.phaseContext;
-
-    const {
-      entityId,
-      entityType
-    } = phaseConfig;
 
     const createdInMode = phaseContext.workflowMode;
 
@@ -185,21 +204,24 @@ const createRequirementService = async ({
       }
     }
 
-    // Log activity tracker event (fire-and-forget)
-    const { user, device, requestId } = auditContext || {};
-    logActivityTrackerEvent(
-      user, device, requestId, ACTIVITY_TRACKER_EVENTS.REQUIREMENT_CREATED,
-      `Requirement created: "${title}"`,
-      { newData: savedRequirement.toObject(), adminActions: { targetId: savedRequirement._id.toString() } }
-    );
+    if (!usedInBulkImport) {
+      // Log activity tracker event (fire-and-forget)
+      const { user, device, requestId } = auditContext || {};
+      logActivityTrackerEvent(
+        user, device, requestId, ACTIVITY_TRACKER_EVENTS.REQUIREMENT_CREATED,
+        `Requirement created: "${title}"`,
+        { newData: savedRequirement.toObject(), adminActions: { targetId: savedRequirement._id.toString() } }
+      );
 
-    await manualVersionControlService({
-      projectId,
-      currentPhase: assignedPhase,
-      action: `Requirement created in ${assignedPhase} phase`,
-      performedBy: createdBy,
-      auditContext
-    });
+
+      await manualVersionControlService({
+        projectId,
+        currentPhase: assignedPhase,
+        action: `Requirement created in ${assignedPhase} phase`,
+        performedBy: createdBy,
+        auditContext
+      });
+    }
     return { success: true, requirement: savedRequirement };
 
   } catch (error) {
