@@ -4,14 +4,11 @@ const mongoose = require("mongoose");
 const { ActivityTrackerModel } = require("@models/activity-tracker.model");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@/responses/common/error-handler.response");
-const { createDocumentFilterService } = require("@services/factory/create-document-filter.service");
-const { UserTypes } = require("@configs/enums.config");
+const { createDocumentFilterService } = require("@services/factory/create-doc-filter-service.factory");
 const { ACTIVITY_TRACKER_ADMIN_LIST_FIELDS } = require("@/configs/list-fields.config");
 
-const activityFilterService = createDocumentFilterService({
-  hiddenFields: {
-    [UserTypes.ADMIN]: ACTIVITY_TRACKER_ADMIN_LIST_FIELDS.hiddenFields,
-  }
+const adminActivityFilterService = createDocumentFilterService({
+  hiddenFields: ACTIVITY_TRACKER_ADMIN_LIST_FIELDS.hiddenFields
 });
 
 /**
@@ -51,16 +48,19 @@ const getActivityByIdService = async (activityId, adminId, filters = {}) => {
       };
     }
 
-    const filteredActivity = await activityFilterService({
+    const filteredResult = await adminActivityFilterService({
       document: activity,
-      userType: UserTypes.ADMIN,
       selectFields: filters.selectFields
     });
+
+    if (!filteredResult.success) {
+      return filteredResult;
+    }
 
     // Return complete activity information
     return {
       success: true,
-      activity: filteredActivity
+      activity: filteredResult.data
     };
 
   } catch (error) {

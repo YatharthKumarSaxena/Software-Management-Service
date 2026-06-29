@@ -1,15 +1,15 @@
 // services/projects/get-project.service.js
 
 const { StakeholderModel } = require("@models/stakeholder.model");
-const { createDocumentFilterService } = require("@services/factory/create-document-filter.service");
-const { UserTypes } = require("@configs/enums.config");
+const { createDocumentFilterService } = require("@services/factory/create-doc-filter-service.factory");
 const { PROJECT_ADMIN_LIST_FIELDS, PROJECT_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
 
-const projectFilterService = createDocumentFilterService({
-  hiddenFields: {
-    [UserTypes.ADMIN]: PROJECT_ADMIN_LIST_FIELDS.hiddenFields,
-    [UserTypes.CLIENT]: PROJECT_CLIENT_LIST_FIELDS.hiddenFields,
-  }
+const adminProjectFilterService = createDocumentFilterService({
+  hiddenFields: PROJECT_ADMIN_LIST_FIELDS.hiddenFields
+});
+
+const clientProjectFilterService = createDocumentFilterService({
+  hiddenFields: PROJECT_CLIENT_LIST_FIELDS.hiddenFields
 });
 
 const getProjectAdminService = async (project, filters = {}) => {
@@ -18,16 +18,19 @@ const getProjectAdminService = async (project, filters = {}) => {
       .find({ projectId: project._id, isDeleted: false })
       .lean();
 
-    const filteredProject = await projectFilterService({
+    const filteredResult = await adminProjectFilterService({
       document: project,
-      userType: UserTypes.ADMIN,
       selectFields: filters.selectFields
     });
+
+    if (!filteredResult.success) {
+      return filteredResult;
+    }
 
     return {
       success: true,
       project: {
-        ...filteredProject,
+        ...filteredResult.data,
         stakeholders,
       },
     };
@@ -47,16 +50,19 @@ const getProjectClientService = async (project, filters = {}, requestStakeholder
       }
       : null;
 
-    const filteredProject = await projectFilterService({
+    const filteredResult = await clientProjectFilterService({
       document: project,
-      userType: UserTypes.CLIENT,
       selectFields: filters.selectFields
     });
+
+    if (!filteredResult.success) {
+      return filteredResult;
+    }
 
     return {
       success: true,
       project: {
-        ...filteredProject,
+        ...filteredResult.data,
         stakeholder: safeStakeholder,
       },
     };

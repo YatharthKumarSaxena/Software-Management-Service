@@ -1,25 +1,28 @@
 // services/stakeholders/get-stakeholder.service.js
 
-const { createDocumentFilterService } = require("@services/factory/create-document-filter.service");
-const { UserTypes } = require("@configs/enums.config");
+const { createDocumentFilterService } = require("@services/factory/create-doc-filter-service.factory");
 const { STAKEHOLDER_ADMIN_LIST_FIELDS, STAKEHOLDER_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
 
-const stakeholderFilterService = createDocumentFilterService({
-  hiddenFields: {
-    [UserTypes.ADMIN]: STAKEHOLDER_ADMIN_LIST_FIELDS.hiddenFields,
-    [UserTypes.CLIENT]: STAKEHOLDER_CLIENT_LIST_FIELDS.hiddenFields,
-  }
+const adminStakeholderFilterService = createDocumentFilterService({
+  hiddenFields: STAKEHOLDER_ADMIN_LIST_FIELDS.hiddenFields
+});
+
+const clientStakeholderFilterService = createDocumentFilterService({
+  hiddenFields: STAKEHOLDER_CLIENT_LIST_FIELDS.hiddenFields
 });
 
 const getStakeholderAdminService = async (stakeholder, filters = {}) => {
   try {
-    const filteredStakeholder = await stakeholderFilterService({
+    const filteredResult = await adminStakeholderFilterService({
       document: stakeholder,
-      userType: UserTypes.ADMIN,
       selectFields: filters.selectFields
     });
 
-    return { success: true, stakeholder: filteredStakeholder };
+    if (!filteredResult.success) {
+      return filteredResult;
+    }
+
+    return { success: true, stakeholder: filteredResult.data };
   } catch (error) {
     return { success: false, message: "Internal error while fetching stakeholder", error: error.message };
   }
@@ -27,11 +30,16 @@ const getStakeholderAdminService = async (stakeholder, filters = {}) => {
 
 const getStakeholderClientService = async (stakeholder, filters = {}) => {
   try {
-    const filteredStakeholder = await stakeholderFilterService({
+    const filteredResult = await clientStakeholderFilterService({
       document: stakeholder,
-      userType: UserTypes.CLIENT,
       selectFields: filters.selectFields
     });
+
+    if (!filteredResult.success) {
+      return filteredResult;
+    }
+
+    const filteredStakeholder = filteredResult.data;
 
     return {
       success: true,
