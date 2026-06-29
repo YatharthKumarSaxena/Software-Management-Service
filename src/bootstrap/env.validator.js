@@ -69,7 +69,10 @@ function validateEnvironment() {
     requireEnv([
         "DB_URL",
         "ACCESS_TOKEN_SECRET_CODE",
-        "REFRESH_TOKEN_SECRET_CODE"
+        "REFRESH_TOKEN_SECRET_CODE",
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "SUPABASE_BUCKET_NAME"
     ], "Core System");
 
     // ==========================
@@ -125,6 +128,9 @@ function validateEnvironment() {
     ) {
         requireEnv([
             "CUSTOM_AUTH_SERVICE_TOKEN_SECRET",
+            "SOFTWARE_MANAGEMENT_SERVICE_TOKEN_SECRET",
+            "ADMIN_PANEL_SERVICE_TOKEN_SECRET",
+            "ALLOWED_SERVICE_NAMES",
             "SERVICE_INSTANCE_NAME",
             "REDIS_KEY_SALT",
             "CUSTOM_AUTH_SERVICE_URI",
