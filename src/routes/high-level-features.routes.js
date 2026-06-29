@@ -12,6 +12,7 @@ const { commonMiddlewares } = require("@/middlewares/common");
 const { createHLFRateLimiter, updateHLFRateLimiter, deleteHLFRateLimiter, getHLFRateLimiter, listHLFsRateLimiter, linkHLFtoIdeaRateLimiter, unlinkHLFFromIdeaRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
 const { ideaMiddlewares } = require("@/middlewares/ideas");
 const { inceptionMiddlewares } = require("@/middlewares/inceptions");
+const { getDataMiddleware, listDataMiddleware } = require("@middlewares/common/fetch-data.middleware");
 
 const {
   CREATE_HLF,
@@ -108,6 +109,7 @@ hlfRouter.get(
   [
     ...baseAuthClientOrAdminMiddlewares,
     getHLFRateLimiter,
+    getDataMiddleware,
     hlfMiddlewares.fetchHlfMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
   ],
@@ -123,6 +125,7 @@ hlfRouter.get(
   [
     ...baseAuthClientOrAdminMiddlewares,
     listHLFsRateLimiter,
+    listDataMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     inceptionMiddlewares.fetchLatestAnyStatusInceptionMiddleware

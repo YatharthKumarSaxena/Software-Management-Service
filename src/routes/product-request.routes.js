@@ -17,6 +17,7 @@ const {
 
 const { productRequestControllers } = require("@controllers/product-requests");
 const { productRequestMiddlewares } = require("@/middlewares/product-requests");
+const { getDataMiddleware, listDataMiddleware } = require("@middlewares/common/fetch-data.middleware");
 
 const {
   CREATE_PRODUCT_REQUEST,
@@ -101,6 +102,7 @@ productRequestRouter.get(
   [
     ...baseAuthClientOrAdminMiddlewares,
     getProductRequestRateLimiter,
+    getDataMiddleware,
     productRequestMiddlewares.fetchProductRequestMiddleware,
   ],
   productRequestControllers.getProductRequestController
@@ -116,6 +118,7 @@ productRequestRouter.get(
   [
     ...baseAuthClientOrAdminMiddlewares,
     listProductRequestsRateLimiter,
+    listDataMiddleware,
   ],
   productRequestControllers.listProductRequestsController
 );
