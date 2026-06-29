@@ -183,7 +183,8 @@ module.exports = {
         GET_REQUIREMENT: `/get/:requirementId`, // GET /api/v1/requirements/get/:requirementId
         LIST_REQUIREMENTS: `/list/:projectId`, // GET /api/v1/requirements/list/:projectId
         LINK_REQUIREMENT_TO_HLF: `/link-to-hlf/:requirementId/:hlfId`, // PATCH /api/v1/requirements/link-to-hlf/:requirementId/:hlfId
-        UNLINK_REQUIREMENT_FROM_HLF: `/unlink-from-hlf/:requirementId` // PATCH /api/v1/requirements/unlink-from-hlf/:requirementId
+        UNLINK_REQUIREMENT_FROM_HLF: `/unlink-from-hlf/:requirementId`, // PATCH /api/v1/requirements/unlink-from-hlf/:requirementId
+        CREATE_REQUIREMENT_IN_BULK: `/create-bulk/:projectId`, // POST /api/v1/requirements/create-bulk/:projectId
     },
     PHASE_ROUTES: {
         CREATE_PHASE: `/create/:projectId`, // POST /api/v1/phases/create/:projectId

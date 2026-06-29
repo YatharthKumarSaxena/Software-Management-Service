@@ -26,7 +26,8 @@ const DB_COLLECTIONS = {
     MEETINGS: "meetings",
     EXTERNAL_INTERFACES: "external_interfaces",
     IDEAS: "ideas",
-    EXTERNAL_INTERFACE_REQUIREMENT_MAPPINGS: "external_interface_requirement_mappings"
+    EXTERNAL_INTERFACE_REQUIREMENT_MAPPINGS: "external_interface_requirement_mappings",
+    BULK_IMPORTS: "bulk_imports"
 }
 
 module.exports = { DB_COLLECTIONS };
