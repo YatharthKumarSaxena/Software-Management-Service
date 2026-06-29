@@ -2,6 +2,15 @@
 const { ActivityTrackerModel } = require("@models/activity-tracker.model");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@/responses/common/error-handler.response");
+const { createListService } = require("@services/factory/create-list-service.factory");
+
+const myActivityListService = createListService({
+  model: ActivityTrackerModel,
+  hiddenFields: ["__v", "adminActions", "userData", "deviceInfo", "reqBody", "isDeleted", "deletedAt", "deletedBy", "updatedAt", "updatedBy"],
+  searchableFields: [],
+  sortableFields: ["createdAt"],
+  filterableFields: ["userId"]
+});
 
 /**
  * Get current user's activity history with limited fields
@@ -9,37 +18,36 @@ const { errorMessage } = require("@/responses/common/error-handler.response");
  * Accessible by both admin and client
  * 
  * @param {string} userId - User ID (admin or client)
- * @param {Object} pagination - { page, limit }
- * @returns {{ success: boolean, activities?: Array, total?: number, page?: number, totalPages?: number, message?: string, error?: string }}
+ * @param {Object} filters - Extracted from parseListFilters
  */
-const getMyActivityService = async (userId, pagination = {}) => {
+const getMyActivityService = async (userId, filters = {}) => {
   try {
-    const page = Math.max(1, parseInt(pagination.page, 10) || 1);
-    const limit = Math.min(50, Math.max(1, parseInt(pagination.limit, 10) || 20));
-    const skip = (page - 1) * limit;
+    const andConditions = [{ field: "userId", operator: "eq", value: userId }];
 
-    // Fetch user's activities with limited fields
-    const [activities, total] = await Promise.all([
-      ActivityTrackerModel.find({ userId })
-        .select('description eventType createdAt _id')
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      ActivityTrackerModel.countDocuments({ userId })
-    ]);
+    if (filters.query) {
+      andConditions.push(filters.query);
+    }
+
+    const query = { and: andConditions };
+
+    const result = await myActivityListService({
+      query,
+      selectFields: ["description", "eventType", "createdAt", "_id"],
+      pageNumber: filters.pageNumber,
+      pageSize: Math.min(50, filters.pageSize || 20),
+      sortField: filters.sortField || "createdAt",
+      sortOrder: filters.sortOrder || "desc"
+    });
 
     return {
       success: true,
-      activities: activities.map(activity => ({
+      activities: result.data.map(activity => ({
         id: activity._id, 
         description: activity.description,
         eventType: activity.eventType,
         timestamp: activity.createdAt
       })),
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
+      pagination: result.pagination
     };
   } catch (error) {
     logWithTime(`❌ [getMyActivityService] Error fetching user activities`);

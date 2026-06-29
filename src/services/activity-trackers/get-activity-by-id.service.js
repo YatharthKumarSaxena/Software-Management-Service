@@ -4,6 +4,15 @@ const mongoose = require("mongoose");
 const { ActivityTrackerModel } = require("@models/activity-tracker.model");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@/responses/common/error-handler.response");
+const { createDocumentFilterService } = require("@services/factory/create-document-filter.service");
+const { UserTypes } = require("@configs/enums.config");
+const { ACTIVITY_TRACKER_ADMIN_LIST_FIELDS } = require("@/configs/list-fields.config");
+
+const activityFilterService = createDocumentFilterService({
+  hiddenFields: {
+    [UserTypes.ADMIN]: ACTIVITY_TRACKER_ADMIN_LIST_FIELDS.hiddenFields,
+  }
+});
 
 /**
  * Get activity tracker details by ID (Admin only)
@@ -11,9 +20,9 @@ const { errorMessage } = require("@/responses/common/error-handler.response");
  * 
  * @param {string} activityId - Activity tracker ID to fetch
  * @param {string} adminId - Admin ID requesting (must match userId in activity)
- * @returns {{ success: boolean, activity?: Object, message?: string, error?: string }}
+ * @param {Object} filters - Extracted from parseListFilters
  */
-const getActivityByIdService = async (activityId, adminId) => {
+const getActivityByIdService = async (activityId, adminId, filters = {}) => {
   try {
     // Validate MongoDB ObjectId format
     if (!mongoose.Types.ObjectId.isValid(activityId)) {
@@ -42,10 +51,16 @@ const getActivityByIdService = async (activityId, adminId) => {
       };
     }
 
+    const filteredActivity = await activityFilterService({
+      document: activity,
+      userType: UserTypes.ADMIN,
+      selectFields: filters.selectFields
+    });
+
     // Return complete activity information
     return {
       success: true,
-      activity
+      activity: filteredActivity
     };
 
   } catch (error) {
