@@ -1,15 +1,16 @@
 // controllers/product-requests/get-product-request.controller.js
 
 const { getProductRequestService } = require("@services/product-requests");
-const { sendProductRequestRetrievedSuccess } = require("@/responses/success/product-request.response");
+const { sendProductRequestFetchedSuccess } = require("@/responses/success/product-request.response");
 const {
-  throwDBResourceNotFoundError,
   throwInternalServerError,
   getLogIdentifiers,
   throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { NOT_FOUND } = require("@configs/http-status.config");
+const { NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
+const { UserTypes } = require("@configs/enums.config");
 
 /**
  * Controller: Get Product Request
@@ -25,39 +26,44 @@ const { NOT_FOUND } = require("@configs/http-status.config");
  */
 const getProductRequestController = async (req, res) => {
   try {
-    const productRequest = req.productRequest;
-
-    // Determine user type and extract proper client MongoDB _id
+    const { productRequest } = req;
+    
     let isClient = false;
     let clientMongoId = null;
 
     if (req.admin) {
-      // Admin - no client restriction
       isClient = false;
     } else if (req.client) {
       clientMongoId = req.client._id;
       isClient = true;
     }
 
-    // ── Call service ────────────────────────────────────────────────────
+    const filters = parseListFilters(req.query);
+    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
+
     const result = await getProductRequestService(productRequest, {
       clientMongoId,
-      isClient
+      isClient,
+      selectFields: filters.selectFields,
+      userType
     });
 
-    // ── Handle response based on errorCode ──────────────────────────────
     if (!result.isSuccess) {
       if (result.errorCode === NOT_FOUND) {
-        logWithTime(`❌ [getProductRequestController] Product request not found | ${getLogIdentifiers(req)}`);
-        return throwDBResourceNotFoundError(res, "Product Request");
+        logWithTime(`❌ [getProductRequestController] Not found: ${result.description} | ${getLogIdentifiers(req)}`);
+        return throwSpecificInternalServerError(res, result.description);
+      }
+      if (result.errorCode === INTERNAL_ERROR) {
+        logWithTime(`❌ [getProductRequestController] Internal error: ${result.description} | ${getLogIdentifiers(req)}`);
+        return throwInternalServerError(res, result.description);
       }
 
       logWithTime(`❌ [getProductRequestController] Internal error: ${result.description} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.description);
     }
 
-    logWithTime(`✅ [getProductRequestController] Product request retrieved successfully | ${getLogIdentifiers(req)}`);
-    return sendProductRequestRetrievedSuccess(res, result.data.productRequest);
+    logWithTime(`✅ [getProductRequestController] Product request fetched successfully | ${getLogIdentifiers(req)}`);
+    return sendProductRequestFetchedSuccess(res, result.data.productRequest);
 
   } catch (error) {
     logWithTime(`❌ [getProductRequestController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);

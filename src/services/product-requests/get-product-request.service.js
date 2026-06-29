@@ -2,29 +2,23 @@
 
 const { logWithTime } = require("@utils/time-stamps.util");
 const { OK, NOT_FOUND, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { createDocumentFilterService } = require("@services/factory/create-doc-filter-service.factory");
+const { PRODUCT_REQUEST_ADMIN_LIST_FIELDS, PRODUCT_REQUEST_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
+const { UserTypes } = require("@configs/enums.config");
 
-/**
- * Fetches a single product request by ID.
- * 
- * Authorization:
- * - Admin: Can get any request
- * - Client: Can only get their own requests
- *
- * @param {Object} productRequest - The product request document (from middleware)
- * @param {Object} params
- * @param {Object} params.clientMongoId - Client's MongoDB _id (if client making request)
- * @param {boolean} params.isClient     - Whether requester is a client
- *
- * @returns {Object} { errorCode, isSuccess: true, data } | { errorCode, isSuccess: false, description }
- */
+const adminProductRequestGetService = createDocumentFilterService({
+    hiddenFields: PRODUCT_REQUEST_ADMIN_LIST_FIELDS.hiddenFields
+});
+
+const clientProductRequestGetService = createDocumentFilterService({
+    hiddenFields: PRODUCT_REQUEST_CLIENT_LIST_FIELDS.hiddenFields
+});
+
 const getProductRequestService = async (productRequest, params) => {
   try {
-    const { clientMongoId, isClient } = params;
+    const { clientMongoId, isClient, selectFields, userType } = params;
 
-    // ── Authorization check ───────────────────────────────────────────
-    // For clients: only allow access to their own requests
     if (isClient) {
-      // Compare MongoDB ObjectIds
       const requestExistsForClient = productRequest.requestedBy.toString() === clientMongoId?.toString();
       
       if (!requestExistsForClient) {
@@ -36,13 +30,15 @@ const getProductRequestService = async (productRequest, params) => {
         };
       }
     }
-    // Admins can access all requests (no additional check needed)
+
+    const getService = userType === UserTypes.CLIENT ? clientProductRequestGetService : adminProductRequestGetService;
+    const result = await getService({ document: productRequest, selectFields });
 
     logWithTime(`✅ [getProductRequestService] Product request retrieved successfully: ${productRequest._id}`);
     return {
       errorCode: OK,
       isSuccess: true,
-      data: { productRequest }
+      data: { productRequest: result.data }
     };
 
   } catch (error) {
