@@ -1,48 +1,33 @@
 // services/projects/get-project.service.js
 
-const { ProjectModel } = require("@models/project.model");
 const { StakeholderModel } = require("@models/stakeholder.model");
+const { createDocumentFilterService } = require("@services/factory/create-document-filter.service");
+const { UserTypes } = require("@configs/enums.config");
+const { PROJECT_ADMIN_LIST_FIELDS, PROJECT_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Field projection constants
-// ─────────────────────────────────────────────────────────────────────────────
+const projectFilterService = createDocumentFilterService({
+  hiddenFields: {
+    [UserTypes.ADMIN]: PROJECT_ADMIN_LIST_FIELDS.hiddenFields,
+    [UserTypes.CLIENT]: PROJECT_CLIENT_LIST_FIELDS.hiddenFields,
+  }
+});
 
-/**
- * Fields a client can see on a single project detail view.
- * Internal audit/reason trails are hidden from clients.
- */
-const CLIENT_DETAIL_FIELDS = {
-  _id: 1,
-  name: 1,
-  description: 1,
-  problemStatement: 1,
-  goal: 1,
-  version: 1,
-  projectStatus: 1,
-  currentPhase: 1,
-  createdAt: 1,
-  updatedAt: 1,
-  completedAt: 1,
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Service 1: Get single project – Admin view (full details)
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * @param {Object} project
- * @returns {{ success: true, project } | { success: false, message }}
- */
-const getProjectAdminService = async (project) => {
+const getProjectAdminService = async (project, filters = {}) => {
   try {
     const stakeholders = await StakeholderModel
       .find({ projectId: project._id, isDeleted: false })
       .lean();
 
+    const filteredProject = await projectFilterService({
+      document: project,
+      userType: UserTypes.ADMIN,
+      selectFields: filters.selectFields
+    });
+
     return {
       success: true,
       project: {
-        ...(project.toObject ? project.toObject() : project),
+        ...filteredProject,
         stakeholders,
       },
     };
@@ -51,22 +36,8 @@ const getProjectAdminService = async (project) => {
   }
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Service 2: Get single project – Client view (restricted fields)
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * @param {Object} project
- * @param {Object} [requestStakeholder]
- * @returns {{ success: true, project } | { success: false, message }}
- */
-const getProjectClientService = async (project, requestStakeholder = null) => {
+const getProjectClientService = async (project, filters = {}, requestStakeholder = null) => {
   try {
-
-    const restrictedProjectDetails = await ProjectModel
-      .findById(project._id, CLIENT_DETAIL_FIELDS)
-      .lean();
-
     const safeStakeholder = requestStakeholder
       ? {
         stakeholderId: requestStakeholder.userId,
@@ -76,14 +47,19 @@ const getProjectClientService = async (project, requestStakeholder = null) => {
       }
       : null;
 
+    const filteredProject = await projectFilterService({
+      document: project,
+      userType: UserTypes.CLIENT,
+      selectFields: filters.selectFields
+    });
+
     return {
       success: true,
       project: {
-        ...restrictedProjectDetails,
+        ...filteredProject,
         stakeholder: safeStakeholder,
       },
     };
-
   } catch (error) {
     return {
       success: false,

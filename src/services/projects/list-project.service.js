@@ -1,147 +1,72 @@
-// services/projects/get-project.service.js
+// services/projects/list-project.service.js
 
 const { ProjectModel } = require("@models/project.model");
 const { StakeholderModel } = require("@models/stakeholder.model");
+const { createListService } = require("@services/factory/create-list-service.factory");
+const { PROJECT_ADMIN_LIST_FIELDS, PROJECT_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Field projection constants
-// ─────────────────────────────────────────────────────────────────────────────
+const adminProjectListService = createListService({
+  model: ProjectModel,
+  hiddenFields: PROJECT_ADMIN_LIST_FIELDS.hiddenFields,
+  searchableFields: PROJECT_ADMIN_LIST_FIELDS.searchableFields,
+  sortableFields: PROJECT_ADMIN_LIST_FIELDS.sortableFields,
+  filterableFields: PROJECT_ADMIN_LIST_FIELDS.filterableFields
+});
+
+const clientProjectListService = createListService({
+  model: ProjectModel,
+  hiddenFields: PROJECT_CLIENT_LIST_FIELDS.hiddenFields,
+  searchableFields: PROJECT_CLIENT_LIST_FIELDS.searchableFields,
+  sortableFields: PROJECT_CLIENT_LIST_FIELDS.sortableFields,
+  filterableFields: PROJECT_CLIENT_LIST_FIELDS.filterableFields
+});
 
 /**
- * All fields an admin can see on a single project detail view.
- * (Everything except Mongoose internals.)
+ * Builds the common list filter object for createListService
+ * @param {Object} filters - Extracted from parseListFilters
+ * @param {boolean} isAdmin - Whether the caller is an admin
+ * @param {string[]} [allowedProjectIds] - restricted project IDs for clients
  */
-const ADMIN_DETAIL_FIELDS = null; // null = no projection = all fields
+const buildListQuery = (filters = {}, isAdmin = false, allowedProjectIds = null) => {
+  const andConditions = [];
 
-/**
- * Fields a client can see on a single project detail view.
- * Internal audit/reason trails are hidden from clients.
- */
-const CLIENT_DETAIL_FIELDS = {
-  _id: 1,
-  name: 1,
-  description: 1,
-  problemStatement: 1,
-  goal: 1,
-  version: 1,
-  projectStatus: 1,
-  currentPhase: 1,
-  createdAt: 1,
-  updatedAt: 1,
-  completedAt: 1,
+  // Clients never see deleted
+  if (!isAdmin) {
+    andConditions.push({ field: "isDeleted", operator: "eq", value: false });
+  }
+
+  if (allowedProjectIds !== null) {
+    andConditions.push({ field: "_id", operator: "in", value: allowedProjectIds });
+  }
+
+  if (filters?.query) {
+    andConditions.push(filters.query);
+  }
+
+  return { and: andConditions };
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helper: build a Mongoose query filter from flexible list params
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Builds a MongoDB filter object from optional list query parameters.
- *
- * @param {Object} filters
- * @param {string[]}  [filters.projectIds]     - specific _id values to include
- * @param {string}    [filters.projectStatus]  - single status filter
- * @param {string}    [filters.currentPhase]   - single phase filter
- * @param {boolean}   [filters.isArchived]     - include archived
- * @param {string}    [filters.createdBy]      - admin USR ID who created
- * @param {string}    [filters.search]         - partial name search (case-insensitive)
- * @param {boolean}   [filters.includeDeleted] - include soft-deleted (admin only)
- *
- * @returns {Object} Mongoose-compatible filter
- */
-const buildListFilter = (filters = {}) => {
-  const query = {};
-
-  // Soft-delete: clients never see deleted; admins opt-in
-  if (!filters.includeDeleted) {
-    query.isDeleted = false;
-  }
-
-  if (filters.projectIds && filters.projectIds.length > 0) {
-    query._id = { $in: filters.projectIds };
-  }
-
-  if (filters.projectStatus) {
-    query.projectStatus = filters.projectStatus;
-  }
-
-  if (filters.currentPhase) {
-    query.currentPhase = filters.currentPhase;
-  }
-
-  if (typeof filters.isArchived === "boolean") {
-    query.isArchived = filters.isArchived;
-  }
-
-  if (filters.createdBy) {
-    query.createdBy = filters.createdBy;
-  }
-
-  if (filters.search) {
-    query.name = { $regex: filters.search, $options: "i" };
-  }
-
-  return query;
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Service 1: Get project list – Admin view (flexible filters, full fields)
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * @param {Object} filters  - see buildListFilter
- * @param {Object} pagination
- * @param {number} pagination.page   - 1-based
- * @param {number} pagination.limit
- * @param {string[]} [selectFields]  - optional field whitelist
- *
- * @returns {{ success: true, projects, total, page, totalPages } | { success: false, message }}
- */
-const listProjectsAdminService = async (filters = {}, pagination = {}) => {
+const listProjectsAdminService = async (filters = {}) => {
   try {
-    const { page = 1, limit = 20, selectFields } = pagination;
-    const skip = (page - 1) * limit;
+    const query = buildListQuery(filters, true);
+    
+    const result = await adminProjectListService({
+      query,
+      selectFields: filters.selectFields,
+      pageNumber: filters.pageNumber,
+      pageSize: filters.pageSize,
+      sortField: filters.sortField,
+      sortOrder: filters.sortOrder
+    });
 
-    const query = buildListFilter({ ...filters, includeDeleted: filters.includeDeleted || false });
-    const projection = selectFields && selectFields.length > 0
-      ? selectFields.reduce((acc, f) => { acc[f] = 1; return acc; }, {})
-      : ADMIN_DETAIL_FIELDS;
-
-    const [projects, total] = await Promise.all([
-      ProjectModel.find(query, projection).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
-      ProjectModel.countDocuments(query),
-    ]);
-
-    return {
-      success: true,
-      projects,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
+    return { success: true, projects: result.data, pagination: result.pagination };
   } catch (error) {
     return { success: false, message: "Internal error while listing projects", error: error.message };
   }
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Service 2: Get project list – Client view (restricted fields + no deleted)
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * @param {Object} filters  - see buildListFilter (includeDeleted always false)
- * @param {Object} pagination
- * @param {number} pagination.page
- * @param {number} pagination.limit
- * @param {string[]} [selectFields]  - must be a subset of CLIENT_DETAIL_FIELDS keys
- *
- * @returns {{ success: true, projects, total, page, totalPages } | { success: false, message }}
- */
-const listProjectsClientService = async (filters = {}, pagination = {}, requesterUserId = null) => {
+const listProjectsClientService = async (filters = {}, requesterUserId = null) => {
   try {
-    const { page = 1, limit = 20, selectFields } = pagination;
-    const skip = (page - 1) * limit;
-
     if (!requesterUserId) {
       return { success: false, message: "Requester userId is required for restricted project list" };
     }
@@ -154,58 +79,23 @@ const listProjectsClientService = async (filters = {}, pagination = {}, requeste
       return {
         success: true,
         projects: [],
-        total: 0,
-        page,
-        totalPages: 0,
+        pagination: { total: 0, page: filters.pageNumber || 1, limit: filters.pageSize || 10, pages: 0 },
       };
     }
 
-    const stakeholderProjectIds = stakeholderMemberships.map((item) => item.projectId.toString());
-    const requestedProjectIds = Array.isArray(filters.projectIds) ? filters.projectIds : null;
+    const accessibleProjectIds = stakeholderMemberships.map((item) => item.projectId.toString());
+    const query = buildListQuery(filters, false, accessibleProjectIds);
 
-    const accessibleProjectIds = requestedProjectIds
-      ? requestedProjectIds.filter((id) => stakeholderProjectIds.includes(id.toString()))
-      : stakeholderProjectIds;
-
-    if (!accessibleProjectIds.length) {
-      return {
-        success: true,
-        projects: [],
-        total: 0,
-        page,
-        totalPages: 0,
-      };
-    }
-
-    // Clients never see deleted projects, ever
-    const query = buildListFilter({
-      ...filters,
-      includeDeleted: false,
-      projectIds: accessibleProjectIds,
+    const result = await clientProjectListService({
+      query,
+      selectFields: filters.selectFields,
+      pageNumber: filters.pageNumber,
+      pageSize: filters.pageSize,
+      sortField: filters.sortField,
+      sortOrder: filters.sortOrder
     });
 
-    // If caller requests specific fields, intersect with CLIENT_DETAIL_FIELDS whitelist
-    let projection = CLIENT_DETAIL_FIELDS;
-    if (selectFields && selectFields.length > 0) {
-      const allowed = Object.keys(CLIENT_DETAIL_FIELDS);
-      const safe = selectFields.filter((f) => allowed.includes(f));
-      projection = safe.length > 0
-        ? safe.reduce((acc, f) => { acc[f] = 1; return acc; }, {})
-        : CLIENT_DETAIL_FIELDS;
-    }
-
-    const [projects, total] = await Promise.all([
-      ProjectModel.find(query, projection).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
-      ProjectModel.countDocuments(query),
-    ]);
-
-    return {
-      success: true,
-      projects,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
+    return { success: true, projects: result.data, pagination: result.pagination };
   } catch (error) {
     return { success: false, message: "Internal error while listing projects", error: error.message };
   }
