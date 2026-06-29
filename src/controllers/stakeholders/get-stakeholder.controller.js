@@ -9,29 +9,18 @@ const {
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
 
-/**
- * Controller: Get Stakeholder
- *
- * @route  GET /software-management-service/api/v1/admin/get-stakeholder/:stakeholderId
- * @access Private – Admin (all roles)
- *
- * @param {string} stakeholderId - MongoDB ObjectId (from URL param)
- *
- * @returns {200} Stakeholder data
- * @returns {400} Invalid ID or deleted
- * @returns {404} Not found
- * @returns {500} Internal server error
- */
 const getStakeholderController = async (req, res) => {
   try {
     const stakeholder = req.foundStakeholder;
     const authorizationContext = req.authorizationContext || {};
     const shouldUseRestrictedView = authorizationContext.grantedBy === "stakeholder-membership";
+    const filters = parseListFilters(req.query);
 
     const result = shouldUseRestrictedView
-      ? await getStakeholderClientService(stakeholder)
-      : await getStakeholderAdminService(stakeholder);
+      ? await getStakeholderClientService(stakeholder, filters)
+      : await getStakeholderAdminService(stakeholder, filters);
 
     if (!result.success) {
       logWithTime(`❌ [getStakeholderController] ${result.message} | ${getLogIdentifiers(req)}`);
