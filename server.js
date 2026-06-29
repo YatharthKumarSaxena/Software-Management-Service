@@ -13,6 +13,9 @@ require("@bootstrap/env.validator").validateEnvironment();
 
 const mongoose = require("mongoose");
 
+// Polyfill for Node.js < 22
+global.WebSocket = require("ws");
+
 const { app } = require("@app");
 const { DB_URL } = require("@configs/db.config");
 const { PORT_NUMBER } = require("@configs/server.config");

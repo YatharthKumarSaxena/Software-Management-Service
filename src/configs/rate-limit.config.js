@@ -799,8 +799,12 @@ module.exports = {
       reason: "List phases endpoint abuse",
       message: "Too many requests to list phases endpoint. Please try again later."
     },
-    getRequirement: {
-
+    createRequirementInBulk: {
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      prefix: "create_requirement_in_bulk",
+      reason: "Create requirement in bulk endpoint abuse",
+      message: "Too many requests to create requirement in bulk endpoint. Please try again later."
     }
   }
 }
