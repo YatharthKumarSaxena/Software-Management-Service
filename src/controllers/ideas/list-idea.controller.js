@@ -3,46 +3,52 @@
 const { ideaServices } = require("@services/ideas");
 const {
   throwInternalServerError,
+  throwBadRequestError,
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
 const { sendIdeasListSuccess } = require("@/responses/success/idea.response");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
+const { UserTypes } = require("@configs/enums.config");
+const { BAD_REQUEST } = require("@configs/http-status.config");
 
 /**
  * GET /ideas/list/:projectId
- * List all ideas for a project with pagination.
- * Query params:
- *   - page: Page number (default: 1)
- *   - limit: Items per page (default: 10, max: 100)
+ * List all ideas for a project with pagination and filters.
  */
 const listIdeasController = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { page = 1, limit = 10 } = req.query;
+    const filters = parseListFilters(req.query);
+
+    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
 
     logWithTime(
-      `📍 [listIdeasController] Listing ideas for project: ${projectId} (page: ${page}, limit: ${limit}) | ${getLogIdentifiers(req)}`
+      `📍 [listIdeasController] Listing ideas for project: ${projectId} | ${getLogIdentifiers(req)}`
     );
 
     // ── Call service ──────────────────────────────────────────────────
     const result = await ideaServices.listIdeasService({
       projectId,
-      page,
-      limit
+      filters,
+      userType
     });
 
     // ── Handle error response ─────────────────────────────────────────
     if (!result.success) {
+      if (result.errorCode === BAD_REQUEST) {
+        return throwBadRequestError(res, result.message);
+      }
       logWithTime(`❌ [listIdeasController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwInternalServerError(res, new Error(result.message));
     }
 
     // ── Return success response using the helper ──────────────────────
     logWithTime(
-      `✅ [listIdeasController] Retrieved ${result.ideas.length} ideas (${result.pagination.total} total) | ${getLogIdentifiers(req)}`
+      `✅ [listIdeasController] Retrieved ${result.data.length} ideas (${result.pagination.totalCount} total) | ${getLogIdentifiers(req)}`
     );
     return sendIdeasListSuccess(res, {
-      ideas: result.ideas,
+      ideas: result.data,
       pagination: result.pagination
     });
 

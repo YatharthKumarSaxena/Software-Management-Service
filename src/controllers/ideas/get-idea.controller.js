@@ -8,6 +8,8 @@ const {
 } = require("@/responses/common/error-handler.response");
 const { sendIdeaFetchedSuccess } = require("@/responses/success/idea.response");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
+const { UserTypes } = require("@configs/enums.config");
 
 /**
  * GET /ideas/:ideaId
@@ -16,13 +18,19 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const getIdeaController = async (req, res) => {
   try {
     const { idea } = req;
+    const filters = parseListFilters(req.query);
+    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
 
     logWithTime(
       `📍 [getIdeaController] Retrieving idea: ${idea._id} | ${getLogIdentifiers(req)}`
     );
 
     // ── Call service ──────────────────────────────────────────────────
-    const result = await ideaServices.getIdeaService(idea);
+    const result = await ideaServices.getIdeaService({
+      idea,
+      selectFields: filters.selectFields,
+      userType
+    });
 
     // ── Handle error response ─────────────────────────────────────────
     if (!result.success) {
@@ -32,7 +40,7 @@ const getIdeaController = async (req, res) => {
 
     // ── Return success response ───────────────────────────────────────
     logWithTime(`✅ [getIdeaController] Idea retrieved successfully | ${getLogIdentifiers(req)}`);
-    return sendIdeaFetchedSuccess(res, result.idea);
+    return sendIdeaFetchedSuccess(res, result.data);
 
   } catch (error) {
     logWithTime(`❌ [getIdeaController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
