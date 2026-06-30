@@ -1,13 +1,12 @@
 // services/scopes/unlink-scope-to-hlf.service.js
 
-const { ScopeModel } = require("@models/scope-model");
 const { manualVersionControlService } = require("@services/common/version.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
-const { ScopeCategoryTypes } = require("@/configs/enums.config");
+const { ApplicabilityTypes } = require("@/configs/enums.config");
 
 /**
  * Unlinks a scope from a high-level feature.
@@ -45,7 +44,7 @@ const unlinkScopeToHlfService = async ({
 
     // ── Update Scope: remove featureId and set category to GLOBAL ─────────────
     scope.featureId = null;
-    scope.category = ScopeCategoryTypes.GLOBAL;
+    scope.category = ApplicabilityTypes.GLOBAL;
     scope.updatedBy = unlinkedBy;
     const unlinkedScope = await scope.save();
 
