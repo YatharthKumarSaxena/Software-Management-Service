@@ -14,6 +14,7 @@ const CLIENT_BASE = `${API_PREFIX}/clients`; // /software-management-service/api
 const PRODUCT_REQUEST_BASE = `${API_PREFIX}/product-requests`; // /software-management-service/api/v1/product-requests
 const ORG_PROJECT_REQUEST_BASE = `${API_PREFIX}/org-project-requests`; // /software-management-service/api/v1/org-project-requests
 const SCOPE_BASE = `${API_PREFIX}/scope`; // /software-management-service/api/v1/scope
+const CONSTRAINT_BASE = `${API_PREFIX}/constraints`; // /software-management-service/api/v1/constraints
 const HLF_BASE = `${API_PREFIX}/high-level-features`; // /software-management-service/api/v1/high-level-features
 const IDEAS_BASE = `${API_PREFIX}/ideas`; // /software-management-service/api/v1/ideas
 const PRODUCT_VISION_BASE = `${API_PREFIX}/product-vision`; // /software-management-service/api/v1/product-vision
@@ -35,6 +36,7 @@ module.exports = {
     ORG_PROJECT_REQUEST_BASE,
     SCOPE_BASE,
     HLF_BASE,
+    CONSTRAINT_BASE,
     IDEAS_BASE,
     PRODUCT_VISION_BASE,
     COMMENT_BASE,
@@ -116,6 +118,15 @@ module.exports = {
         LIST_SCOPES:     `/list/:projectId`,        // GET /software-management-service/api/v1/scope/list/:projectId
         LINK_SCOPE_TO_HLF: `/link/:scopeId/:hlfId`,  // PATCH /software-management-service/api/v1/scope/link/:scopeId/:hlfId
         UNLINK_SCOPE_TO_HLF: `/unlink/:scopeId`     // PATCH /software-management-service/api/v1/scope/unlink/:scopeId
+    },
+    CONSTRAINT_ROUTES: {
+        GET_CONSTRAINT:              `/get/:constraintId`,       // GET    /api/v1/constraints/get/:constraintId
+        CREATE_CONSTRAINT:          `/create/:projectId`,       // POST   /api/v1/constraints/create/:projectId
+        UPDATE_CONSTRAINT:          `/update/:constraintId`,    // PATCH  /api/v1/constraints/update/:constraintId
+        DELETE_CONSTRAINT:          `/delete/:constraintId`,    // DELETE /api/v1/constraints/delete/:constraintId
+        LIST_CONSTRAINTS:           `/list/:projectId`,          // GET    /api/v1/constraints/list/:projectId
+        LINK_CONSTRAINT_TO_HLF:     `/link/:constraintId/:hlfId`, // PATCH  /api/v1/constraints/link/:constraintId/:hlfId
+        UNLINK_CONSTRAINT_TO_HLF:   `/unlink/:constraintId`      // PATCH  /api/v1/constraints/unlink/:constraintId
     },
     HLF_ROUTES: {
         GET_HLF:       `/get/:hlfId`,         // GET /software-management-service/api/v1/high-level-features/get/:hlfId

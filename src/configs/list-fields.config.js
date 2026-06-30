@@ -115,6 +115,20 @@ const SCOPE_CLIENT_LIST_FIELDS = {
     searchableFields: ["title", "description", "id"]
 };
 
+const CONSTRAINT_ADMIN_LIST_FIELDS = {
+    hiddenFields: ["__v"],
+    filterableFields: ["title", "type", "category", "projectId", "inceptionId", "featureId", "isDeleted"],
+    sortableFields: ["title", "type", "sequence", "createdAt", "updatedAt"],
+    searchableFields: ["title", "description", "id"]
+};
+
+const CONSTRAINT_CLIENT_LIST_FIELDS = {
+    hiddenFields: ["__v", "createdBy", "updatedBy", "isDeleted", "deletedAt", "deletedBy"],
+    filterableFields: ["title", "type", "category", "projectId", "inceptionId", "featureId"],
+    sortableFields: ["title", "type", "sequence", "createdAt"],
+    searchableFields: ["title", "description", "id"]
+};
+
 const PHASE_ADMIN_LIST_FIELDS = {
     hiddenFields: ["__v"],
     filterableFields: ["projectId", "isDeleted", "status"],
@@ -222,6 +236,8 @@ module.exports = {
     HLF_CLIENT_LIST_FIELDS,
     SCOPE_ADMIN_LIST_FIELDS,
     SCOPE_CLIENT_LIST_FIELDS,
+    CONSTRAINT_ADMIN_LIST_FIELDS,
+    CONSTRAINT_CLIENT_LIST_FIELDS,
     PHASE_ADMIN_LIST_FIELDS,
     PHASE_CLIENT_LIST_FIELDS,
     PRODUCT_REQUEST_ADMIN_LIST_FIELDS,

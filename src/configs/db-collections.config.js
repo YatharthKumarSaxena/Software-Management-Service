@@ -5,6 +5,7 @@ const DB_COLLECTIONS = {
     CLIENTS: "clients",
     STAKEHOLDERS: "stakeholders",
     COUNTERS: "counters",
+    CONSTRAINTS: "constraints",
 
     SERVICE_TRACKERS: "service_trackers",
     SERVICE_TOKENS: "service_tokens",
