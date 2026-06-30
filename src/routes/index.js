@@ -7,6 +7,7 @@ const {
   PRODUCT_REQUEST_BASE, 
   ORG_PROJECT_REQUEST_BASE, 
   SCOPE_BASE, 
+  CONSTRAINT_BASE,
   HLF_BASE, 
   IDEAS_BASE, 
   PRODUCT_VISION_BASE, 
@@ -24,6 +25,7 @@ const { stakeholderRouter } = require("./stakeholder.routes");
 const { productRequestRouter } = require("./product-request.routes");
 const { orgProjectRequestsRoutes } = require("./org-project-requests.routes");
 const { scopeRouter } = require("./scope.routes");
+const { constraintRouter } = require("./constraint.routes");
 const { hlfRouter } = require("./high-level-features.routes");
 const { ideaRouter } = require("./idea.routes");
 const { productVisionRouter } = require("./product-vision.routes");
@@ -53,6 +55,9 @@ module.exports = (app) => {
 
   // Admin/Client-facing API routes — scopes
   app.use(SCOPE_BASE, scopeRouter);
+
+  // Admin/Client-facing API routes — constraints
+  app.use(CONSTRAINT_BASE, constraintRouter);
 
   // Admin/Client-facing API routes — high-level features
   app.use(HLF_BASE, hlfRouter);
