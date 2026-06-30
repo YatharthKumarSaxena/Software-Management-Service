@@ -17,7 +17,7 @@ const { OK } = require("@/configs/http-status.config");
 
 const updateScopeController = async (req, res) => {
   try {
-    const { title, description, type, linkedHlfId } = req.body;
+    const { title, description, type } = req.body;
     const updatedBy = req.admin.adminId;
 
     const scope = req.scope;
@@ -32,7 +32,6 @@ const updateScopeController = async (req, res) => {
       title: title || null,
       description: description || null,
       type: type || null,
-      linkFeatureId: linkedHlfId || null,
       updatedBy,
       auditContext: {
         user: req.admin,
@@ -49,11 +48,6 @@ const updateScopeController = async (req, res) => {
       if (result.message === "No changes detected") {
         logWithTime(`⚠️ [updateScopeController] No changes detected | ${getLogIdentifiers(req)}`);
         return sendScopeUpdatedSuccess(res, result.scope);
-      }
-
-      if (result.message === "The specified HLF feature does not exist or is deleted.") {
-        logWithTime(`❌ [updateScopeController] Invalid HLF feature ID | ${getLogIdentifiers(req)}`);
-        return throwBadRequestError(res, result.message);
       }
 
       if (result.message === "Validation error") {

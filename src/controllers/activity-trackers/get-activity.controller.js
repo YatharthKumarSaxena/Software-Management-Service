@@ -10,6 +10,7 @@ const {
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@/utils/time-stamps.util");
 const { errorMessage } = require("@/utils/log-error.util");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
 
 /**
  * Controller: Get Activity By ID
@@ -20,18 +21,19 @@ const getActivityController = async (req, res) => {
   try {
     const { activityId } = req.params;
     const adminId = req.admin.adminId;
+    const filters = parseListFilters(req.query);
 
     // ── Call service ──────────────────────────────────────
-    const result = await getActivityByIdService(activityId, adminId);
+    const result = await getActivityByIdService(activityId, adminId, filters);
 
     if (!result.success) {
       if (result.message === "Invalid activity ID format") {
-        logWithTime(`❌ [getMyActivityController] ${result.message} | ${getLogIdentifiers(req)}`);
+        logWithTime(`❌ [getActivityController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwBadRequestError(res, result.message);
       }
 
       if (result.message === "Activity not found") {
-        logWithTime(`❌ [getMyActivityController] ${result.message} | ${getLogIdentifiers(req)}`);
+        logWithTime(`❌ [getActivityController] ${result.message} | ${getLogIdentifiers(req)}`);
         return throwDBResourceNotFoundError(res, result.message);
       }
 

@@ -51,7 +51,9 @@ const {
   ContributionTypesHelper,
   RevokeRequirementTypesHelper,
   UnlinkReasonTypesHelper,
-  AllowedPhaseTypesHelper
+  AllowedPhaseTypesHelper,
+  ConstraintTypesHelper,
+  ApplicabilityTypesHelper
 } = require("@utils/enum-validators.util");
 
 const { customIdRegex, mongoIdRegex, budgetRegex, timelineRegex, isoDateRegex } = require("./regex.config");
@@ -312,6 +314,14 @@ const validationRules = {
   },
   AllowedPhaseTypes: {
     enum: AllowedPhaseTypesHelper
+  },
+
+  // ── Constraint fields ──────────────────────────────────────────────────
+  constraintType: {
+    enum: ConstraintTypesHelper
+  },
+  applicabilityType: {
+    enum: ApplicabilityTypesHelper
   }
 };
 

@@ -1,67 +1,74 @@
 // services/ideas/list-ideas.service.js
 
 const { IdeaModel } = require("@models/idea.model");
+const { createListService } = require("@services/factory/create-list-service.factory");
+const { INTERNAL_ERROR } = require("@configs/http-status.config");
+const { UserTypes } = require("@configs/enums.config");
+const {
+    IDEA_ADMIN_LIST_FIELDS,
+    IDEA_CLIENT_LIST_FIELDS
+} = require("@/configs/list-fields.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 
+const adminIdeaListService = createListService({
+    model: IdeaModel,
+    hiddenFields: IDEA_ADMIN_LIST_FIELDS.hiddenFields,
+    searchableFields: IDEA_ADMIN_LIST_FIELDS.searchableFields,
+    sortableFields: IDEA_ADMIN_LIST_FIELDS.sortableFields,
+    filterableFields: IDEA_ADMIN_LIST_FIELDS.filterableFields
+});
+
+const clientIdeaListService = createListService({
+    model: IdeaModel,
+    hiddenFields: IDEA_CLIENT_LIST_FIELDS.hiddenFields,
+    searchableFields: IDEA_CLIENT_LIST_FIELDS.searchableFields,
+    sortableFields: IDEA_CLIENT_LIST_FIELDS.sortableFields,
+    filterableFields: IDEA_CLIENT_LIST_FIELDS.filterableFields
+});
+
 /**
- * Lists all ideas for a project with pagination.
- *
- * @param {Object} params
- * @param {string} params.projectId - Project MongoDB ObjectId
- * @param {number} params.page - Page number (default: 1)
- * @param {number} params.limit - Items per page (default: 10, max: 100)
- *
- * @returns {{ success: true, ideas, total, page, totalPages } | { success: false, message, errorCode }}
+ * Lists all ideas for a project with pagination and filtering.
  */
 const listIdeasService = async ({
-  projectId,
-  page = 1,
-  limit = 10
+    projectId,
+    filters,
+    userType
 }) => {
-  try {
-    // ── Validate and normalize pagination parameters ──────────────────────
-    const pageNumber = Math.max(1, parseInt(page) || 1);
-    const pageLimit = Math.min(100, Math.max(1, parseInt(limit) || 10));
-    const skip = (pageNumber - 1) * pageLimit;
+    try {
+        const listService =
+            userType === UserTypes.CLIENT
+                ? clientIdeaListService
+                : adminIdeaListService;
 
-    // ── Fetch total count ────────────────────────────────────────────────
-    const total = await IdeaModel.countDocuments({
-      projectId,
-      isDeleted: false
-    });
+        const andConditions = [
+            { field: "projectId", operator: "eq", value: projectId },
+            { field: "isDeleted", operator: "eq", value: false }
+        ];
 
-    // ── Fetch paginated ideas ────────────────────────────────────────────
-    const ideas = await IdeaModel.find({
-      projectId,
-      isDeleted: false
-    })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(pageLimit)
-      .lean();
+        if (filters?.query) {
+            andConditions.push(filters.query);
+        }
 
-    const totalPages = Math.ceil(total / pageLimit);
+        const query = { and: andConditions };
 
-    logWithTime(`✅ [listIdeasService] Retrieved ${ideas.length} ideas for project ${projectId} (page ${pageNumber}/${totalPages})`);
+        const result = await listService({
+            query,
+            selectFields: filters?.selectFields,
+            pageNumber: filters?.pageNumber,
+            pageSize: filters?.pageSize,
+            sortField: filters?.sortField,
+            sortOrder: filters?.sortOrder
+        });
 
-    return {
-      success: true,
-      ideas,
-      pagination: {
-        total,
-        page: pageNumber,
-        limit: pageLimit,
-        totalPages
-      }
-    };
-
-  } catch (error) {
-    logWithTime(`❌ [listIdeasService] Error: ${error.message}`);
-    if (error.name === "ValidationError") {
-      return { success: false, message: "Validation error", error: error.message };
+        return result;
+    } catch (error) {
+        logWithTime(`❌ [listIdeasService] ${error.message}`);
+        return {
+            success: false,
+            message: error.message || "Failed to list ideas",
+            errorCode: INTERNAL_ERROR
+        };
     }
-    return { success: false, message: "Internal error while listing ideas", error: error.message };
-  }
 };
 
 module.exports = { listIdeasService };

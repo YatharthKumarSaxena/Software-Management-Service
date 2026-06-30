@@ -1,108 +1,61 @@
 // services/scopes/list-scope.service.js
 
-const mongoose = require("mongoose");
 const { ScopeModel } = require("@models/scope-model");
+const { createListService } = require("@services/factory/create-list-service.factory");
+const { INTERNAL_ERROR } = require("@configs/http-status.config");
+const { UserTypes } = require("@configs/enums.config");
+const { SCOPE_ADMIN_LIST_FIELDS, SCOPE_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
+const { logWithTime } = require("@utils/time-stamps.util");
 
-const parsePagination = (pagination = {}) => {
-  const page = Math.max(1, parseInt(pagination.page, 10) || 1);
-  const limit = Math.min(100, Math.max(1, parseInt(pagination.limit, 10) || 20));
-  const skip = (page - 1) * limit;
-  return { page, limit, skip };
+const adminScopeListService = createListService({
+    model: ScopeModel,
+    hiddenFields: SCOPE_ADMIN_LIST_FIELDS.hiddenFields,
+    searchableFields: SCOPE_ADMIN_LIST_FIELDS.searchableFields,
+    sortableFields: SCOPE_ADMIN_LIST_FIELDS.sortableFields,
+    filterableFields: SCOPE_ADMIN_LIST_FIELDS.filterableFields
+});
+
+const clientScopeListService = createListService({
+    model: ScopeModel,
+    hiddenFields: SCOPE_CLIENT_LIST_FIELDS.hiddenFields,
+    searchableFields: SCOPE_CLIENT_LIST_FIELDS.searchableFields,
+    sortableFields: SCOPE_CLIENT_LIST_FIELDS.sortableFields,
+    filterableFields: SCOPE_CLIENT_LIST_FIELDS.filterableFields
+});
+
+const listScopesService = async ({ projectId, inceptionId, filters, userType }) => {
+    try {
+        const listService = userType === UserTypes.CLIENT ? clientScopeListService : adminScopeListService;
+
+        const andConditions = [
+            { field: "projectId", operator: "eq", value: projectId },
+            { field: "isDeleted", operator: "eq", value: false }
+        ];
+
+        if (inceptionId) {
+            andConditions.push({ field: "inceptionId", operator: "eq", value: inceptionId });
+        }
+
+        if (filters?.query) {
+            andConditions.push(filters.query);
+        }
+
+        const query = { and: andConditions };
+
+        const result = await listService({
+            query,
+            selectFields: filters?.selectFields,
+            pageNumber: filters?.pageNumber,
+            pageSize: filters?.pageSize,
+            sortField: filters?.sortField,
+            sortOrder: filters?.sortOrder
+        });
+
+        return result;
+    } catch (error) {
+        logWithTime(`❌ [listScopesService] ${error.message}`);
+        return { success: false, message: error.message || "Failed to list scopes", errorCode: INTERNAL_ERROR };
+    }
 };
 
-const buildScopeQuery = (filters = {}, forceIncludeDeleted = false) => {
-  const {
-    inceptionId,
-    type,
-    includeDeleted = false,
-  } = filters;
-
-  const query = {};
-
-  const includeDeletedResolved = forceIncludeDeleted ? forceIncludeDeleted :includeDeleted;
-  if (!includeDeletedResolved) {
-    query.isDeleted = false;
-  }
-
-  if (inceptionId && mongoose.Types.ObjectId.isValid(inceptionId)) {
-    query.inceptionId = inceptionId;
-  }
-
-  if (type) {
-    query.type = type;
-  }
-
-  return query;
-};
-
-/**
- * Admin/full scope list.
- */
-const listScopesAdminService = async (filters = {}, pagination = {}) => {
-  try {
-    const query = buildScopeQuery(filters);
-    const { page, limit, skip } = parsePagination(pagination);
-
-    const [scopes, total] = await Promise.all([
-      ScopeModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
-      ScopeModel.countDocuments(query),
-    ]);
-
-    return {
-      success: true,
-      scopes,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
-  } catch (error) {
-    return { success: false, message: "Internal error while fetching scopes", error: error.message };
-  }
-};
-
-/**
- * Restricted scope list for client/stakeholder access.
- * Only shows basic scope information.
- */
-const listScopesClientService = async (filters = {}, pagination = {}) => {
-  try {
-    const query = buildScopeQuery(filters, false);
-    const { page, limit, skip } = parsePagination(pagination);
-
-    const projection = {
-      _id: 1,
-      type: 1,
-      title: 1,
-      description: 1,
-      createdAt: 1,
-    };
-
-    const [scopes, total] = await Promise.all([
-      ScopeModel.find(query, projection).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
-      ScopeModel.countDocuments(query),
-    ]);
-
-    const restrictedScopes = scopes.map((scope) => ({
-      scopeId: scope._id,
-      type: scope.type,
-      title: scope.title,
-      description: scope.description,
-      createdAt: scope.createdAt,
-    }));
-
-    return {
-      success: true,
-      scopes: restrictedScopes,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
-  } catch (error) {
-    return { success: false, message: "Internal error while fetching scopes", error: error.message };
-  }
-};
-
-module.exports = {
-  listScopesAdminService,
-  listScopesClientService,
-};
+module.exports = { listScopesService };

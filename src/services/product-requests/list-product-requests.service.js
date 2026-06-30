@@ -1,83 +1,60 @@
 // services/product-requests/list-product-requests.service.js
 
 const { ProductRequestModel } = require("@models/product-request.model");
+const { createListService } = require("@services/factory/create-list-service.factory");
+const { INTERNAL_ERROR } = require("@configs/http-status.config");
+const { UserTypes } = require("@configs/enums.config");
+const { PRODUCT_REQUEST_ADMIN_LIST_FIELDS, PRODUCT_REQUEST_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { OK, INTERNAL_ERROR } = require("@configs/http-status.config");
 
-/**
- * Lists product requests based on user type.
- * 
- * Authorization:
- * - Admin: Can see all product requests
- * - Client: Can only see their own raised product requests
- *
- * @param {Object} params
- * @param {Object} params.clientMongoId  - Client's MongoDB _id (if client making request)
- * @param {boolean} params.isClient      - Whether the user is a client
- * @param {number} [params.page]         - Page number (default: 1)
- * @param {number} [params.limit]        - Records per page (default: 10)
- * @param {Object} [params.filters]      - Additional filters (status, priority, etc.)
- *
- * @returns {Object} { errorCode, isSuccess: true, data } | { errorCode, isSuccess: false, description }
- */
-const listProductRequestsService = async (params) => {
-  try {
-    const { clientMongoId, isClient, page = 1, limit = 10, filters = {} } = params;
+const adminProductRequestListService = createListService({
+    model: ProductRequestModel,
+    hiddenFields: PRODUCT_REQUEST_ADMIN_LIST_FIELDS.hiddenFields,
+    searchableFields: PRODUCT_REQUEST_ADMIN_LIST_FIELDS.searchableFields,
+    sortableFields: PRODUCT_REQUEST_ADMIN_LIST_FIELDS.sortableFields,
+    filterableFields: PRODUCT_REQUEST_ADMIN_LIST_FIELDS.filterableFields
+});
 
-    // ── Build query based on user type ────────────────────────────────
-    let query = { isDeleted: false };
+const clientProductRequestListService = createListService({
+    model: ProductRequestModel,
+    hiddenFields: PRODUCT_REQUEST_CLIENT_LIST_FIELDS.hiddenFields,
+    searchableFields: PRODUCT_REQUEST_CLIENT_LIST_FIELDS.searchableFields,
+    sortableFields: PRODUCT_REQUEST_CLIENT_LIST_FIELDS.sortableFields,
+    filterableFields: PRODUCT_REQUEST_CLIENT_LIST_FIELDS.filterableFields
+});
 
-    if (isClient && clientMongoId) {
-      // Clients can only see their own requests
-      query.requestedBy = clientMongoId;
-    }
-    // Admins can see all (no additional filter)
+const listProductRequestsService = async ({ clientMongoId, isClient, filters, userType }) => {
+    try {
+        const listService = userType === UserTypes.CLIENT ? clientProductRequestListService : adminProductRequestListService;
 
-    // ── Apply additional filters ──────────────────────────────────────
-    if (filters.status) {
-      query.status = filters.status;
-    }
-    if (filters.priority) {
-      query.priority = filters.priority;
-    }
-    if (filters.projectType) {
-      query.projectType = filters.projectType;
-    }
+        const andConditions = [
+            { field: "isDeleted", operator: "eq", value: false }
+        ];
 
-    const skip = (page - 1) * limit;
-
-    const productRequests = await ProductRequestModel
-      .find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    const total = await ProductRequestModel.countDocuments(query);
-
-    logWithTime(`✅ [listProductRequestsService] Retrieved ${productRequests.length} product requests`);
-    return {
-      errorCode: OK,
-      isSuccess: true,
-      data: {
-        productRequests,
-        pagination: {
-          total,
-          page,
-          limit,
-          pages: Math.ceil(total / limit)
+        if (isClient && clientMongoId) {
+            andConditions.push({ field: "requestedBy", operator: "eq", value: clientMongoId });
         }
-      }
-    };
 
-  } catch (error) {
-    logWithTime(`❌ [listProductRequestsService] Error: ${error.message}`);
-    return {
-      errorCode: INTERNAL_ERROR,
-      isSuccess: false,
-      description: "Internal error while listing product requests"
-    };
-  }
+        if (filters?.query) {
+            andConditions.push(filters.query);
+        }
+
+        const query = { and: andConditions };
+
+        const result = await listService({
+            query,
+            selectFields: filters?.selectFields,
+            pageNumber: filters?.pageNumber,
+            pageSize: filters?.pageSize,
+            sortField: filters?.sortField,
+            sortOrder: filters?.sortOrder
+        });
+
+        return { isSuccess: true, data: result.data, pagination: result.pagination };
+    } catch (error) {
+        logWithTime(`❌ [listProductRequestsService] ${error.message}`);
+        return { isSuccess: false, description: error.message || "Failed to list product requests", errorCode: INTERNAL_ERROR };
+    }
 };
 
 module.exports = { listProductRequestsService };

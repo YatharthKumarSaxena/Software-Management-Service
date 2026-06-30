@@ -16,7 +16,7 @@ const { errorMessage } = require("@/utils/log-error.util");
 
 const createScopeController = async (req, res) => {
   try {
-    const { title, description, type, linkedHlfId } = req.body;
+    const { title, description, type } = req.body;
     const createdBy = req.admin.adminId;
 
     const inception = req.inception;
@@ -29,7 +29,6 @@ const createScopeController = async (req, res) => {
       title,
       description: description || null,
       type: type || null,
-      linkFeatureId: linkedHlfId || null,
       createdBy,
       auditContext: {
         user: req.admin,
@@ -42,11 +41,6 @@ const createScopeController = async (req, res) => {
       if (result.message === "Scope with this title already exists in this inception.") {
         logWithTime(`❌ [createScopeController] Duplicate scope title | ${getLogIdentifiers(req)}`);
         return throwConflictError(res, result.message);
-      }
-
-      if (result.message === "The specified HLF feature does not exist or is deleted.") {
-        logWithTime(`❌ [createScopeController] Invalid HLF feature ID | ${getLogIdentifiers(req)}`);
-        return throwBadRequestError(res, result.message);
       }
 
       if (result.message === "Validation error") {

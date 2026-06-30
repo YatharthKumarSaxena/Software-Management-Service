@@ -1,4 +1,4 @@
-// controllers/stakeholders/get-stakeholders.controller.js
+// controllers/stakeholders/list-stakeholders.controller.js
 
 const {
   listStakeholdersAdminService,
@@ -12,51 +12,22 @@ const {
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
 
-/**
- * Controller: Get Stakeholders (list)
- *
- * @route  GET /software-management-service/api/v1/admin/get-stakeholders
- * @access Private – Admin (all roles)
- *
- * @query {string}  [projectId]       - Filter by project
- * @query {string}  [role]            - Filter by role
- * @query {string}  [stakeholderId]   - Filter by custom stakeholderId (USR…)
- * @query {boolean} [includeDeleted]  - Include soft-deleted records (default: false)
- * @query {number}  [page]            - Page number (default: 1)
- * @query {number}  [limit]           - Records per page (default: 20, max: 100)
- *
- * @returns {200} Paginated stakeholder list
- * @returns {500} Internal server error
- */
 const listStakeholdersController = async (req, res) => {
   try {
     const authorizationContext = req.authorizationContext || {};
     const shouldUseRestrictedView = authorizationContext.grantedBy === "stakeholder-membership";
 
-    const {
-      projectId,
-      role,
-      stakeholderId,
-      includeDeleted,
-      page,
-      limit,
-    } = req.query;
-
-    const filters = {
-      projectId,
-      role,
-      stakeholderId,
-      includeDeleted: includeDeleted === "true",
-    };
+    const filters = parseListFilters(req.query);
 
     const requesterUserId = req.stakeholder?.userId || req.admin?.adminId || req.client?.clientId;
     const result = shouldUseRestrictedView
-      ? await listStakeholdersClientService(filters, { page, limit }, requesterUserId)
-      : await listStakeholdersAdminService(filters, { page, limit });
+      ? await listStakeholdersClientService(filters, requesterUserId)
+      : await listStakeholdersAdminService(filters);
 
     if (!result.success) {
-      logWithTime(`❌ [getStakeholdersController] ${result.message} | ${getLogIdentifiers(req)}`);
+      logWithTime(`❌ [listStakeholdersController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
 
@@ -64,16 +35,14 @@ const listStakeholdersController = async (req, res) => {
       ? result.stakeholders
       : await enrichStakeholdersWithName(result.stakeholders);
 
-    logWithTime(`✅ [getStakeholdersController] Stakeholders list fetched successfully | ${getLogIdentifiers(req)}`);
+    logWithTime(`✅ [listStakeholdersController] Stakeholders list fetched successfully | ${getLogIdentifiers(req)}`);
     return sendStakeholdersListFetchedSuccess(
       res,
       stakeholdersResponse,
-      result.total,
-      result.page,
-      result.totalPages
+      result.pagination
     );
   } catch (error) {
-    logWithTime(`❌ [getStakeholdersController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
+    logWithTime(`❌ [listStakeholdersController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
     return throwInternalServerError(res, error);
   }
 };

@@ -81,6 +81,11 @@ const validationSets = {
     deletePhaseValidationSet: getValidationSet(FieldDefinitions.DELETE_PHASE),
 
     phaseRoleActionValidationSet: getValidationSet(FieldDefinitions.PHASE_ROLE_ACTION),
+
+    // ── Constraint Operations ──────────────────────────────────────────
+    createConstraintValidationSet: getValidationSet(FieldDefinitions.CREATE_CONSTRAINT),
+    updateConstraintValidationSet: getValidationSet(FieldDefinitions.UPDATE_CONSTRAINT),
+    deleteConstraintValidationSet: getValidationSet(FieldDefinitions.DELETE_CONSTRAINT)
 };
 
 module.exports = { validationSets };

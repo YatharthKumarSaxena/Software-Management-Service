@@ -123,6 +123,15 @@ const createRequirementInBulkRateLimiter = createRateLimiter(perUserAndDevice.cr
 const listRequirementsRateLimiter = createRateLimiter(perUserAndDevice.listRequirements);
 const getRequirementRateLimiter = createRateLimiter(perUserAndDevice.getRequirement)
 
+// ── Constraint rate limiters ──────────────────────────────────────────────
+const createConstraintRateLimiter = createRateLimiter(perUserAndDevice.createConstraint);
+const updateConstraintRateLimiter = createRateLimiter(perUserAndDevice.updateConstraint);
+const deleteConstraintRateLimiter = createRateLimiter(perUserAndDevice.deleteConstraint);
+const getConstraintRateLimiter    = createRateLimiter(perUserAndDevice.getConstraint);
+const listConstraintsRateLimiter  = createRateLimiter(perUserAndDevice.listConstraints);
+const linkConstraintToHlfRateLimiter   = createRateLimiter(perUserAndDevice.linkConstraintToHlf);
+const unlinkConstraintToHlfRateLimiter = createRateLimiter(perUserAndDevice.unlinkConstraintToHlf);
+
 
 module.exports = {
     welcomeAdminRateLimiter,
@@ -227,5 +236,12 @@ module.exports = {
     createRequirementRateLimiter,
     listRequirementsRateLimiter,
     getRequirementRateLimiter,
-    createRequirementInBulkRateLimiter
+    createRequirementInBulkRateLimiter,
+    createConstraintRateLimiter,
+    updateConstraintRateLimiter,
+    deleteConstraintRateLimiter,
+    getConstraintRateLimiter,
+    listConstraintsRateLimiter,
+    linkConstraintToHlfRateLimiter,
+    unlinkConstraintToHlfRateLimiter
 }

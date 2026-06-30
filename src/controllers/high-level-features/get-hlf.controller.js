@@ -1,9 +1,6 @@
 // controllers/high-level-features/get-hlf.controller.js
 
-const {
-  getHlfAdminService,
-  getHlfClientService,
-} = require("@services/high-level-features/get-hlf.service");
+const { getHlfService } = require("@services/high-level-features/get-hlf.service");
 const { sendHlfFetchedSuccess } = require("@/responses/success/hlf.response");
 const {
   throwInternalServerError,
@@ -12,16 +9,20 @@ const {
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
+const { UserTypes } = require("@configs/enums.config");
 
 const getHlfController = async (req, res) => {
   try {
     const hlf = req.foundHlf || req.hlf;
-    const authorizationContext = req.authorizationContext || {};
-    const shouldUseRestrictedView = authorizationContext.grantedBy === "stakeholder-membership";
+    const filters = parseListFilters(req.query);
+    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
 
-    const result = shouldUseRestrictedView
-      ? await getHlfClientService(hlf)
-      : await getHlfAdminService(hlf);
+    const result = await getHlfService({
+      hlf,
+      selectFields: filters.selectFields,
+      userType
+    });
 
     if (!result.success) {
       logWithTime(`❌ [getHlfController] ${result.message} | ${getLogIdentifiers(req)}`);
@@ -29,7 +30,7 @@ const getHlfController = async (req, res) => {
     }
 
     logWithTime(`✅ [getHlfController] High-level feature fetched successfully | ${getLogIdentifiers(req)}`);
-    return sendHlfFetchedSuccess(res, result.hlf);
+    return sendHlfFetchedSuccess(res, result.data);
 
   } catch (error) {
     logWithTime(`❌ [getHlfController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);

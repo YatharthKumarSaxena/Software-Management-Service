@@ -1,9 +1,6 @@
 // controllers/scopes/get-scope.controller.js
 
-const {
-  getScopeAdminService,
-  getScopeClientService,
-} = require("@services/scopes/get-scope.service");
+const { getScopeService } = require("@services/scopes/get-scope.service");
 const { sendScopeFetchedSuccess } = require("@/responses/success/scope.response");
 const {
   throwInternalServerError,
@@ -12,16 +9,20 @@ const {
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
+const { UserTypes } = require("@configs/enums.config");
 
 const getScopeController = async (req, res) => {
   try {
     const scope = req.foundScope || req.scope;
-    const authorizationContext = req.authorizationContext || {};
-    const shouldUseRestrictedView = authorizationContext.grantedBy === "stakeholder-membership";
+    const filters = parseListFilters(req.query);
+    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
 
-    const result = shouldUseRestrictedView
-      ? await getScopeClientService(scope)
-      : await getScopeAdminService(scope);
+    const result = await getScopeService({
+      scope,
+      selectFields: filters.selectFields,
+      userType
+    });
 
     if (!result.success) {
       logWithTime(`❌ [getScopeController] ${result.message} | ${getLogIdentifiers(req)}`);
@@ -29,7 +30,7 @@ const getScopeController = async (req, res) => {
     }
 
     logWithTime(`✅ [getScopeController] Scope fetched successfully | ${getLogIdentifiers(req)}`);
-    return sendScopeFetchedSuccess(res, result.scope);
+    return sendScopeFetchedSuccess(res, result.data);
 
   } catch (error) {
     logWithTime(`❌ [getScopeController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);

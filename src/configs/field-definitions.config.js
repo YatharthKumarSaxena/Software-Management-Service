@@ -506,12 +506,6 @@ const FieldDefinitions = {
       required: false,
       validation: null,
       description: "Scope type: IN_SCOPE | OUT_SCOPE | CONSTRAINT (optional, defaults to IN_SCOPE)"
-    },
-    LINKED_HLF_ID: {
-      field: "linkedHlfId",
-      required: false,
-      validation: validationRules.mongoId,
-      description: "Linked high-level feature ID (optional, must be valid MongoDB ObjectId if provided)"
     }
   },
 
@@ -534,12 +528,6 @@ const FieldDefinitions = {
       required: false,
       validation: validationRules.scopeType,
       description: "Updated scope type: IN_SCOPE | OUT_SCOPE | CONSTRAINT (optional)"
-    },
-    LINKED_HLF_ID: {
-      field: "linkedHlfId",
-      required: false,
-      validation: validationRules.mongoId,
-      description: "Linked high-level feature ID (optional, must be valid MongoDB ObjectId if provided)"
     }
   },
 
@@ -1496,6 +1484,59 @@ const FieldDefinitions = {
     },
   },
 
+  // ── CREATE CONSTRAINT ─────────────────────────────────────────────────
+  CREATE_CONSTRAINT: {
+    TITLE: {
+      field: "title",
+      required: true,
+      validation: validationRules.title,
+      description: "Constraint title (required)"
+    },
+    DESCRIPTION: {
+      field: "description",
+      required: false,
+      validation: validationRules.description,
+      description: "Detailed constraint description (optional)"
+    },
+    TYPE: {
+      field: "type",
+      required: true,
+      validation: validationRules.constraintType,
+      description: "Constraint type: BUSINESS | TECHNICAL | SCHEDULE | COST | RESOURCE | QUALITY | SECURITY | LEGAL | OTHER (required)"
+    }
+  },
+
+  // ── UPDATE CONSTRAINT ─────────────────────────────────────────────────
+  UPDATE_CONSTRAINT: {
+    TITLE: {
+      field: "title",
+      required: false,
+      validation: validationRules.title,
+      description: "Updated constraint title (optional)"
+    },
+    DESCRIPTION: {
+      field: "description",
+      required: false,
+      validation: validationRules.description,
+      description: "Updated constraint description (optional)"
+    },
+    TYPE: {
+      field: "type",
+      required: false,
+      validation: validationRules.constraintType,
+      description: "Updated constraint type (optional enum)"
+    }
+  },
+
+  // ── DELETE CONSTRAINT ─────────────────────────────────────────────────
+  DELETE_CONSTRAINT: {
+    DELETION_REASON_DESCRIPTION: {
+      field: "deletionReasonDescription",
+      required: false,
+      validation: validationRules.reasonDescription,
+      description: "Reason for constraint deletion (optional string, added to activity log)"
+    }
+  },
 
 };
 

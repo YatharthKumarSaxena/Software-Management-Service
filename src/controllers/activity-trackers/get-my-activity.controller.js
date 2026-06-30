@@ -8,6 +8,7 @@ const {
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@/utils/time-stamps.util");
 const { errorMessage } = require("@/utils/log-error.util");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
 
 /**
  * Controller: Get My Activity
@@ -17,10 +18,10 @@ const { errorMessage } = require("@/utils/log-error.util");
 const getMyActivityController = async (req, res) => {
   try {
     const userId = req.admin?.adminId || req.client?.clientId;
-    const { page, limit } = req.query;
+    const filters = parseListFilters(req.query);
 
     // ── Call service ──────────────────────────────────────
-    const result = await getMyActivityService(userId, { page, limit });
+    const result = await getMyActivityService(userId, filters);
 
     if (!result.success) {
       logWithTime(`❌ [getMyActivityController] ${result.message} | ${getLogIdentifiers(req)}`);
@@ -33,12 +34,7 @@ const getMyActivityController = async (req, res) => {
       success: true,
       data: {
         activities: result.activities,
-        pagination: {
-          total: result.total,
-          page: result.page,
-          totalPages: result.totalPages,
-          limit: parseInt(limit, 10) || 20
-        }
+        pagination: result.pagination
       }
     });
 

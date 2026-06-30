@@ -1,101 +1,61 @@
 // services/high-level-features/list-hlf.service.js
 
-const mongoose = require("mongoose");
 const { HighLevelFeatureModel } = require("@models/high-level-feature.model");
+const { createListService } = require("@services/factory/create-list-service.factory");
+const { INTERNAL_ERROR } = require("@configs/http-status.config");
+const { UserTypes } = require("@configs/enums.config");
+const { HLF_ADMIN_LIST_FIELDS, HLF_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
+const { logWithTime } = require("@utils/time-stamps.util");
 
-const parsePagination = (pagination = {}) => {
-  const page = Math.max(1, parseInt(pagination.page, 10) || 1);
-  const limit = Math.min(100, Math.max(1, parseInt(pagination.limit, 10) || 20));
-  const skip = (page - 1) * limit;
-  return { page, limit, skip };
+const adminHlfListService = createListService({
+    model: HighLevelFeatureModel,
+    hiddenFields: HLF_ADMIN_LIST_FIELDS.hiddenFields,
+    searchableFields: HLF_ADMIN_LIST_FIELDS.searchableFields,
+    sortableFields: HLF_ADMIN_LIST_FIELDS.sortableFields,
+    filterableFields: HLF_ADMIN_LIST_FIELDS.filterableFields
+});
+
+const clientHlfListService = createListService({
+    model: HighLevelFeatureModel,
+    hiddenFields: HLF_CLIENT_LIST_FIELDS.hiddenFields,
+    searchableFields: HLF_CLIENT_LIST_FIELDS.searchableFields,
+    sortableFields: HLF_CLIENT_LIST_FIELDS.sortableFields,
+    filterableFields: HLF_CLIENT_LIST_FIELDS.filterableFields
+});
+
+const listHlfService = async ({ projectId, inceptionId, filters, userType }) => {
+    try {
+        const listService = userType === UserTypes.CLIENT ? clientHlfListService : adminHlfListService;
+
+        const andConditions = [
+            { field: "projectId", operator: "eq", value: projectId },
+            { field: "isDeleted", operator: "eq", value: false }
+        ];
+
+        if (inceptionId) {
+            andConditions.push({ field: "inceptionId", operator: "eq", value: inceptionId });
+        }
+
+        if (filters?.query) {
+            andConditions.push(filters.query);
+        }
+
+        const query = { and: andConditions };
+
+        const result = await listService({
+            query,
+            selectFields: filters?.selectFields,
+            pageNumber: filters?.pageNumber,
+            pageSize: filters?.pageSize,
+            sortField: filters?.sortField,
+            sortOrder: filters?.sortOrder
+        });
+
+        return result;
+    } catch (error) {
+        logWithTime(`❌ [listHlfService] ${error.message}`);
+        return { success: false, message: error.message || "Failed to list high-level features", errorCode: INTERNAL_ERROR };
+    }
 };
 
-const buildHlfQuery = (filters = {}, forceIncludeDeleted = false) => {
-  const {
-    inceptionId,
-    includeDeleted = false,
-  } = filters;
-
-  const query = {};
-
-  const includeDeletedResolved = forceIncludeDeleted ? forceIncludeDeleted : includeDeleted;
-  if (!includeDeletedResolved) {
-    query.isDeleted = false;
-  }
-
-  if (inceptionId && mongoose.Types.ObjectId.isValid(inceptionId)) {
-    query.inceptionId = inceptionId;
-  }
-
-  return query;
-};
-
-/**
- * Admin/full HLF list.
- */
-const listHlfAdminService = async (filters = {}, pagination = {}) => {
-  try {
-    const query = buildHlfQuery(filters);
-    const { page, limit, skip } = parsePagination(pagination);
-
-    const [hlfs, total] = await Promise.all([
-      HighLevelFeatureModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
-      HighLevelFeatureModel.countDocuments(query),
-    ]);
-
-    return {
-      success: true,
-      hlfs,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
-  } catch (error) {
-    return { success: false, message: "Internal error while fetching high-level features", error: error.message };
-  }
-};
-
-/**
- * Restricted HLF list for client/stakeholder access.
- * Only shows basic HLF information.
- */
-const listHlfClientService = async (filters = {}, pagination = {}) => {
-  try {
-    const query = buildHlfQuery(filters, false);
-    const { page, limit, skip } = parsePagination(pagination);
-
-    const projection = {
-      _id: 1,
-      title: 1,
-      description: 1,
-      createdAt: 1,
-    };
-
-    const [hlfs, total] = await Promise.all([
-      HighLevelFeatureModel.find(query, projection).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
-      HighLevelFeatureModel.countDocuments(query),
-    ]);
-
-    const restrictedHlfs = hlfs.map((hlf) => ({
-      hlfId: hlf._id,
-      title: hlf.title,
-      description: hlf.description,
-      createdAt: hlf.createdAt,
-    }));
-
-    return {
-      success: true,
-      hlfs: restrictedHlfs,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
-  } catch (error) {
-    return { success: false, message: "Internal error while fetching high-level features", error: error.message };
-  }
-};
-
-module.exports = {
-  listHlfAdminService,
-  listHlfClientService,
-};
+module.exports = { listHlfService };

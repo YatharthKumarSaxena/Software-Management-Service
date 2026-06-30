@@ -1,37 +1,53 @@
 // services/stakeholders/get-stakeholder.service.js
 
-/**
- * Admin/full view of a stakeholder record.
- *
- * @param {Object} stakeholder
- * @returns {{ success: boolean, stakeholder?: Object, message?: string, error?: string }}
- */
-const getStakeholderAdminService = async (stakeholder) => {
+const { createDocumentFilterService } = require("@services/factory/create-doc-filter-service.factory");
+const { STAKEHOLDER_ADMIN_LIST_FIELDS, STAKEHOLDER_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
+
+const adminStakeholderFilterService = createDocumentFilterService({
+  hiddenFields: STAKEHOLDER_ADMIN_LIST_FIELDS.hiddenFields
+});
+
+const clientStakeholderFilterService = createDocumentFilterService({
+  hiddenFields: STAKEHOLDER_CLIENT_LIST_FIELDS.hiddenFields
+});
+
+const getStakeholderAdminService = async (stakeholder, filters = {}) => {
   try {
-    const stakeholderData = stakeholder?.toObject ? stakeholder.toObject() : stakeholder;
-    return { success: true, stakeholder: stakeholderData };
+    const filteredResult = await adminStakeholderFilterService({
+      document: stakeholder,
+      selectFields: filters.selectFields
+    });
+
+    if (!filteredResult.success) {
+      return filteredResult;
+    }
+
+    return { success: true, stakeholder: filteredResult.data };
   } catch (error) {
     return { success: false, message: "Internal error while fetching stakeholder", error: error.message };
   }
 };
 
-/**
- * Restricted stakeholder view for stakeholder/member access.
- *
- * @param {Object} stakeholder
- * @returns {{ success: boolean, stakeholder?: Object, message?: string, error?: string }}
- */
-const getStakeholderClientService = async (stakeholder) => {
+const getStakeholderClientService = async (stakeholder, filters = {}) => {
   try {
-    const stakeholderData = stakeholder?.toObject ? stakeholder.toObject() : stakeholder;
+    const filteredResult = await clientStakeholderFilterService({
+      document: stakeholder,
+      selectFields: filters.selectFields
+    });
+
+    if (!filteredResult.success) {
+      return filteredResult;
+    }
+
+    const filteredStakeholder = filteredResult.data;
 
     return {
       success: true,
       stakeholder: {
-        stakeholderId: stakeholderData.userId,
-        role: stakeholderData.role,
-        phase: stakeholderData.phase,
-        joinedAt: stakeholderData.createdAt,
+        stakeholderId: filteredStakeholder.userId,
+        role: filteredStakeholder.role,
+        phase: filteredStakeholder.phase,
+        joinedAt: filteredStakeholder.createdAt,
       },
     };
   } catch (error) {

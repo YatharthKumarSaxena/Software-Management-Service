@@ -6,7 +6,7 @@ const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
-const { Phases, ScopeCategoryTypes } = require("@/configs/enums.config");
+const { Phases, ApplicabilityTypes } = require("@/configs/enums.config");
 const { FORBIDDEN } = require("@/configs/http-status.config");
 
 /**
@@ -51,7 +51,7 @@ const linkScopeToHlfService = async ({
 
     // ── Update Scope with featureId and set category ───────────────────────────
     scope.featureId = hlf._id;
-    scope.category = featureId ? ScopeCategoryTypes.LOCAL : ScopeCategoryTypes.GLOBAL;
+    scope.category = featureId ? ApplicabilityTypes.LOCAL : ApplicabilityTypes.GLOBAL;
     scope.updatedBy = linkedBy;
     const linkedScope = await scope.save();
 

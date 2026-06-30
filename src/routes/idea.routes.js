@@ -22,6 +22,7 @@ const { ideaMiddlewares } = require("@middlewares/ideas");
 const { projectMiddlewares } = require("@middlewares/projects");
 const { baseAuthAdminMiddlewares ,baseAuthClientOrAdminMiddlewares } = require("./middleware.gateway.routes");
 const { checkUserIsStakeholder } = require("@/middlewares/stakeholders/check-user-is-stakeholder.middleware");
+const { getDataMiddleware, listDataMiddleware } = require("@middlewares/common/fetch-data.middleware");
 
 const {
   CREATE_IDEA,
@@ -208,6 +209,7 @@ ideaRouter.get(
   [
     ...baseAuthClientOrAdminMiddlewares,
     getIdeaRateLimiter,
+    getDataMiddleware,
     ideaMiddlewares.fetchIdeaMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder
@@ -224,6 +226,7 @@ ideaRouter.get(
   [
     ...baseAuthClientOrAdminMiddlewares,
     listIdeasRateLimiter,
+    listDataMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder
   ],

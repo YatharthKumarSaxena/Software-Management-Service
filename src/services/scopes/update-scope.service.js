@@ -1,14 +1,13 @@
 // services/scopes/update-scope.service.js
 
-const { ScopeModel } = require("@models/scope-model");
-const { HighLevelFeatureModel } = require("@models/high-level-feature.model");
+
 const { manualVersionControlService } = require("@services/common/version.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
-const { Phases, ScopeCategoryTypes } = require("@/configs/enums.config");
+const { Phases, ApplicabilityTypes } = require("@/configs/enums.config");
 
 /**
  * Updates an existing scope with change detection.
@@ -21,7 +20,6 @@ const { Phases, ScopeCategoryTypes } = require("@/configs/enums.config");
  * @param {string} params.title - Updated title (optional)
  * @param {string} params.description - Updated description (optional)
  * @param {string} params.type - Updated type (optional)
- * @param {string} params.linkFeatureId - HLF feature ID to link scope to (optional)
  * @param {string} params.updatedBy - USR-prefixed custom ID of the admin updating
  * @param {Object} params.auditContext - { admin, device, requestId }
  * @returns {{ success: boolean, scope?: Object, message?: string, error?: string }}
@@ -33,7 +31,6 @@ const updateScopeService = async ({
   title = null,
   description = null,
   type = null,
-  linkFeatureId = null,
   updatedBy,
   auditContext,
 }) => {
@@ -95,30 +92,6 @@ const updateScopeService = async ({
       }
     }
 
-    // ── Handle linkFeatureId and category update ────────────────────────────
-    if (linkFeatureId !== null) {
-      let newCategory = ScopeCategoryTypes.GLOBAL;
-      let newFeatureId = null;
-
-      if (linkFeatureId) {
-        // Check if HLF feature exists
-        const feature = await HighLevelFeatureModel.findById(linkFeatureId);
-        if (!feature || feature.isDeleted) {
-          return { success: false, message: "The specified HLF feature does not exist or is deleted." };
-        }
-        newCategory = ScopeCategoryTypes.LOCAL;
-        newFeatureId = feature._id;
-      }
-
-      const oldFeatureIdStr = scope.featureId?.toString();
-      const newFeatureIdStr = newFeatureId?.toString();
-
-      if (oldFeatureIdStr !== newFeatureIdStr || scope.category !== newCategory) {
-        scope.featureId = newFeatureId;
-        scope.category = newCategory;
-        hasChanges = true;
-      }
-    }
 
     // ── If no changes, return early ──────────────────────────────────────────
     if (!hasChanges) {

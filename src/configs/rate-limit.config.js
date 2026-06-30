@@ -805,6 +805,57 @@ module.exports = {
       prefix: "create_requirement_in_bulk",
       reason: "Create requirement in bulk endpoint abuse",
       message: "Too many requests to create requirement in bulk endpoint. Please try again later."
+    },
+
+    // ── Constraint operations ──────────────────────────────────────────────────
+    createConstraint: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "create_constraint",
+      reason: "Create constraint endpoint abuse",
+      message: "Too many requests to create constraint endpoint. Please try again later."
+    },
+    updateConstraint: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "update_constraint",
+      reason: "Update constraint endpoint abuse",
+      message: "Too many requests to update constraint endpoint. Please try again later."
+    },
+    deleteConstraint: {
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      prefix: "delete_constraint",
+      reason: "Delete constraint endpoint abuse",
+      message: "Too many requests to delete constraint endpoint. Please try again later."
+    },
+    getConstraint: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "get_constraint",
+      reason: "Get constraint endpoint abuse",
+      message: "Too many requests to get constraint endpoint. Please try again later."
+    },
+    listConstraints: {
+      maxRequests: 30,
+      windowMs: 60 * 1000,
+      prefix: "list_constraints",
+      reason: "List constraints endpoint abuse",
+      message: "Too many requests to list constraints endpoint. Please try again later."
+    },
+    linkConstraintToHlf: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "link_constraint_to_hlf",
+      reason: "Link constraint to HLF endpoint abuse",
+      message: "Too many requests to link constraint to HLF endpoint. Please try again later."
+    },
+    unlinkConstraintToHlf: {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+      prefix: "unlink_constraint_to_hlf",
+      reason: "Unlink constraint from HLF endpoint abuse",
+      message: "Too many requests to unlink constraint from HLF endpoint. Please try again later."
     }
   }
 }

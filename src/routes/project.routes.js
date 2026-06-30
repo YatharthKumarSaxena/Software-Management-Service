@@ -23,6 +23,7 @@ const {
 
 const { projectControllers } = require("@controllers/projects");
 const { projectMiddlewares } = require("@/middlewares/projects");
+const { getDataMiddleware, listDataMiddleware } = require("@middlewares/common/fetch-data.middleware");
 
 const {
   CREATE_PROJECT,
@@ -238,6 +239,7 @@ projectRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getProjectRateLimiter,
+    getDataMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     apiAuthorizationMiddleware.authorizeAdminGetProjectOrStakeholder
   ],
@@ -254,6 +256,7 @@ projectRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getProjectsRateLimiter,
+    listDataMiddleware,
     apiAuthorizationMiddleware.authorizeAdminGetProjectsOrStakeholder
   ],
   projectControllers.listProjectsController

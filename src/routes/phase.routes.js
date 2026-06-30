@@ -100,6 +100,7 @@ phaseRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getPhaseRateLimiter,
+    getDataMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     phaseMiddlewares.fetchPhaseMiddleware
@@ -112,6 +113,7 @@ phaseRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     getLatestPhaseRateLimiter,
+    getDataMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     checkUserIsStakeholder,
     phaseMiddlewares.fetchLatestPhaseMiddleware

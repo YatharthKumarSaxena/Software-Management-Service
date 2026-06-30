@@ -376,8 +376,7 @@ const RejectOrgProjectRequestReasonType = Object.freeze({
 
 const ScopeTypes = Object.freeze({
   IN_SCOPE: "IN_SCOPE",
-  OUT_SCOPE: "OUT_SCOPE",
-  CONSTRAINT: "CONSTRAINT"
+  OUT_SCOPE: "OUT_SCOPE"
 });
 
 const RequirementTypes = Object.freeze({
@@ -593,7 +592,7 @@ const EIFrequencyTypes = Object.freeze({
   ON_DEMAND: "ON_DEMAND"
 });
 
-const ScopeCategoryTypes = Object.freeze({
+const ApplicabilityTypes = Object.freeze({
   LOCAL: "LOCAL",
   GLOBAL: "GLOBAL"
 });
@@ -655,6 +654,18 @@ const AuthorityTypes = Object.freeze({
     REVIEWER: "reviewers",
     APPROVER: "approvers",
     COLLABORATORS: "collaborators"
+});
+
+const ConstraintTypes = Object.freeze({
+    BUSINESS: "BUSINESS",
+    TECHNICAL: "TECHNICAL",
+    SCHEDULE: "SCHEDULE",
+    COST: "COST",
+    RESOURCE: "RESOURCE",
+    QUALITY: "QUALITY",
+    SECURITY: "SECURITY",
+    LEGAL: "LEGAL",
+    OTHER: "OTHER"
 });
 
 module.exports = {
@@ -727,7 +738,7 @@ module.exports = {
   EIInterfaceTypes,
   EIInteractionTypes,
   EIFrequencyTypes,
-  ScopeCategoryTypes,
+  ApplicabilityTypes,
   IdeaStatuses,
   RejectedIdeaReasonTypes,
   DeferredIdeaReasonTypes,
@@ -741,5 +752,6 @@ module.exports = {
   BulkImportStatuses,
   BulkImportCategories,
   BulkImportFileTypes,
-  ImportColumns
+  ImportColumns,
+  ConstraintTypes
 };

@@ -1,47 +1,43 @@
 // controllers/high-level-features/list-hlf.controller.js
 
-const {
-  listHlfAdminService,
-  listHlfClientService,
-} = require("@services/high-level-features/list-hlf.service");
+const { listHlfService } = require("@services/high-level-features/list-hlf.service");
 const { sendHlfListFetchedSuccess } = require("@/responses/success/hlf.response");
 const {
   throwInternalServerError,
   throwSpecificInternalServerError,
   getLogIdentifiers,
+  throwBadRequestError
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
+const { UserTypes } = require("@configs/enums.config");
+const { BAD_REQUEST } = require("@configs/http-status.config");
 
 const listHlfController = async (req, res) => {
   try {
     const inception = req.inception;
-    const authorizationContext = req.authorizationContext || {};
-    const shouldUseRestrictedView = authorizationContext.grantedBy === "stakeholder-membership";
+    const project = req.project;
+    const filters = parseListFilters(req.query);
+    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
 
-    // Parse query filters and pagination
-    const filters = {
-      inceptionId: inception._id.toString(),
-      includeDeleted: req.query.includeDeleted === "true" ? true : false,
-    };
-
-    const pagination = {
-      page: req.query.page,
-      limit: req.query.limit,
-    };
-
-    // Call appropriate service based on user type
-    const result = shouldUseRestrictedView
-      ? await listHlfClientService(filters, pagination)
-      : await listHlfAdminService(filters, pagination);
+    const result = await listHlfService({
+      projectId: project._id,
+      inceptionId: inception ? inception._id : null,
+      filters,
+      userType
+    });
 
     if (!result.success) {
+      if (result.errorCode === BAD_REQUEST) {
+        return throwBadRequestError(res, result.message);
+      }
       logWithTime(`❌ [listHlfController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
 
     logWithTime(`✅ [listHlfController] High-level features fetched successfully | ${getLogIdentifiers(req)}`);
-    return sendHlfListFetchedSuccess(res, result.hlfs, result.total, result.page, result.totalPages);
+    return sendHlfListFetchedSuccess(res, result.data, result.pagination.totalCount, result.pagination.currentPage, result.pagination.totalPages);
 
   } catch (error) {
     logWithTime(`❌ [listHlfController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);

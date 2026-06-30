@@ -12,6 +12,7 @@ const { hlfMiddlewares } = require("@/middlewares/high-level-features");
 const { createScopeRateLimiter, updateScopeRateLimiter, deleteScopeRateLimiter, getScopeRateLimiter, listScopesRateLimiter, linkScopeToHlfRateLimiter, unlinkScopeToHlfRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
 const { commonMiddlewares } = require("@/middlewares/common");
 const { inceptionMiddlewares } = require("@/middlewares/inceptions");
+const { getDataMiddleware, listDataMiddleware } = require("@middlewares/common/fetch-data.middleware");
 
 const {
   CREATE_SCOPE,
@@ -109,6 +110,7 @@ scopeRouter.get(
   [
     ...baseAuthClientOrAdminMiddlewares,
     getScopeRateLimiter,
+    getDataMiddleware,
     scopeMiddlewares.fetchScopeMiddleware,
     commonMiddlewares.checkUserIsStakeholder
   ],
@@ -124,6 +126,7 @@ scopeRouter.get(
   [
     ...baseAuthClientOrAdminMiddlewares,
     listScopesRateLimiter,
+    listDataMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     inceptionMiddlewares.fetchLatestAnyStatusInceptionMiddleware

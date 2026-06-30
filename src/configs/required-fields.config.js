@@ -110,7 +110,12 @@ const requiredFields = {
     updatePhaseSettingsField: getRequiredFields(FieldDefinitions.UPDATE_PHASE_SETTINGS),
     deletePhaseField: getRequiredFields(FieldDefinitions.DELETE_PHASE),
 
-    phaseRoleActionField: getRequiredFields(FieldDefinitions.PHASE_ROLE_ACTION)
+    phaseRoleActionField: getRequiredFields(FieldDefinitions.PHASE_ROLE_ACTION),
+
+    // ── Constraint ──────────────────────────────────────────────────────
+    createConstraintField: getRequiredFields(FieldDefinitions.CREATE_CONSTRAINT),
+    updateConstraintField: getRequiredFields(FieldDefinitions.UPDATE_CONSTRAINT),
+    deleteConstraintField: getRequiredFields(FieldDefinitions.DELETE_CONSTRAINT)
 }
 
 module.exports = {

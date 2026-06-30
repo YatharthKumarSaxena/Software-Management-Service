@@ -8,6 +8,7 @@ const {
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@/utils/time-stamps.util");
 const { errorMessage } = require("@/utils/log-error.util");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
 
 /**
  * Controller: List Activities
@@ -17,17 +18,18 @@ const { errorMessage } = require("@/utils/log-error.util");
  */
 const listActivityController = async (req, res) => {
   try {
-    const { userId, eventType, dateFrom, dateTo, page, limit } = req.query;
+    const filters = parseListFilters(req.query);
 
-    // Build filters object
-    const filters = {};
+    const { userId, eventType, dateFrom, dateTo } = req.query;
+    
+    // Add custom filters back to filters object if they exist
     if (userId) filters.userId = userId;
     if (eventType) filters.eventType = eventType;
     if (dateFrom) filters.dateFrom = dateFrom;
     if (dateTo) filters.dateTo = dateTo;
 
     // ── Call service ──────────────────────────────────────
-    const result = await listActivityService(filters, { page, limit });
+    const result = await listActivityService(filters);
 
     if (!result.success) {
       logWithTime(`❌ [listActivityController] ${result.message} | ${getLogIdentifiers(req)}`);
@@ -40,12 +42,7 @@ const listActivityController = async (req, res) => {
       success: true,
       data: {
         activities: result.activities,
-        pagination: {
-          total: result.total,
-          page: result.page,
-          totalPages: result.totalPages,
-          limit: parseInt(limit, 10) || 20
-        },
+        pagination: result.pagination,
         filters: {
           userId: userId || null,
           eventType: eventType || null,

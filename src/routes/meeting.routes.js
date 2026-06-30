@@ -12,6 +12,7 @@ const { baseAuthAdminMiddlewares, baseAuthClientOrAdminMiddlewares } = require("
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { stakeholderMiddlewares } = require("@/middlewares/stakeholders");
 const { stakeholderRoleAccessMiddlewares } = require("@/middlewares/stakeholders/api-stakeholder-role-access.middleware");
+const { getDataMiddleware, listDataMiddleware } = require("@middlewares/common/fetch-data.middleware");
 const {
   createMeetingRateLimiter,
   updateMeetingRateLimiter,

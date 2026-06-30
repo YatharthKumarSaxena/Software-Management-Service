@@ -8,6 +8,7 @@ const {
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
+const { parseListFilters } = require("@utils/parse-list-filters.util");
 
 /**
  * Controller: Get Single Project – Admin View
@@ -25,23 +26,24 @@ const { logWithTime } = require("@utils/time-stamps.util");
  */
 const getProjectController = async (req, res) => {
   try {
-    const project = req.project; // fetchProjectMiddleware ne inject kiya hai
+    const project = req.project; // fetchProjectMiddleware injected this
     const authorizationContext = req.authorizationContext || {};
+    const filters = parseListFilters(req.query);
 
     const shouldUseRestrictedView = authorizationContext.grantedBy === "stakeholder-membership";
     const result = shouldUseRestrictedView
-      ? await getProjectClientService(project, req.stakeholder)
-      : await getProjectAdminService(project);
+      ? await getProjectClientService(project, filters, req.stakeholder)
+      : await getProjectAdminService(project, filters);
 
     if (!result.success) {
-      logWithTime(`❌ [getProjectAdminController] ${result.message} | ${getLogIdentifiers(req)}`);
+      logWithTime(`❌ [getProjectController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);
     }
 
-    logWithTime(`✅ [getProjectAdminController] Project fetched successfully | ${getLogIdentifiers(req)}`);
+    logWithTime(`✅ [getProjectController] Project fetched successfully | ${getLogIdentifiers(req)}`);
     return sendProjectFetchedSuccess(res, result.project);
   } catch (error) {
-    logWithTime(`❌ [getProjectAdminController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
+    logWithTime(`❌ [getProjectController] Unexpected error: ${error.message} | ${getLogIdentifiers(req)}`);
     return throwInternalServerError(res, error);
   }
 };

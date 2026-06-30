@@ -1,69 +1,62 @@
-// services/stakeholders/get-stakeholders.service.js
+// services/stakeholders/list-stakeholders.service.js
 
 const mongoose = require("mongoose");
 const { StakeholderModel } = require("@models/stakeholder.model");
+const { createListService } = require("@services/factory/create-list-service.factory");
+const { STAKEHOLDER_ADMIN_LIST_FIELDS, STAKEHOLDER_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
 
-const parsePagination = (pagination = {}) => {
-  const page = Math.max(1, parseInt(pagination.page, 10) || 1);
-  const limit = Math.min(100, Math.max(1, parseInt(pagination.limit, 10) || 20));
-  const skip = (page - 1) * limit;
-  return { page, limit, skip };
-};
+const adminStakeholderListService = createListService({
+  model: StakeholderModel,
+  hiddenFields: STAKEHOLDER_ADMIN_LIST_FIELDS.hiddenFields,
+  searchableFields: STAKEHOLDER_ADMIN_LIST_FIELDS.searchableFields,
+  sortableFields: STAKEHOLDER_ADMIN_LIST_FIELDS.sortableFields,
+  filterableFields: STAKEHOLDER_ADMIN_LIST_FIELDS.filterableFields
+});
+
+const clientStakeholderListService = createListService({
+  model: StakeholderModel,
+  hiddenFields: STAKEHOLDER_CLIENT_LIST_FIELDS.hiddenFields,
+  searchableFields: STAKEHOLDER_CLIENT_LIST_FIELDS.searchableFields,
+  sortableFields: STAKEHOLDER_CLIENT_LIST_FIELDS.sortableFields,
+  filterableFields: STAKEHOLDER_CLIENT_LIST_FIELDS.filterableFields
+});
 
 const buildStakeholderQuery = (filters = {}, forceUserId = null, forceIncludeDeleted = null) => {
-  const {
-    projectId,
-    role,
-    stakeholderId,
-    includeDeleted = false,
-  } = filters;
+  const andConditions = [];
 
-  const query = {};
-
-  const includeDeletedResolved = forceIncludeDeleted === null ? includeDeleted : forceIncludeDeleted;
+  const includeDeletedResolved = forceIncludeDeleted === null ? false : forceIncludeDeleted; // Defaults to false
   if (!includeDeletedResolved) {
-    query.isDeleted = false;
-  }
-
-  if (projectId && mongoose.Types.ObjectId.isValid(projectId)) {
-    query.projectId = projectId;
-  }
-
-  if (role) {
-    query.role = role;
-  }
-
-  if (stakeholderId) {
-    query.userId = stakeholderId;
+    andConditions.push({ field: "isDeleted", operator: "eq", value: false });
   }
 
   if (forceUserId) {
-    query.userId = forceUserId;
+    andConditions.push({ field: "userId", operator: "eq", value: forceUserId });
   }
 
-  return query;
+  if (filters?.query) {
+    andConditions.push(filters.query);
+  }
+
+  return { and: andConditions };
 };
 
 /**
  * Admin/full stakeholder list.
  */
-const listStakeholdersAdminService = async (filters = {}, pagination = {}) => {
+const listStakeholdersAdminService = async (filters = {}) => {
   try {
-    const query = buildStakeholderQuery(filters);
-    const { page, limit, skip } = parsePagination(pagination);
+    const query = buildStakeholderQuery(filters, null, filters.query?.isDeleted || false);
 
-    const [stakeholders, total] = await Promise.all([
-      StakeholderModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
-      StakeholderModel.countDocuments(query),
-    ]);
+    const result = await adminStakeholderListService({
+      query,
+      selectFields: filters.selectFields,
+      pageNumber: filters.pageNumber,
+      pageSize: filters.pageSize,
+      sortField: filters.sortField,
+      sortOrder: filters.sortOrder
+    });
 
-    return {
-      success: true,
-      stakeholders,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
+    return { success: true, stakeholders: result.data, pagination: result.pagination };
   } catch (error) {
     return { success: false, message: "Internal error while fetching stakeholders", error: error.message };
   }
@@ -72,30 +65,24 @@ const listStakeholdersAdminService = async (filters = {}, pagination = {}) => {
 /**
  * Restricted stakeholder list for stakeholder/member access.
  */
-const listStakeholdersClientService = async (filters = {}, pagination = {}, requesterUserId = null) => {
+const listStakeholdersClientService = async (filters = {}, requesterUserId = null) => {
   try {
     if (!requesterUserId) {
       return { success: false, message: "Requester userId is required for restricted stakeholder list" };
     }
 
     const query = buildStakeholderQuery(filters, requesterUserId, false);
-    const { page, limit, skip } = parsePagination(pagination);
 
-    const projection = {
-      userId: 1,
-      role: 1,
-      phase: 1,
-      createdAt: 1,
-      projectId: 1,
-      _id: 0,
-    };
+    const result = await clientStakeholderListService({
+      query,
+      selectFields: filters.selectFields,
+      pageNumber: filters.pageNumber,
+      pageSize: filters.pageSize,
+      sortField: filters.sortField,
+      sortOrder: filters.sortOrder
+    });
 
-    const [stakeholders, total] = await Promise.all([
-      StakeholderModel.find(query, projection).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
-      StakeholderModel.countDocuments(query),
-    ]);
-
-    const restrictedStakeholders = stakeholders.map((stakeholder) => ({
+    const restrictedStakeholders = result.data.map((stakeholder) => ({
       stakeholderId: stakeholder.userId,
       role: stakeholder.role,
       phase: stakeholder.phase,
@@ -103,13 +90,7 @@ const listStakeholdersClientService = async (filters = {}, pagination = {}, requ
       projectId: stakeholder.projectId,
     }));
 
-    return {
-      success: true,
-      stakeholders: restrictedStakeholders,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
+    return { success: true, stakeholders: restrictedStakeholders, pagination: result.pagination };
   } catch (error) {
     return { success: false, message: "Internal error while fetching stakeholders", error: error.message };
   }

@@ -1,47 +1,39 @@
 // services/scopes/get-scope.service.js
 
-/**
- * Admin/full view of a scope record.
- *
- * @param {Object} scope
- * @returns {{ success: boolean, scope?: Object, message?: string, error?: string }}
- */
-const getScopeAdminService = async (scope) => {
+const { logWithTime } = require("@utils/time-stamps.util");
+const { createDocumentFilterService } = require("@services/factory/create-doc-filter-service.factory");
+const { INTERNAL_ERROR } = require("@configs/http-status.config");
+const { UserTypes } = require("@configs/enums.config");
+const { SCOPE_ADMIN_LIST_FIELDS, SCOPE_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
+
+const adminScopeGetService = createDocumentFilterService({
+    hiddenFields: SCOPE_ADMIN_LIST_FIELDS.hiddenFields
+});
+
+const clientScopeGetService = createDocumentFilterService({
+    hiddenFields: SCOPE_CLIENT_LIST_FIELDS.hiddenFields
+});
+
+const getScopeService = async ({ scope, selectFields, userType }) => {
   try {
-    const scopeData = scope?.toObject ? scope.toObject() : scope;
-    return { success: true, scope: scopeData };
+    if (!scope) {
+      logWithTime(`❌ [getScopeService] Scope not found or is deleted`);
+      return { success: false, message: "Scope not found or is deleted" };
+    }
+
+    const getService = userType === UserTypes.CLIENT ? clientScopeGetService : adminScopeGetService;
+    const result = await getService({ document: scope, selectFields });
+    
+    return result;
+
   } catch (error) {
-    return { success: false, message: "Internal error while fetching scope", error: error.message };
-  }
-};
-
-/**
- * Restricted scope view for client/stakeholder access.
- * Filters out sensitive audit fields.
- *
- * @param {Object} scope
- * @returns {{ success: boolean, scope?: Object, message?: string, error?: string }}
- */
-const getScopeClientService = async (scope) => {
-  try {
-    const scopeData = scope?.toObject ? scope.toObject() : scope;
-
+    logWithTime(`❌ [getScopeService] Error: ${error.message}`);
     return {
-      success: true,
-      scope: {
-        scopeId: scopeData._id,
-        type: scopeData.type,
-        title: scopeData.title,
-        description: scopeData.description,
-        createdAt: scopeData.createdAt,
-      },
+      success: false,
+      message: "Internal error while retrieving scope",
+      errorCode: INTERNAL_ERROR
     };
-  } catch (error) {
-    return { success: false, message: "Internal error while fetching scope", error: error.message };
   }
 };
 
-module.exports = {
-  getScopeAdminService,
-  getScopeClientService,
-};
+module.exports = { getScopeService };

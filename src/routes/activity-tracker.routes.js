@@ -8,6 +8,7 @@ const { baseAuthClientOrAdminMiddlewares, baseAuthAdminMiddlewares } = require("
 const { activityTrackerControllers } = require("@controllers/activity-trackers");
 const { adminApiAuthorizationMiddleware } = require("@/middlewares/admins/admin-api-authorization.middleware");
 const { getMyActivityRateLimiter, getActivityByIdRateLimiter, listActivityRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
+const { getDataMiddleware, listDataMiddleware } = require("@middlewares/common/fetch-data.middleware");
 
 const {
   GET_MY_ACTIVITY,
@@ -35,7 +36,8 @@ activityTrackerRouter.get(
   GET_MY_ACTIVITY,
   [
     ...baseAuthClientOrAdminMiddlewares,
-    getMyActivityRateLimiter
+    getMyActivityRateLimiter,
+    listDataMiddleware
   ],
   activityTrackerControllers.getMyActivityController
 );
@@ -58,6 +60,7 @@ activityTrackerRouter.get(
   [
     ...baseAuthAdminMiddlewares,
     listActivityRateLimiter,
+    listDataMiddleware,
     adminApiAuthorizationMiddleware.authorizeAdminListActivity
   ],
   activityTrackerControllers.listActivityController
@@ -76,7 +79,8 @@ activityTrackerRouter.get(
   GET_ACTIVITY,
   [
     ...baseAuthAdminMiddlewares,
-    getActivityByIdRateLimiter
+    getActivityByIdRateLimiter,
+    getDataMiddleware
   ],
   activityTrackerControllers.getActivityController
 );
