@@ -4,7 +4,7 @@ const express = require("express");
 const stakeholderRouter = express.Router();
 
 const { STAKEHOLDER_ROUTES } = require("@/configs/uri.config");
-const { baseAuthAdminMiddlewares } = require("./middleware.gateway.routes");
+const { baseAuthAdminMiddlewares, baseAuthClientOrAdminMiddlewares } = require("./middleware.gateway.routes");
 const { adminApiAuthorizationMiddleware: apiAuthorizationMiddleware } = require("@/middlewares/admins/admin-api-authorization.middleware");
 const {
   createStakeholderRateLimiter,
@@ -49,8 +49,10 @@ stakeholderRouter.post(
   [
     ...baseAuthAdminMiddlewares,
     createStakeholderRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminCreateStakeholder,
     projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    apiAuthorizationMiddleware.authorizeAdminCreateStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderMiddlewares.createStakeholderPresenceMiddleware,
     stakeholderMiddlewares.createStakeholderValidationMiddleware,
     stakeholderMiddlewares.createStakeholderRoleGuardMiddleware,
@@ -68,9 +70,10 @@ stakeholderRouter.patch(
   [ 
     ...baseAuthAdminMiddlewares,
     updateStakeholderRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminUpdateStakeholder,
     stakeholderMiddlewares.fetchStakeholderMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    apiAuthorizationMiddleware.authorizeAdminUpdateStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderMiddlewares.updateStakeholderPresenceMiddleware,
     stakeholderMiddlewares.updateStakeholderValidationMiddleware,
@@ -89,9 +92,10 @@ stakeholderRouter.delete(
   [
     ...baseAuthAdminMiddlewares,
     deleteStakeholderRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminDeleteStakeholder,
     stakeholderMiddlewares.fetchStakeholderMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    apiAuthorizationMiddleware.authorizeAdminDeleteStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
     stakeholderMiddlewares.deleteStakeholderPresenceMiddleware,
     stakeholderMiddlewares.deleteStakeholderValidationMiddleware,
@@ -107,10 +111,11 @@ stakeholderRouter.delete(
 stakeholderRouter.get(
   GET_STAKEHOLDER,
   [
-    ...baseAuthAdminMiddlewares,
+    ...baseAuthClientOrAdminMiddlewares,
     getStakeholderRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminGetStakeholderOrMember,
-    stakeholderMiddlewares.fetchStakeholderMiddleware
+    stakeholderMiddlewares.fetchStakeholderMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder
   ],
   stakeholderControllers.getStakeholderController
 );
@@ -123,9 +128,10 @@ stakeholderRouter.get(
 stakeholderRouter.get(
   LIST_STAKEHOLDERS,
   [
-    ...baseAuthAdminMiddlewares,
+    ...baseAuthClientOrAdminMiddlewares,
     getStakeholdersRateLimiter,
-    apiAuthorizationMiddleware.authorizeAdminGetStakeholdersOrMember
+    projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder
   ],
   stakeholderControllers.listStakeholdersController
 );
