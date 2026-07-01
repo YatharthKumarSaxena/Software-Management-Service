@@ -23,7 +23,7 @@ const clientScopeListService = createListService({
     filterableFields: SCOPE_CLIENT_LIST_FIELDS.filterableFields
 });
 
-const listScopesService = async ({ projectId, inceptionId, filters, userType }) => {
+const listScopesService = async ({ projectId, filters, userType }) => {
     try {
         const listService = userType === UserTypes.CLIENT ? clientScopeListService : adminScopeListService;
 
@@ -31,10 +31,6 @@ const listScopesService = async ({ projectId, inceptionId, filters, userType }) 
             { field: "projectId", operator: "eq", value: projectId },
             { field: "isDeleted", operator: "eq", value: false }
         ];
-
-        if (inceptionId) {
-            andConditions.push({ field: "inceptionId", operator: "eq", value: inceptionId });
-        }
 
         if (filters?.query) {
             andConditions.push(filters.query);
