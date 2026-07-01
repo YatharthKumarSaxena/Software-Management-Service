@@ -11,7 +11,7 @@ const {
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { parseListFilters } = require("@utils/parse-list-filters.util");
-const { UserTypes } = require("@configs/enums.config");
+const { TotalTypes } = require("@configs/enums.config");
 const { BAD_REQUEST } = require("@configs/http-status.config");
 
 const listScopesController = async (req, res) => {
@@ -19,7 +19,7 @@ const listScopesController = async (req, res) => {
     const inception = req.inception;
     const project = req.project;
     const filters = parseListFilters(req.query);
-    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
+    const userType = req.admin ? TotalTypes.ADMIN : TotalTypes.CLIENT;
 
     const result = await listScopesService({
       projectId: project._id,

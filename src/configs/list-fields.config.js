@@ -82,7 +82,7 @@ const IDEA_ADMIN_LIST_FIELDS = {
 
 const IDEA_CLIENT_LIST_FIELDS = {
     hiddenFields: ["__v", "deletedBy", "deletedAt", "createdBy", "updatedBy", "isDeleted", "decidedBy", "revokedBy"],
-    filterableFields: ["title", "status", "projectId"],
+    filterableFields: ["title", "status", "projectId", "isDeleted"],
     sortableFields: ["title", "status", "createdAt"],
     searchableFields: ["title", "description"]
 };
@@ -96,7 +96,7 @@ const HLF_ADMIN_LIST_FIELDS = {
 
 const HLF_CLIENT_LIST_FIELDS = {
     hiddenFields: ["__v", "createdBy", "updatedBy", "isDeleted", "deletedAt", "deletedBy"],
-    filterableFields: ["title", "projectId", "inceptionId", "ideaId"],
+    filterableFields: ["title", "projectId", "inceptionId", "ideaId", "isDeleted"],
     sortableFields: ["title", "sequence", "createdAt"],
     searchableFields: ["title", "description", "id"]
 };
@@ -110,7 +110,7 @@ const SCOPE_ADMIN_LIST_FIELDS = {
 
 const SCOPE_CLIENT_LIST_FIELDS = {
     hiddenFields: ["__v", "createdBy", "updatedBy", "isDeleted", "deletedAt", "deletedBy"],
-    filterableFields: ["title", "type", "category", "projectId", "inceptionId", "featureId"],
+    filterableFields: ["title", "type", "category", "projectId", "inceptionId", "featureId", "isDeleted"],
     sortableFields: ["title", "type", "sequence", "createdAt"],
     searchableFields: ["title", "description", "id"]
 };
@@ -124,7 +124,7 @@ const CONSTRAINT_ADMIN_LIST_FIELDS = {
 
 const CONSTRAINT_CLIENT_LIST_FIELDS = {
     hiddenFields: ["__v", "createdBy", "updatedBy", "isDeleted", "deletedAt", "deletedBy"],
-    filterableFields: ["title", "type", "category", "projectId", "inceptionId", "featureId"],
+    filterableFields: ["title", "type", "category", "projectId", "inceptionId", "featureId", "isDeleted"],
     sortableFields: ["title", "type", "sequence", "createdAt"],
     searchableFields: ["title", "description", "id"]
 };
@@ -138,7 +138,7 @@ const PHASE_ADMIN_LIST_FIELDS = {
 
 const PHASE_CLIENT_LIST_FIELDS = {
     hiddenFields: ["__v", "createdBy", "updatedBy", "isDeleted", "deletedAt", "deletedBy"],
-    filterableFields: ["projectId", "status"],
+    filterableFields: ["projectId", "status", "isDeleted"],
     sortableFields: ["createdAt"],
     searchableFields: []
 };
@@ -152,7 +152,7 @@ const PRODUCT_REQUEST_ADMIN_LIST_FIELDS = {
 
 const PRODUCT_REQUEST_CLIENT_LIST_FIELDS = {
     hiddenFields: ["__v", "internalNotes", "isDeleted", "deletedAt", "deletedBy"],
-    filterableFields: ["title", "status", "priority", "projectType", "clientId"],
+    filterableFields: ["title", "status", "priority", "projectType", "clientId", "isDeleted"],
     sortableFields: ["createdAt", "updatedAt"],
     searchableFields: ["title", "description"]
 };
@@ -166,7 +166,7 @@ const ORG_PROJECT_REQUEST_ADMIN_LIST_FIELDS = {
 
 const ORG_PROJECT_REQUEST_CLIENT_LIST_FIELDS = {
     hiddenFields: ["__v", "internalNotes", "isDeleted", "deletedAt", "deletedBy"],
-    filterableFields: ["status", "projectId", "clientId"],
+    filterableFields: ["status", "projectId", "clientId", "isDeleted"],
     sortableFields: ["createdAt", "updatedAt"],
     searchableFields: ["message"]
 };
@@ -180,21 +180,21 @@ const MEETING_ADMIN_LIST_FIELDS = {
 
 const MEETING_CLIENT_LIST_FIELDS = {
     hiddenFields: ["__v", "isDeleted", "deletedAt", "deletedBy", "createdBy", "updatedBy"],
-    filterableFields: ["title", "status", "entityType", "entityId", "hostId"],
+    filterableFields: ["title", "status", "entityType", "entityId", "hostId", "isDeleted"],
     sortableFields: ["scheduledAt", "createdAt"],
     searchableFields: ["title", "agenda"]
 };
 
 const PROJECT_ADMIN_LIST_FIELDS = {
     hiddenFields: ["__v"],
-    filterableFields: ["projectStatus", "currentPhase", "isArchived", "isDeleted", "createdBy"],
+    filterableFields: ["_id", "projectStatus", "currentPhase", "isArchived", "isDeleted", "createdBy"],
     sortableFields: ["createdAt", "updatedAt"],
     searchableFields: ["name", "description"]
 };
 
 const PROJECT_CLIENT_LIST_FIELDS = {
     hiddenFields: ["__v", "deletedAt", "deletedBy", "isDeleted"],
-    filterableFields: ["projectStatus", "currentPhase", "isArchived"],
+    filterableFields: ["_id", "projectStatus", "currentPhase", "isArchived", "isDeleted"],
     sortableFields: ["createdAt", "updatedAt"],
     searchableFields: ["name", "description"]
 };
@@ -208,7 +208,7 @@ const STAKEHOLDER_ADMIN_LIST_FIELDS = {
 
 const STAKEHOLDER_CLIENT_LIST_FIELDS = {
     hiddenFields: ["__v", "deletedAt", "deletedBy", "isDeleted"],
-    filterableFields: ["projectId", "userId", "role", "phase"],
+    filterableFields: ["projectId", "userId", "role", "phase", "isDeleted"],
     sortableFields: ["createdAt"],
     searchableFields: []
 };

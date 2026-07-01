@@ -32,11 +32,11 @@ const updateIdeaController = async (req, res) => {
       {
         title,
         description,
-        updatedBy: req.admin.adminId,
+        updatedBy: req?.admin?.adminId || req?.client?.clientId,
         auditContext: {
-          user: req.admin,
-          device: req.device,
-          requestId: req.requestId
+          user: req?.admin || req?.client,
+          device: req?.device,
+          requestId: req?.requestId
         }
       }
     );

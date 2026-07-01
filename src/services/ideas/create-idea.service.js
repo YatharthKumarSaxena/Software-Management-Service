@@ -8,6 +8,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { INTERNAL_ERROR, CONFLICT, BAD_REQUEST } = require("@configs/http-status.config");
+const { counterServices } = require("@services/common/counter.service");
 
 /**
  * Creates a new idea document in the database.
@@ -48,10 +49,19 @@ const createIdeaService = async ({
       };
     }
 
+    // ── Call counter service to get sequence and id ──────────────────────────
+    const counterResult = await counterServices.ideaCounterService(projectId);
+    if (!counterResult.success) {
+      logWithTime(`❌ [createIdeaService] Error generating idea sequence for project: ${projectId}`);
+      return { success: false, message: "Failed to generate idea sequence", errorCode: INTERNAL_ERROR };
+    }
+
     // ── Step 3: Create the idea document ──────────────────────────────
     logWithTime(`[createIdeaService] Creating idea document`);
     
     const newIdea = new IdeaModel({
+      id: counterResult.generatedId,
+      sequence: counterResult.sequence,
       title: normalizedTitle,
       description: normalizedDescription,
       status: IdeaStatuses.PENDING,

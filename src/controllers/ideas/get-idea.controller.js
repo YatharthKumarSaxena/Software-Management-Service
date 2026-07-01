@@ -9,7 +9,7 @@ const {
 const { sendIdeaFetchedSuccess } = require("@/responses/success/idea.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { parseListFilters } = require("@utils/parse-list-filters.util");
-const { UserTypes } = require("@configs/enums.config");
+const { TotalTypes } = require("@configs/enums.config");
 
 /**
  * GET /ideas/:ideaId
@@ -19,7 +19,7 @@ const getIdeaController = async (req, res) => {
   try {
     const { idea } = req;
     const filters = parseListFilters(req.query);
-    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
+    const userType = req.admin ? TotalTypes.ADMIN : TotalTypes.CLIENT;
 
     logWithTime(
       `📍 [getIdeaController] Retrieving idea: ${idea._id} | ${getLogIdentifiers(req)}`

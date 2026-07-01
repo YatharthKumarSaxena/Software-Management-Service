@@ -106,7 +106,7 @@ const createStakeholderRoleGuardMiddleware = async (req, res, next) => {
 const updateStakeholderRoleGuardMiddleware = async (req, res, next) => {
   try {
     const { role } = req.body;
-    const userId   = req?.stakeholder?.userId || req?.foundStakeholder?.userId; // stakeholderId === userId in the model
+    const userId   = req?.foundStakeholder?.userId; 
 
     if (!userId || !role) {
       return throwBadRequestError(res, "Missing fields", "Stakeholder userId and new role are required.");

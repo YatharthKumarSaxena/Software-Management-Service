@@ -140,8 +140,7 @@ constraintRouter.get(
     listConstraintsRateLimiter,
     listDataMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
-    commonMiddlewares.checkUserIsStakeholder,
-    inceptionMiddlewares.fetchLatestAnyStatusInceptionMiddleware
+    commonMiddlewares.checkUserIsStakeholder
   ],
   constraintControllers.listConstraintsController
 );

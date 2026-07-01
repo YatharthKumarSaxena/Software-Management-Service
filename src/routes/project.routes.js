@@ -4,7 +4,7 @@ const express = require("express");
 const projectRouter = express.Router();
 
 const { PROJECT_ROUTES } = require("@/configs/uri.config");
-const { baseAuthAdminMiddlewares } = require("./middleware.gateway.routes");
+const { baseAuthAdminMiddlewares, baseAuthClientOrAdminMiddlewares } = require("./middleware.gateway.routes");
 const { adminApiAuthorizationMiddleware: apiAuthorizationMiddleware } = require("@/middlewares/admins/admin-api-authorization.middleware");
 const {
   createProjectRateLimiter,
@@ -24,6 +24,7 @@ const {
 const { projectControllers } = require("@controllers/projects");
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { getDataMiddleware, listDataMiddleware } = require("@middlewares/common/fetch-data.middleware");
+const { commonMiddlewares } = require("@/middlewares/common");
 
 const {
   CREATE_PROJECT,
@@ -237,11 +238,11 @@ projectRouter.patch(
 projectRouter.get(
   GET_PROJECT,
   [
-    ...baseAuthAdminMiddlewares,
+    ...baseAuthClientOrAdminMiddlewares,
     getProjectRateLimiter,
     getDataMiddleware,
     projectMiddlewares.fetchProjectMiddleware,
-    apiAuthorizationMiddleware.authorizeAdminGetProjectOrStakeholder
+    commonMiddlewares.checkUserIsStakeholder
   ],
   projectControllers.getProjectController
 );
@@ -254,10 +255,9 @@ projectRouter.get(
 projectRouter.get(
   LIST_PROJECTS,
   [
-    ...baseAuthAdminMiddlewares,
+    ...baseAuthClientOrAdminMiddlewares,
     getProjectsRateLimiter,
-    listDataMiddleware,
-    apiAuthorizationMiddleware.authorizeAdminGetProjectsOrStakeholder
+    listDataMiddleware
   ],
   projectControllers.listProjectsController
 );

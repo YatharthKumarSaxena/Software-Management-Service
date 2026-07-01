@@ -1,9 +1,11 @@
 // services/stakeholders/list-stakeholders.service.js
 
-const mongoose = require("mongoose");
 const { StakeholderModel } = require("@models/stakeholder.model");
 const { createListService } = require("@services/factory/create-list-service.factory");
 const { STAKEHOLDER_ADMIN_LIST_FIELDS, STAKEHOLDER_CLIENT_LIST_FIELDS } = require("@/configs/list-fields.config");
+const { UserTypes } = require("@configs/enums.config");
+const { INTERNAL_ERROR } = require("@configs/http-status.config");
+const { logWithTime } = require("@utils/time-stamps.util");
 
 const adminStakeholderListService = createListService({
   model: StakeholderModel,
@@ -21,82 +23,46 @@ const clientStakeholderListService = createListService({
   filterableFields: STAKEHOLDER_CLIENT_LIST_FIELDS.filterableFields
 });
 
-const buildStakeholderQuery = (filters = {}, forceUserId = null, forceIncludeDeleted = null) => {
-  const andConditions = [];
-
-  const includeDeletedResolved = forceIncludeDeleted === null ? false : forceIncludeDeleted; // Defaults to false
-  if (!includeDeletedResolved) {
-    andConditions.push({ field: "isDeleted", operator: "eq", value: false });
-  }
-
-  if (forceUserId) {
-    andConditions.push({ field: "userId", operator: "eq", value: forceUserId });
-  }
-
-  if (filters?.query) {
-    andConditions.push(filters.query);
-  }
-
-  return { and: andConditions };
-};
-
-/**
- * Admin/full stakeholder list.
- */
-const listStakeholdersAdminService = async (filters = {}) => {
+const listStakeholdersService = async ({
+  projectId,
+  filters,
+  userType
+}) => {
   try {
-    const query = buildStakeholderQuery(filters, null, filters.query?.isDeleted || false);
+    const listService = userType === UserTypes.CLIENT ? clientStakeholderListService : adminStakeholderListService;
 
-    const result = await adminStakeholderListService({
-      query,
-      selectFields: filters.selectFields,
-      pageNumber: filters.pageNumber,
-      pageSize: filters.pageSize,
-      sortField: filters.sortField,
-      sortOrder: filters.sortOrder
-    });
+    const andConditions = [
+      { field: "projectId", operator: "eq", value: projectId },
+      { field: "isDeleted", operator: "eq", value: false }
+    ];
 
-    return { success: true, stakeholders: result.data, pagination: result.pagination };
-  } catch (error) {
-    return { success: false, message: "Internal error while fetching stakeholders", error: error.message };
-  }
-};
-
-/**
- * Restricted stakeholder list for stakeholder/member access.
- */
-const listStakeholdersClientService = async (filters = {}, requesterUserId = null) => {
-  try {
-    if (!requesterUserId) {
-      return { success: false, message: "Requester userId is required for restricted stakeholder list" };
+    if (filters?.query) {
+      andConditions.push(filters.query);
     }
 
-    const query = buildStakeholderQuery(filters, requesterUserId, false);
+    const query = { and: andConditions };
 
-    const result = await clientStakeholderListService({
+    const result = await listService({
       query,
-      selectFields: filters.selectFields,
-      pageNumber: filters.pageNumber,
-      pageSize: filters.pageSize,
-      sortField: filters.sortField,
-      sortOrder: filters.sortOrder
+      selectFields: filters?.selectFields,
+      pageNumber: filters?.pageNumber,
+      pageSize: filters?.pageSize,
+      sortField: filters?.sortField,
+      sortOrder: filters?.sortOrder
     });
 
-    const restrictedStakeholders = result.data.map((stakeholder) => ({
-      stakeholderId: stakeholder.userId,
-      role: stakeholder.role,
-      phase: stakeholder.phase,
-      joinedAt: stakeholder.createdAt,
-      projectId: stakeholder.projectId,
-    }));
-
-    return { success: true, stakeholders: restrictedStakeholders, pagination: result.pagination };
+    return result;
   } catch (error) {
-    return { success: false, message: "Internal error while fetching stakeholders", error: error.message };
+    logWithTime(`❌ [listStakeholdersService] ${error.message}`);
+
+    return {
+      success: false,
+      message: error.message || "Failed to list stakeholders",
+      errorCode: INTERNAL_ERROR
+    };
   }
 };
 
 module.exports = {
-  listStakeholdersAdminService,
-  listStakeholdersClientService,
+  listStakeholdersService,
 };

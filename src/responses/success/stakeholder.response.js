@@ -1,6 +1,7 @@
 // responses/success/stakeholder.response.js
 
 const { CREATED, OK } = require("@configs/http-status.config");
+const { logWithTime } = require("@utils/time-stamps.util");
 
 /**
  * 201 – Stakeholder created successfully.
@@ -48,14 +49,13 @@ const sendStakeholderFetchedSuccess = (res, stakeholder) => {
 /**
  * 200 – Stakeholder list fetched successfully.
  */
-const sendStakeholdersListFetchedSuccess = (res, stakeholders, total, page, totalPages) => {
+const sendStakeholdersListFetchedSuccess = (res, stakeholders, pagination) => {
+  logWithTime(`✅ [sendStakeholdersListFetchedSuccess] Listed ${stakeholders?.length || 0} stakeholders`);
   return res.status(OK).json({
     success: true,
-    message: "Stakeholders fetched successfully.",
-    data: {
-      stakeholders,
-      pagination: { total, page, totalPages },
-    },
+    message: "Stakeholders listed successfully",
+    data: stakeholders,
+    pagination
   });
 };
 
