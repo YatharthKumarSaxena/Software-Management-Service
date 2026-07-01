@@ -1,5 +1,6 @@
 // services/scopes/link-scope-to-hlf.service.js
 
+const { ScopeModel } = require("@models/scope-model");
 const { manualVersionControlService } = require("@services/common/version.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");
@@ -53,7 +54,11 @@ const linkScopeToHlfService = async ({
     scope.featureId = hlf._id;
     scope.category = featureId ? ApplicabilityTypes.LOCAL : ApplicabilityTypes.GLOBAL;
     scope.updatedBy = linkedBy;
-    const linkedScope = await scope.save();
+    const linkedScope = await ScopeModel.findByIdAndUpdate(
+      scope._id,
+      { $set: scope },
+      { new: true }
+    ).lean();
 
     // ── Version control ────────────────────────────────────────────────────
     await manualVersionControlService({
