@@ -30,6 +30,18 @@ const ideaSchema = new mongoose.Schema({
         index: true
     },
 
+    sequence: {
+        type: Number,
+        required: true,
+        min: 1
+    },
+
+    id: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
     status: {
         type: String,
         enum: Object.values(IdeaStatuses),
@@ -132,6 +144,12 @@ const ideaSchema = new mongoose.Schema({
 ideaSchema.index(
     { title: 1, projectId: 1, isDeleted: 1 },
     { unique: true, partialFilterExpression: { isDeleted: false } }
+);
+
+// Unique custom id inside a project
+ideaSchema.index(
+    { projectId: 1, id: 1 },
+    { unique: true }
 );
 
 /* ---------------- Validations ---------------- */
