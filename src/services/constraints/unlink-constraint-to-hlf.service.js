@@ -1,5 +1,6 @@
 // services/constraints/unlink-constraint-to-hlf.service.js
 
+const { ConstraintModel } = require("@models/constraints.model");
 const { manualVersionControlService } = require("@services/common/version.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");
@@ -46,7 +47,11 @@ const unlinkConstraintToHlfService = async ({
     constraint.featureId = null;
     constraint.category = ApplicabilityTypes.GLOBAL;  // automatically set — user does not control this
     constraint.updatedBy = unlinkedBy;
-    const unlinkedConstraint = await constraint.save();
+    const unlinkedConstraint = await ConstraintModel.findByIdAndUpdate(
+      constraint._id,
+      { $set: constraint },
+      { new: true }
+    ).lean();
 
     // ── Version control ────────────────────────────────────────────────────────
     await manualVersionControlService({
