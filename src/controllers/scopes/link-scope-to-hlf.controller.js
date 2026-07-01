@@ -3,10 +3,10 @@
 const { linkScopeToHlfService } = require("@services/scopes/link-scope-to-hlf.service");
 const { sendScopeLinkedSuccess } = require("@/responses/success/scope.response");
 const {
-  throwConflictError,
   throwInternalServerError,
   throwAccessDeniedError,
   getLogIdentifiers,
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { FORBIDDEN } = require("@/configs/http-status.config");
@@ -49,7 +49,7 @@ const linkScopeToHlfController = async (req, res) => {
       logWithTime(
         `❌ [linkScopeToHlfController] ${result.message} | ${getLogIdentifiers(req)}`
       );
-      return throwConflictError(res, result.message);
+      return throwSpecificInternalServerError(res, result.message);
     }
 
     // ── Return success response ───────────────────────────────────────
