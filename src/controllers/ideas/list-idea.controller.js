@@ -9,7 +9,7 @@ const {
 const { sendIdeasListSuccess } = require("@/responses/success/idea.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { parseListFilters } = require("@utils/parse-list-filters.util");
-const { UserTypes } = require("@configs/enums.config");
+const { TotalTypes } = require("@configs/enums.config");
 const { BAD_REQUEST } = require("@configs/http-status.config");
 
 /**
@@ -21,7 +21,7 @@ const listIdeasController = async (req, res) => {
     const { projectId } = req.params;
     const filters = parseListFilters(req.query);
 
-    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
+    const userType = req.admin ? TotalTypes.ADMIN : TotalTypes.CLIENT;
 
     logWithTime(
       `📍 [listIdeasController] Listing ideas for project: ${projectId} | ${getLogIdentifiers(req)}`

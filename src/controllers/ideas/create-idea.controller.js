@@ -30,9 +30,9 @@ const createIdeaController = async (req, res) => {
       projectId,
       title,
       description,
-      createdBy: req.admin.adminId,
+      createdBy: req.admin?.adminId || req.client?.clientId,
       auditContext: {
-        user: req.admin,
+        user: req.admin || req.client,
         device: req.device,
         requestId: req.requestId
       }

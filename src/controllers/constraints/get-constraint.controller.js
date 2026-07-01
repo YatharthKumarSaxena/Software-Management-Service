@@ -10,13 +10,13 @@ const {
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { parseListFilters } = require("@utils/parse-list-filters.util");
-const { UserTypes } = require("@configs/enums.config");
+const { TotalTypes } = require("@configs/enums.config");
 
 const getConstraintController = async (req, res) => {
   try {
     const constraint = req.foundConstraint || req.constraint;
     const filters = parseListFilters(req.query);
-    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
+    const userType = req.admin ? TotalTypes.ADMIN : TotalTypes.CLIENT;
 
     const result = await getConstraintService({
       constraint,

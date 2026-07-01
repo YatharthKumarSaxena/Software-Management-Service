@@ -10,7 +10,7 @@ const {
 const { logWithTime } = require("@utils/time-stamps.util");
 const { INTERNAL_ERROR } = require("@configs/http-status.config");
 const { parseListFilters } = require("@utils/parse-list-filters.util");
-const { UserTypes } = require("@configs/enums.config");
+const { TotalTypes } = require("@configs/enums.config");
 
 const listProductRequestsController = async (req, res) => {
   try {
@@ -25,7 +25,7 @@ const listProductRequestsController = async (req, res) => {
     }
 
     const filters = parseListFilters(req.query);
-    const userType = req.admin ? UserTypes.USER : UserTypes.CLIENT;
+    const userType = req.admin ? TotalTypes.ADMIN : TotalTypes.CLIENT;
 
     const result = await listProductRequestsService({
       clientMongoId,

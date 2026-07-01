@@ -8,7 +8,7 @@ const {
 } = require("@/responses/common/error-handler.response");
 const { sendRequirementFetchSuccess } = require("@/responses/success/requirement.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { UserTypes } = require("@configs/enums.config");
+const { TotalTypes } = require("@configs/enums.config");
 
 const {
     parseListFilters
@@ -20,11 +20,7 @@ const getRequirementController = async (req, res) => {
 
     const filters = parseListFilters(req.query);
 
-    const userType =
-      req.admin
-        ? UserTypes.USER
-        : UserTypes.CLIENT;
-
+    const userType = req.admin ? TotalTypes.ADMIN : TotalTypes.CLIENT;
 
     const requirement = req.requirement;
 

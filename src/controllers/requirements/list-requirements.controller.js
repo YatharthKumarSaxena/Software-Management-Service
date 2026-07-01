@@ -19,7 +19,7 @@ const {
     parseListFilters
 } = require("@utils/parse-list-filters.util");
 
-const { UserTypes } = require("@configs/enums.config");
+const { TotalTypes } = require("@configs/enums.config");
 
 const listRequirementsController = async (req, res) => {
     try {
@@ -27,10 +27,7 @@ const listRequirementsController = async (req, res) => {
         const filters = parseListFilters(req.query);
         const projectId = req.project._id;
 
-        const userType =
-            req.admin
-                ? UserTypes.USER
-                : UserTypes.CLIENT;
+        const userType = req.admin ? TotalTypes.ADMIN : TotalTypes.CLIENT;
 
         const result =
             await requirementServices.listRequirementsService({
