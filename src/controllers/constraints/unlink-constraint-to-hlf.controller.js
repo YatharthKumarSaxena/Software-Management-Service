@@ -3,9 +3,9 @@
 const { unlinkConstraintToHlfService } = require("@services/constraints/unlink-constraint-to-hlf.service");
 const { sendConstraintUnlinkedSuccess } = require("@/responses/success/constraint.response");
 const {
-  throwConflictError,
   throwInternalServerError,
   getLogIdentifiers,
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 
@@ -37,7 +37,7 @@ const unlinkConstraintToHlfController = async (req, res) => {
       logWithTime(
         `❌ [unlinkConstraintToHlfController] ${result.message} | ${getLogIdentifiers(req)}`
       );
-      return throwConflictError(res, result.message);
+      return throwSpecificInternalServerError(res, result.message);
     }
 
     logWithTime(`✅ [unlinkConstraintToHlfController] Constraint unlinked from HLF successfully | ${getLogIdentifiers(req)}`);

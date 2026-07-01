@@ -85,7 +85,11 @@ const updateConstraintService = async ({
     }
 
     constraint.updatedBy = updatedBy;
-    const updatedConstraint = await constraint.save();
+    const updatedConstraint = await ConstraintModel.findByIdAndUpdate(
+      constraint._id,
+      { $set: constraint },
+      { new: true }
+    ).lean();
 
     // ── Version control ────────────────────────────────────────────────────────
     await manualVersionControlService({

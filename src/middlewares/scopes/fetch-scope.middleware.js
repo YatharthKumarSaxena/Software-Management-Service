@@ -1,60 +1,28 @@
 // middlewares/scopes/fetch-scope.middleware.js
 
 const { ScopeModel } = require("@models/scope-model");
-const { ProjectModel } = require("@models/project.model");
-const { logMiddlewareError } = require("@utils/log-error.util");
-const { throwDBResourceNotFoundError, throwInternalServerError } = require("@responses/common/error-handler.response");
-const { logWithTime } = require("@/utils/time-stamps.util");
-const { isValidMongoID } = require("@/utils/id-validators.util");
+const { createFetchModelMiddleware } = require("../factory/fetch-model.middleware-factory");
 
-const fetchScopeMiddleware = async (req, res, next) => {
-  try {
-    const scopeId = req?.params?.scopeId;
+const fetchScopeMiddleware = createFetchModelMiddleware({
+        model: ScopeModel,
+        modelName: "Scope",
 
-    if (!scopeId) {
-      logMiddlewareError("fetchScope", "No scopeId provided in params", req);
-      return throwDBResourceNotFoundError(res, "Scope");
-    }
+        idParamName: "scopeId",
+        requestKey: "scope",
 
-    if (!isValidMongoID(scopeId)) {
-      logMiddlewareError("fetchScope", `Invalid scopeId format: ${scopeId}`, req);
-      return throwDBResourceNotFoundError(res, `Scope with ID ${scopeId}`);
-    }
+        additionalQuery: {
+            isDeleted: false
+        },
 
-    // Fetch scope
-    const scope = await ScopeModel.findOne({
-      _id: scopeId,
-      isDeleted: false
+        attachFields: [
+            {
+                source: "projectId",
+                target: "projectId"
+            }
+        ]
     });
-
-    if (!scope) {
-      logMiddlewareError("fetchScope", `Scope ${scopeId} not found or is deleted`, req);
-      return throwDBResourceNotFoundError(res, `Scope with ID ${scopeId}`);
-    }
-
-    // Fetch associated project
-    const project = await ProjectModel.findOne({
-      _id: scope.projectId,
-      isDeleted: false
-    });
-
-    if (!project) {
-      logMiddlewareError("fetchScope", `Project ${scope.projectId} not found for scope ${scope._id}`, req);
-      return throwDBResourceNotFoundError(res, `Associated Project for scope ${scopeId}`);
-    }
-
-    // Attach to request
-    req.scope = scope;
-    req.project = project;
-
-    logWithTime(`✅ Scope ${scopeId} fetched successfully with associated project`);
-    return next();
-  } catch (err) {
-    logMiddlewareError("fetchScope", `Unexpected error: ${err.message}`, req);
-    return throwInternalServerError(res, err);
-  }
-};
 
 module.exports = {
-  fetchScopeMiddleware
+    fetchScopeMiddleware
 };
+

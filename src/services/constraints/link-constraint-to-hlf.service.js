@@ -1,5 +1,6 @@
 // services/constraints/link-constraint-to-hlf.service.js
 
+const { ConstraintModel } = require("@models/constraints.model");
 const { manualVersionControlService } = require("@services/common/version.service");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");
@@ -60,7 +61,11 @@ const linkConstraintToHlfService = async ({
     constraint.featureId = hlf._id;
     constraint.category = ApplicabilityTypes.LOCAL;  // automatically set — user does not control this
     constraint.updatedBy = linkedBy;
-    const linkedConstraint = await constraint.save();
+    const linkedConstraint = await ConstraintModel.findByIdAndUpdate(
+      constraint._id,
+      { $set: constraint },
+      { new: true }
+    ).lean();
 
     // ── Version control ────────────────────────────────────────────────────────
     await manualVersionControlService({

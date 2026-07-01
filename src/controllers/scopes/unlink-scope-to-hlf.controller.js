@@ -3,9 +3,9 @@
 const { unlinkScopeToHlfService } = require("@services/scopes/unlink-scope-to-hlf.service");
 const { sendScopeUnlinkedSuccess } = require("@/responses/success/scope.response");
 const {
-  throwConflictError,
   throwInternalServerError,
   getLogIdentifiers,
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 
@@ -38,7 +38,7 @@ const unlinkScopeToHlfController = async (req, res) => {
       logWithTime(
         `❌ [unlinkScopeToHlfController] ${result.message} | ${getLogIdentifiers(req)}`
       );
-      return throwConflictError(res, result.message);
+      return throwSpecificInternalServerError(res, result.message);
     }
 
     // ── Return success response ───────────────────────────────────────

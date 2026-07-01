@@ -71,6 +71,7 @@ scopeRouter.patch(
     ...baseAuthAdminMiddlewares,
     updateScopeRateLimiter,
     scopeMiddlewares.fetchScopeMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
     inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
@@ -92,6 +93,7 @@ scopeRouter.delete(
     ...baseAuthAdminMiddlewares,
     deleteScopeRateLimiter,
     scopeMiddlewares.fetchScopeMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     projectMiddlewares.activeProjectGuardMiddleware,
     inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
@@ -112,6 +114,7 @@ scopeRouter.get(
     getScopeRateLimiter,
     getDataMiddleware,
     scopeMiddlewares.fetchScopeMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder
   ],
   scopeControllers.getScopeController
@@ -146,6 +149,7 @@ scopeRouter.patch(
     ...baseAuthAdminMiddlewares,
     linkScopeToHlfRateLimiter,
     scopeMiddlewares.fetchScopeMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     hlfMiddlewares.fetchHlfMiddleware,
     inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
@@ -166,6 +170,7 @@ scopeRouter.patch(
     ...baseAuthAdminMiddlewares,
     unlinkScopeToHlfRateLimiter,
     scopeMiddlewares.fetchScopeMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
     commonMiddlewares.checkUserIsStakeholder,
     inceptionMiddlewares.fetchLatestNotFrozenInceptionMiddleware,
     projectMiddlewares.activeProjectGuardMiddleware
