@@ -82,7 +82,7 @@ module.exports = {
         UPDATE_STAKEHOLDER: `/update/:stakeholderId`,       // PATCH   /api/v1/stakeholders/update/:stakeholderId
         DELETE_STAKEHOLDER: `/delete/:stakeholderId`,       // DELETE  /api/v1/stakeholders/delete/:stakeholderId
         GET_STAKEHOLDER:    `/get/:stakeholderId`,          // GET     /api/v1/stakeholders/get/:stakeholderId
-        LIST_STAKEHOLDERS:   `/list`                            // GET     /api/v1/stakeholders/list
+        LIST_STAKEHOLDERS:   `/list/:projectId`             // GET     /api/v1/stakeholders/list/:projectId
     },
     CLIENT_ROUTES: {
         GET_PROJECT:       `/view-project/:projectId`,         // GET /software-management-service/api/v1/clients/view-project/:projectId
