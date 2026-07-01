@@ -3,10 +3,10 @@
 const { linkConstraintToHlfService } = require("@services/constraints/link-constraint-to-hlf.service");
 const { sendConstraintLinkedSuccess } = require("@/responses/success/constraint.response");
 const {
-  throwConflictError,
   throwInternalServerError,
   throwAccessDeniedError,
   getLogIdentifiers,
+  throwSpecificInternalServerError
 } = require("@/responses/common/error-handler.response");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { FORBIDDEN } = require("@/configs/http-status.config");
@@ -46,7 +46,7 @@ const linkConstraintToHlfController = async (req, res) => {
       logWithTime(
         `❌ [linkConstraintToHlfController] ${result.message} | ${getLogIdentifiers(req)}`
       );
-      return throwConflictError(res, result.message);
+      return throwSpecificInternalServerError(res, result.message);
     }
 
     logWithTime(`✅ [linkConstraintToHlfController] Constraint linked to HLF successfully | ${getLogIdentifiers(req)}`);
