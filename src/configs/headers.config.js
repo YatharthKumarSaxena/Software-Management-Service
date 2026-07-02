@@ -5,7 +5,8 @@ const DEVICE_HEADERS = {
 };
 
 const REQUEST_HEADERS = {
-    REQUEST_ID: "x-request-id"
+    REQUEST_ID: "x-request-id",
+    WORKFLOW_ID: "x-workflow-id"
 }
 
 const SERVICE_HEADERS = {

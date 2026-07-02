@@ -668,6 +668,11 @@ const ConstraintTypes = Object.freeze({
     OTHER: "OTHER"
 });
 
+const ConversionTypes = Object.freeze({
+  DIRECT: "DIRECT",
+  INDIRECT: "INDIRECT"
+});
+
 module.exports = {
   AdminTypes,
   RoleHierarchy,
@@ -753,5 +758,6 @@ module.exports = {
   BulkImportCategories,
   BulkImportFileTypes,
   ImportColumns,
-  ConstraintTypes
+  ConstraintTypes,
+  ConversionTypes
 };
