@@ -110,6 +110,12 @@ const activityTrackerSchema = new mongoose.Schema({
     required: true,
     match: UUID_V4_REGEX,
     index: true
+  },
+  workflowId: {
+    type: String,
+    match: UUID_V4_REGEX,
+    default: null,
+    index: true
   }
 }, {
   timestamps: true,
