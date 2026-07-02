@@ -6,6 +6,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@/configs/tracker.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { descriptionLength } = require("@/configs/fields-length.config");
 const { ACTIVITY_TRACKING_ENABLED, ADVANCED_LOGGING_ENABLED } = require("@/configs/security.config");
+const { isValidUUID } = require("@/utils/id-validators.util");
 
 /**
  * Collections that use MongoDB ObjectId for their primary IDs
@@ -22,7 +23,7 @@ const OBJECTID_COLLECTIONS = Object.values(DB_COLLECTIONS);
  */
 const convertTargetIdIfNeeded = (targetId, performedOn) => {
   if (!targetId) return null;
-  
+
   // If the collection uses ObjectIds, convert string to ObjectId
   if (OBJECTID_COLLECTIONS.includes(performedOn)) {
     if (typeof targetId === 'string') {
@@ -34,7 +35,7 @@ const convertTargetIdIfNeeded = (targetId, performedOn) => {
       }
     }
   }
-  
+
   return targetId;
 };
 
@@ -63,12 +64,20 @@ const isValidReasonDescription = (reasonDescription) => {
  * @param {Object} logOptions - Optional logging options (oldData, newData, adminActions, etc)
  */
 const logActivityTrackerEvent = (
+
   user,
+
   device,
+
   requestId,
+
   eventType,
+
   description,
-  logOptions = {}
+
+  logOptions = {},
+
+  workflowId = null
 ) => {
   (async () => {
     try {
@@ -104,6 +113,12 @@ const logActivityTrackerEvent = (
         return;
       }
 
+      // Validate workflowId
+      if (workflowId !== null && !isValidUUID(workflowId)) {
+        logWithTime("❌ Invalid workflowId. Skipping activity log.");
+        return;
+      }
+
       // Base Log Object (matches schema)
       const baseLog = {
         userId: user?.adminId || user?.clientId, // Required field - use whichever is available
@@ -114,6 +129,7 @@ const logActivityTrackerEvent = (
         deviceName: device.deviceName || null,
         eventType,
         description: description || `Performed ${eventType} by ${user?.adminId || user?.clientId}`,
+        workflowId: workflowId || null,
         oldData: logOptions.oldData || null,
         newData: logOptions.newData || null,
       };
@@ -141,7 +157,7 @@ const logActivityTrackerEvent = (
         // Validate and set reason
         if (reason !== undefined && reason !== null) {
           adminActions.reason = reason;
-          
+
           // Set reasonDescription only if reason is present
           if (reasonDescription !== undefined && reasonDescription !== null) {
             if (!isValidReasonDescription(reasonDescription)) {
@@ -162,7 +178,7 @@ const logActivityTrackerEvent = (
         // Validate and set filter array
         if (Array.isArray(filter) && filter.length > 0) {
           const validFilters = filter.filter((f) => validEvents.includes(f));
-          
+
           if (validFilters.length > 0) {
             adminActions.filter = validFilters;
           }

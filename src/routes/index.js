@@ -15,7 +15,7 @@ const {
   ACTIVITY_TRACKER_BASE, 
   MEETINGS_BASE, 
   PARTICIPANTS_BASE, 
-  PHASE_BASE 
+  PHASE_BASE
 } = require("@/configs/uri.config");
 
 const { internalRouter }    = require("./internal.routes");
@@ -34,7 +34,7 @@ const { activityTrackerRouter } = require("./activity-tracker.routes");
 const { meetingRouter } = require("./meeting.routes");
 const { participantRouter } = require("./participant.routes");
 const { requirementRouter } = require("./requirement.routes");
-const { phaseRouter } = require("./phase.routes")
+const { phaseRouter } = require("./phase.routes");
 
 module.exports = (app) => {
   // Internal service-to-service routes (protected by service token)
@@ -81,5 +81,5 @@ module.exports = (app) => {
 
   app.use(REQUIREMENT_BASE, requirementRouter);
 
-  app.use(PHASE_BASE, phaseRouter)
+  app.use(PHASE_BASE, phaseRouter);
 };
