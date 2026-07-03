@@ -7,6 +7,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { CommentModel } = require("@models/comment.model");
 const { UserTypes } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Soft-delete a comment with proper access control
@@ -76,17 +77,17 @@ const deleteCommentService = async ({
       activityMessage = `Comment deleted by admin ${deletedBy} — Reason: ${deletedReason}`;
     }
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.DELETE_COMMENT,
-      activityMessage,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.DELETE_COMMENT,
+      description: activityMessage,
+      logOptions: {
         oldData,
-        adminActions: { targetId: comment._id?.toString() },
+        userActions: { targetId: comment._id?.toString(), performedOn: DB_COLLECTIONS.COMMENTS },
       }
-    );
+  });
 
     return { success: true };
 

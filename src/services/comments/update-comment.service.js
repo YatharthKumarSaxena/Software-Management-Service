@@ -6,6 +6,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { CommentModel } = require("@models/comment.model");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Updates a comment - only the creator can update
@@ -56,18 +57,18 @@ const updateCommentService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldComment, updatedComment);
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_COMMENT,
-      `Comment updated by ${updatedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_COMMENT,
+      description: `Comment updated by ${updatedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: comment._id?.toString() },
+        userActions: { targetId: comment._id?.toString(), performedOn: DB_COLLECTIONS.COMMENTS },
       }
-    );
+  });
 
     return { success: true, comment: updatedComment };
 
