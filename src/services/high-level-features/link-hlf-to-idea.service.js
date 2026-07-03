@@ -8,6 +8,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases, IdeaStatuses } = require("@/configs/enums.config");
 const { FORBIDDEN } = require("@/configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Links a high-level feature to an idea.
@@ -70,18 +71,18 @@ const linkHlfToIdeaService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldHlf, linkedHlf);
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.LINK_HLF_TO_IDEA,
-      `High-level feature "${linkedHlf.title}" linked to Idea "${idea.title}" by ${linkedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.LINK_HLF_TO_IDEA,
+      description: `High-level feature "${linkedHlf.title}" linked to Idea "${idea.title}" by ${linkedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: linkedHlf._id?.toString() },
+        userActions: { targetId: linkedHlf._id?.toString(), performedOn: DB_COLLECTIONS.HIGH_LEVEL_FEATURES },
       }
-    );
+  });
 
     logWithTime(`✅ [linkHlfToIdeaService] HLF ${linkedHlf._id} successfully linked to Idea ${idea._id}`);
     return { success: true, message: "High-level feature linked to idea successfully.", hlf: linkedHlf };

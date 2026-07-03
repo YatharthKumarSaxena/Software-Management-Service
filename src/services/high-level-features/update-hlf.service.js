@@ -9,6 +9,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 const { CONFLICT, NOT_FOUND, BAD_REQUEST, INTERNAL_ERROR, OK } = require("@configs/http-status.config");
 
 /**
@@ -117,18 +118,18 @@ const updateHlfService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldHlf, updatedHlf);
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_HLF,
-      `High-level feature "${updatedHlf.title}" updated by ${updatedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_HLF,
+      description: `High-level feature "${updatedHlf.title}" updated by ${updatedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: updatedHlf._id?.toString() },
+        userActions: { targetId: updatedHlf._id?.toString(), performedOn: DB_COLLECTIONS.HIGH_LEVEL_FEATURES },
       }
-    );
+    });
 
     return { success: true, hlf: updatedHlf };
 

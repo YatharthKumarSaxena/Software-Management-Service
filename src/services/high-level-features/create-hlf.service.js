@@ -11,6 +11,7 @@ const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
 const { CONFLICT, NOT_FOUND, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
 const { counterServices } = require("@services/common/counter.service");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Creates a new high-level feature for an inception document.
@@ -98,17 +99,17 @@ const createHlfService = async ({
 
     // ── Activity tracker ──────────────────────────────────────────────────────
     const { user: auditUser, device, requestId } = auditContext || {};
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.CREATE_HLF,
-      `High-level feature "${title}" created for inception ${inceptionId} by ${createdBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.CREATE_HLF,
+      description: `High-level feature "${title}" created for inception ${inceptionId} by ${createdBy}`,
+      logOptions: {
         newData: prepareAuditData(null, hlf).newData,
-        adminActions: { targetId: hlf._id?.toString() },
+        userActions: { targetId: hlf._id?.toString(), performedOn: DB_COLLECTIONS.HIGH_LEVEL_FEATURES },
       }
-    );
+    });
 
     return { success: true, hlf };
 
