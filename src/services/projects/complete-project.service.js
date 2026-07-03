@@ -5,6 +5,7 @@ const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.se
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { ProjectStatus } = require("@configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Marks a project as COMPLETED.
@@ -59,14 +60,14 @@ const completeProjectService = async (project, params) => {
     const { user, device, requestId } = params.auditContext || {};
     const { oldData, newData } = prepareAuditData(project, updatedProject);
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.COMPLETE_PROJECT,
-      `Project '${updatedProject.name}' (${project._id}) marked as completed by ${params.completedBy}`,
-      { oldData, newData, adminActions: { targetId: project._id } }
-    );
+      eventType: ACTIVITY_TRACKER_EVENTS.COMPLETE_PROJECT,
+      description: `Project '${updatedProject.name}' (${project._id}) marked as completed by ${params.completedBy}`,
+      logOptions: { oldData, newData, userActions: { performedOn: DB_COLLECTIONS.PROJECTS, targetId: project._id } }
+  });
 
     return { success: true, project: updatedProject };
   } catch (error) {

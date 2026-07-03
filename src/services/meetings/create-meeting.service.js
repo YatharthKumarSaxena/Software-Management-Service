@@ -224,17 +224,15 @@ const createMeetingService = async ({
         );
 
         // ── 8. Log activity tracker event ──────────────────────────────────
-        logActivityTrackerEvent(
-            user,
-            device,
-            requestId,
-            ACTIVITY_TRACKER_EVENTS.CREATE_MEETING,
-            `Meeting created: "${title}" in ${entityType} (Facilitator: ${assignedFacilitatorId})`,
-            {
+        logActivityTrackerEvent({
+            user: user, device: device, requestId: requestId,
+            eventType: ACTIVITY_TRACKER_EVENTS.CREATE_MEETING,
+            description: `Meeting created: "${title}" in ${entityType} (Facilitator: ${assignedFacilitatorId})`,
+            logOptions: {
                 newData: { meeting: meetingWithParticipant.toObject() },
-                adminActions: { targetId: projectId?.toString() }
+                userActions: { targetId: meeting._id.toString(), performedOn: DB_COLLECTIONS.MEETINGS }
             }
-        );
+    });
 
         logWithTime(`✅ [createMeetingService] Meeting created: ${meetingWithParticipant._id}`);
 

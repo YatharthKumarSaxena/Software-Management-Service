@@ -8,6 +8,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { ApplicabilityTypes } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Unlinks a scope from a high-level feature.
@@ -66,18 +67,18 @@ const unlinkScopeToHlfService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldScope, unlinkedScope);
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.UNLINK_SCOPE_TO_HLF,
-      `Scope "${unlinkedScope.title}" unlinked from High-level Feature by ${unlinkedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.UNLINK_SCOPE_TO_HLF,
+      description: `Scope "${unlinkedScope.title}" unlinked from High-level Feature by ${unlinkedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: unlinkedScope._id?.toString() },
+        userActions: { performedOn: DB_COLLECTIONS.SCOPES, targetId: unlinkedScope._id?.toString() },
       }
-    );
+  });
 
     logWithTime(
       `✅ [unlinkScopeToHlfService] Scope ${unlinkedScope._id} successfully unlinked from HLF`

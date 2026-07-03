@@ -9,6 +9,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases, ApplicabilityTypes } = require("@/configs/enums.config");
 const { counterServices } = require("@services/common/counter.service");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Creates a new scope for an inception document.
@@ -85,17 +86,17 @@ const createScopeService = async ({
 
     // ── Activity tracker ──────────────────────────────────────────────────────
     const { user: auditUser, device, requestId } = auditContext || {};
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.CREATE_SCOPE,
-      `Scope "${normalizedTitle}" created for inception ${inceptionId} with category GLOBAL by ${createdBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.CREATE_SCOPE,
+      description: `Scope "${normalizedTitle}" created for inception ${inceptionId} with category GLOBAL by ${createdBy}`,
+      logOptions: {
         newData: prepareAuditData(null, scope).newData,
-        adminActions: { targetId: scope._id?.toString() },
+        adminActions: { targetId: scope._id?.toString(), performedOn: DB_COLLECTIONS.SCOPES },
       }
-    );
+  });
 
     return { success: true, scope };
 

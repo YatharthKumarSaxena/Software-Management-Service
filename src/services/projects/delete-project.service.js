@@ -5,6 +5,7 @@ const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.se
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { ProjectStatus } = require("@configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Soft-deletes a project (sets isDeleted = true).
@@ -59,14 +60,14 @@ const deleteProjectService = async (project, params) => {
     const { user, device, requestId } = params.auditContext || {};
     const { oldData, newData } = prepareAuditData(project, updatedProject);
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.DELETE_PROJECT,
-      `Project '${project.name}' (${project._id}) soft-deleted by ${params.deletedBy}. Reason: ${params.deletionReasonType}`,
-      { oldData, newData, adminActions: { targetId: project._id } }
-    );
+      eventType: ACTIVITY_TRACKER_EVENTS.DELETE_PROJECT,
+      description: `Project '${project.name}' (${project._id}) soft-deleted by ${params.deletedBy}. Reason: ${params.deletionReasonType}`,
+      logOptions: { oldData, newData, userActions: { performedOn: DB_COLLECTIONS.PROJECTS, targetId: project._id } }
+  });
 
     return { success: true };
   } catch (error) {

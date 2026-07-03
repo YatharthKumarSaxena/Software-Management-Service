@@ -1,4 +1,4 @@
-const { ProjectModel, AdminModel } = require("@models/index");
+const { ProjectModel } = require("@models/index");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
@@ -8,6 +8,7 @@ const { isValidMongoID } = require("@/utils/id-validators.util");
 const {
   validateLinkedProjectIds
 } = require("@/services/projects/linked-projects.service");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 const updateProjectService = async (existingProject, updates) => {
   try {
@@ -250,18 +251,18 @@ const updateProjectService = async (existingProject, updates) => {
 
     const versionString = `v${updatedProject.version.major}.${updatedProject.version.minor}`;
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_PROJECT,
-      `Project '${updatedProject.name}' (${existingProject._id}) updated to ${versionString} by ${updates.updatedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_PROJECT,
+      description: `Project '${updatedProject.name}' (${existingProject._id}) updated to ${versionString} by ${updates.updatedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: existingProject._id }
+        userActions: { performedOn: DB_COLLECTIONS.PROJECTS, targetId: existingProject._id }
       }
-    );
+  });
 
     return {
       success: true,

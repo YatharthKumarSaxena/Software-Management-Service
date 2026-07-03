@@ -9,6 +9,7 @@ const { ProjectStatus, ProjectCategoryTypes, ClientRoleTypes } = require("@confi
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { isValidMongoID } = require("@/utils/id-validators.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Creates a new stakeholder and handles the side-effects:
@@ -221,17 +222,17 @@ const createStakeholderService = async ({
 
     // ── Activity tracker ──────────────────────────────────────────────────────
     const { user: auditUser, device, requestId } = auditContext || {};
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.CREATE_STAKEHOLDER,
-      `Stakeholder ${userId} (role: ${role}) added to project ${projectId} by ${createdBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.CREATE_STAKEHOLDER,
+      description: `Stakeholder ${userId} (role: ${role}) added to project ${projectId} by ${createdBy}`,
+      logOptions: {
         newData: prepareAuditData(null, stakeholder).newData,
-        adminActions: { targetId: stakeholder._id?.toString() },
+        userActions: { performedOn: DB_COLLECTIONS.STAKEHOLDERS, targetId: stakeholder._id?.toString() },
       }
-    );
+  });
 
     return { success: true, stakeholder };
 

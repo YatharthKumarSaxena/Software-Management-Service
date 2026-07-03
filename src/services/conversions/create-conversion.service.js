@@ -143,18 +143,18 @@ const createConversionService = async ({
     await conversion.save();
 
     // 10. Log Conversion Activity
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.CREATE_CONVERSION,
-      `Converted ${sourceCollection} (${sourceEntityId}) to ${targetCollection} (${targetEntityId})`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.CREATE_CONVERSION,
+      description: `Converted ${sourceCollection} (${sourceEntityId}) to ${targetCollection} (${targetEntityId})`,
+      logOptions: {
         oldData: { sourceEntityId, sourceCollection, projectId },
         newData: { targetEntityId, targetCollection, conversionId: conversion._id, projectId },
         adminActions: { targetId: conversion._id, performedOn: DB_COLLECTIONS.CONVERSIONS }
       }
-    );
+  });
 
     return { success: true, conversion };
   } catch (error) {

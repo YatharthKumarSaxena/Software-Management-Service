@@ -8,6 +8,7 @@ const { RequestStatus } = require("@configs/enums.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CREATED, BAD_REQUEST, INTERNAL_ERROR, CONFLICT } = require("@configs/http-status.config");
 const { counterServices } = require("@services/common/counter.service");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Creates a new product request document in the database.
@@ -140,14 +141,14 @@ const createProductRequestService = async ({
     // ── Fire-and-forget: activity tracking ────────────────────────────
     const { user, device, requestId } = auditContext || {};
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.CREATE_PRODUCT_REQUEST,
-      `Product request '${productRequest.title}' (${productRequest._id}) created by Client ${clientId}`,
-      { oldData: null, newData: productRequest }
-    );
+      eventType: ACTIVITY_TRACKER_EVENTS.CREATE_PRODUCT_REQUEST,
+      description: `Product request '${productRequest.title}' (${productRequest._id}) created by Client ${clientId}`,
+      logOptions: { oldData: null, newData: productRequest, userActions: { performedOn: DB_COLLECTIONS.PRODUCT_REQUESTS, targetId: productRequest._id } }
+    });
 
     logWithTime(`✅ [createProductRequestService] Product request created successfully: ${productRequest._id}`);
     return {

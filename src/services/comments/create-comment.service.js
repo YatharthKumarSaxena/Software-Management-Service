@@ -6,6 +6,7 @@ const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Creates a new comment or reply on an entity.
@@ -67,17 +68,17 @@ const createCommentService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const actionType = parentCommentId ? ACTIVITY_TRACKER_EVENTS.REPLIED_ON_COMMENT : ACTIVITY_TRACKER_EVENTS.CREATE_COMMENT;
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      actionType,
-      `Comment created on ${entityType} (ID: ${entityId}) by ${createdBy}`,
-      {
+      eventType: actionType,
+      description: `Comment created on ${entityType} (ID: ${entityId}) by ${createdBy}`,
+      logOptions: {
         newData: prepareAuditData(null, comment).newData,
-        adminActions: { targetId: comment._id?.toString() },
+        userActions: { targetId: comment._id?.toString(), performedOn: DB_COLLECTIONS.COMMENTS },
       }
-    );
+    });
 
     return { success: true, comment };
 

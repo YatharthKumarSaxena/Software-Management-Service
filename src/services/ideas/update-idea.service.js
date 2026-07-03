@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CONFLICT, BAD_REQUEST, UNAUTHORIZED, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Updates an idea's title and/or description.
@@ -133,11 +134,11 @@ const updateIdeaService = async (
     // ── Step 7: Log activity tracker event ────────────────────────────
     const { user, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldIdeaData, updatedIdea);
-    logActivityTrackerEvent(
-      user, device, requestId, ACTIVITY_TRACKER_EVENTS.UPDATE_IDEA,
-      `Idea updated`,
-      { oldData, newData, adminActions: { targetId: idea._id } }
-    );
+    logActivityTrackerEvent({
+      user: user, device: device, requestId: requestId, eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_IDEA,
+      description: `Idea updated`,
+      logOptions: { oldData, newData, userActions: { targetId: idea._id?.toString(), performedOn: DB_COLLECTIONS.IDEAS } }
+    });
 
     logWithTime(`✅ [updateIdeaService] Idea updated successfully: ${idea._id}`);
 

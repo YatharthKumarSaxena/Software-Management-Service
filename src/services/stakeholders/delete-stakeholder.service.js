@@ -7,6 +7,7 @@ const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { ProjectCategoryTypes } = require("@configs/enums.config");
 const { errorMessage } = require("@/utils/log-error.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Soft-deletes a stakeholder and runs version control on the project's current phase.
@@ -67,21 +68,22 @@ const deleteStakeholderService = async (
     // ── Activity tracker ──────────────────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldStakeholder, updatedStakeholder);
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.DELETE_STAKEHOLDER,
-      `Stakeholder ${stakeholder.userId} deleted from project ${stakeholder.projectId} by ${deletedBy}. Reason: ${deletionReasonType}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.DELETE_STAKEHOLDER,
+      description: `Stakeholder ${stakeholder.userId} deleted from project ${stakeholder.projectId} by ${deletedBy}. Reason: ${deletionReasonType}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: {
+        userActions: {
           targetId: stakeholder._id?.toString(),
-          reason:   deletionReasonType,
+          performedOn: DB_COLLECTIONS.STAKEHOLDERS,
+          reason:  deletionReasonType,
         },
       }
-    );
+  });
 
     return { success: true };
 

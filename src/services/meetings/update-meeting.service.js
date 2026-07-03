@@ -9,6 +9,7 @@ const { versionControlService } = require("@services/common/version.service");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { addParticipantService, updateParticipantService } = require("@services/participants");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Updates a meeting's editable fields.
@@ -261,14 +262,14 @@ const updateMeetingService = async (
         // ── 7. Log activity tracker event ──────────────────────────────────
         const { oldData, newData } = prepareAuditData(oldMeeting, updatedMeeting);
 
-        logActivityTrackerEvent(
+        logActivityTrackerEvent({
             user,
             device,
             requestId,
-            ACTIVITY_TRACKER_EVENTS.UPDATE_MEETING,
-            `Meeting updated: ${changes.join(', ')}`,
-            { oldData, newData }
-        );
+            eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_MEETING,
+            description: `Meeting updated: ${changes.join(', ')}`,
+            logOptions: { oldData, newData, userActions: { targetId: updatedMeeting._id?.toString(), performedOn: DB_COLLECTIONS.MEETINGS } }
+        });
 
         logWithTime(
             `✅ [updateMeetingService] Meeting updated: ${meeting._id}`

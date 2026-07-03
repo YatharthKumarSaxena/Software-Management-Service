@@ -6,6 +6,7 @@ const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.se
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { ProjectStatus } = require("@configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Updates the role of an existing (non-deleted) stakeholder.
@@ -50,18 +51,18 @@ const updateStakeholderService = async (stakeholder, project, { role, updatedBy,
     // ── Activity tracker ──────────────────────────────────────────────────────
     const { user, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldStakeholder, updatedStakeholder);
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_STAKEHOLDER,
-      `Stakeholder ${stakeholder.userId} role changed to "${role}" by ${updatedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_STAKEHOLDER,
+      description: `Stakeholder ${stakeholder.userId} role changed to "${role}" by ${updatedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: stakeholder._id?.toString() },
+        userActions: { performedOn: DB_COLLECTIONS.STAKEHOLDERS, targetId: stakeholder._id?.toString() },
       }
-    );
+  });
 
     return { success: true, stakeholder: updatedStakeholder };
 

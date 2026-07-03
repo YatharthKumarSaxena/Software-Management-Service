@@ -1,6 +1,5 @@
 // services/org-project-requests/approve-org-project-request.service.js
 
-const { OrgProjectRequest } = require("@models/org-project-request.model");
 const { ClientModel } = require("@models/client.model");
 const { ProjectModel } = require("@models/project.model");
 const { RequestStatus } = require("@configs/enums.config");
@@ -10,6 +9,7 @@ const { createStakeholderService } = require("@services/stakeholders/create-stak
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Approves an org project request (project owner/manager only)
@@ -115,14 +115,14 @@ const approveOrgProjectRequestService = async ({
       const { user, device, requestId: auditRequestId } = auditContext || {};
       const { oldData: auditOldData, newData: auditNewData } = prepareAuditData(oldData, updatedRequest);
 
-      logActivityTrackerEvent(
+      logActivityTrackerEvent({
         user,
         device,
         auditRequestId,
-        ACTIVITY_TRACKER_EVENTS.APPROVE_ORG_PROJECT_REQUEST,
-        `Organization project request approved. Reason: ${approveReasonType}${approveReasonDescription ? ` - ${approveReasonDescription}` : ''}. Stakeholder created for client.`,
-        { oldData: auditOldData, newData: auditNewData, adminActions: { targetId: request._id } }
-      );
+        eventType: ACTIVITY_TRACKER_EVENTS.APPROVE_ORG_PROJECT_REQUEST,
+        description: `Organization project request approved. Reason: ${approveReasonType}${approveReasonDescription ? ` - ${approveReasonDescription}` : ''}. Stakeholder created for client.`,
+        logOptions: { oldData: auditOldData, newData: auditNewData, adminActions: { targetId: request._id, performedOn: DB_COLLECTIONS.ORG_PROJECT_REQUESTS } }
+      });
     }
 
     return {

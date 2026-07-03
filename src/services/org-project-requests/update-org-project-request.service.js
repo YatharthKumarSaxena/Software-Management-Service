@@ -6,6 +6,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Updates an org project request (client only, only when PENDING)
@@ -69,14 +70,14 @@ const updateOrgProjectRequestService = async ({
       const { user, device, requestId: auditRequestId } = auditContext || {};
       const { oldData: auditOldData, newData: auditNewData } = prepareAuditData(oldData, updatedRequest);
 
-      logActivityTrackerEvent(
+      logActivityTrackerEvent({
         user,
         device,
         auditRequestId,
-        ACTIVITY_TRACKER_EVENTS.UPDATE_ORG_PROJECT_REQUEST,
-        "Organization project request updated by client",
-        { oldData: auditOldData, newData: auditNewData, adminActions: { targetId: request._id } }
-      );
+        eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_ORG_PROJECT_REQUEST,
+        description: "Organization project request updated by client",
+        logOptions: { oldData: auditOldData, newData: auditNewData, userActions: { targetId: request._id, performedOn: DB_COLLECTIONS.ORG_PROJECT_REQUESTS } }
+    });
     } catch (trackerError) {
       logWithTime(`⚠️  [updateOrgProjectRequestService] Activity tracker logging failed: ${trackerError.message}`);
       // Continue - tracking failure doesn't fail the operation

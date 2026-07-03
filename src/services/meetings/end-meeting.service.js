@@ -8,6 +8,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { versionControlService } = require("@services/common/version.service");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Ends a meeting (transitions from ONGOING to COMPLETED)
@@ -88,14 +89,12 @@ const endMeetingService = async (meeting, project, userId, auditContext = {}) =>
     // ── 5. Log activity tracker event ───────────────────────────────────
     const { oldData, newData } = prepareAuditData(oldMeeting, updatedMeeting);
 
-    logActivityTrackerEvent(
-      user,
-      device,
-      requestId,
-      ACTIVITY_TRACKER_EVENTS.END_MEETING,
-      `Meeting ended: status ONGOING → COMPLETED at ${now.toISOString()}`,
-      { oldData, newData }
-    );
+    logActivityTrackerEvent({
+      user: user, device: device, requestId: requestId,
+      eventType: ACTIVITY_TRACKER_EVENTS.END_MEETING,
+      description: `Meeting ended: status ONGOING → COMPLETED at ${now.toISOString()}`,
+      logOptions: { oldData: oldData, newData: newData, userActions: { targetId: meeting._id?.toString(), performedOn: DB_COLLECTIONS.MEETINGS } }
+  });
 
     return {
       success: true,

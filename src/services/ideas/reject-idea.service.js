@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { BAD_REQUEST, CONFLICT } = require("@configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Rejects an idea (changes status from PENDING to REJECTED).
@@ -68,11 +69,11 @@ const rejectIdeaService = async (
     // ── Step 3: Log activity tracker event ────────────────────────────
     const { user, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldIdeaData, updatedIdea);
-    logActivityTrackerEvent(
-      user, device, requestId, ACTIVITY_TRACKER_EVENTS.REJECT_IDEA,
-      `Idea rejected with reason: ${rejectedReasonType}`,
-      { oldData, newData, adminActions: { targetId: idea._id } }
-    );
+    logActivityTrackerEvent({
+      user: user, device: device, requestId: requestId, eventType: ACTIVITY_TRACKER_EVENTS.REJECT_IDEA,
+      description: `Idea rejected with reason: ${rejectedReasonType}`,
+      logOptions: { oldData, newData, userActions: { targetId: idea._id?.toString(), performedOn: DB_COLLECTIONS.IDEAS } }
+    });
 
     logWithTime(`✅ [rejectIdeaService] Idea rejected successfully: ${idea._id}`);
     

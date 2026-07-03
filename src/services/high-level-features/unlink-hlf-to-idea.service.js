@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Unlinks a high-level feature from an idea.
@@ -60,18 +61,18 @@ const unlinkHlfFromIdeaService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldHlf, unlinkedHlf);
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.UNLINK_HLF_FROM_IDEA,
-      `High-level feature "${unlinkedHlf.title}" unlinked from Idea by ${unlinkedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.UNLINK_HLF_FROM_IDEA,
+      description: `High-level feature "${unlinkedHlf.title}" unlinked from Idea by ${unlinkedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: unlinkedHlf._id?.toString() },
+        userActions: { targetId: unlinkedHlf._id?.toString(), performedOn: DB_COLLECTIONS.HIGH_LEVEL_FEATURES },
       }
-    );
+  });
 
     logWithTime(
       `✅ [unlinkHlfFromIdeaService] HLF ${unlinkedHlf._id} successfully unlinked from Idea`

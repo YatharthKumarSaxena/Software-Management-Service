@@ -170,18 +170,19 @@ const updatePhaseSettingsService = async ({
     const { user, device, requestId } =
       auditContext || {};
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      trackerEvent,
-      `${phaseType} settings updated`,
-      {
-        adminActions: {
-          targetId: projectId
+      eventType: trackerEvent,
+      description: `${phaseType} settings updated`,
+      logOptions: {
+        userActions: {
+          targetId: phase._id,
+          performedOn: Phases[phaseType]
         }
       }
-    );
+  });
 
     return {
       success: true,

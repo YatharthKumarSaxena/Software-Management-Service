@@ -61,9 +61,9 @@ const isValidReasonDescription = (reasonDescription) => {
  * @param {string} requestId - Request ID for tracking
  * @param {string} eventType - Type of event from ACTIVITY_TRACKER_EVENTS
  * @param {string} description - Event description
- * @param {Object} logOptions - Optional logging options (oldData, newData, adminActions, etc)
+ * @param {Object} logOptions - Optional logging options (oldData, newData, userActions, etc)
  */
-const logActivityTrackerEvent = (
+const logActivityTrackerEvent = ({
 
   user,
 
@@ -78,7 +78,7 @@ const logActivityTrackerEvent = (
   logOptions = {},
 
   workflowId = null
-) => {
+}) => {
   (async () => {
     try {
       // Check if activity tracking is enabled
@@ -135,11 +135,11 @@ const logActivityTrackerEvent = (
       };
 
       // Process Admin Actions
-      const adminActions = {};
-      const { adminActions: adminActionsInput } = logOptions;
+      const userActions = {};
+      const { userActions: userActionsInput } = logOptions;
 
-      if (adminActionsInput) {
-        const { targetId, performedOn, reason, reasonDescription, queryFilter, filter } = adminActionsInput;
+      if (userActionsInput) {
+        const { targetId, performedOn, reason, reasonDescription, queryFilter, filter } = userActionsInput;
 
         // Validate and set targetId (convert to ObjectId if needed)
         if (targetId !== undefined && targetId !== null) {
@@ -147,16 +147,16 @@ const logActivityTrackerEvent = (
           if (performedOn && !validCollections.includes(performedOn)) {
             logWithTime(`⚠️ Invalid performedOn collection: ${performedOn}. Skipping targetId.`);
           } else {
-            adminActions.targetId = convertTargetIdIfNeeded(targetId, performedOn);
+            userActions.targetId = convertTargetIdIfNeeded(targetId, performedOn);
             if (performedOn) {
-              adminActions.performedOn = performedOn;
+              userActions.performedOn = performedOn;
             }
           }
         }
 
         // Validate and set reason
         if (reason !== undefined && reason !== null) {
-          adminActions.reason = reason;
+          userActions.reason = reason;
 
           // Set reasonDescription only if reason is present
           if (reasonDescription !== undefined && reasonDescription !== null) {
@@ -165,14 +165,14 @@ const logActivityTrackerEvent = (
                 `⚠️ reasonDescription length invalid (${descriptionLength.min}-${descriptionLength.max}). Skipping.`
               );
             } else {
-              adminActions.reasonDescription = reasonDescription;
+              userActions.reasonDescription = reasonDescription;
             }
           }
         }
 
         // Add queryFilter if advanced logging is enabled
         if (ADVANCED_LOGGING_ENABLED && queryFilter !== undefined && queryFilter !== null) {
-          adminActions.queryFilter = queryFilter;
+          userActions.queryFilter = queryFilter;
         }
 
         // Validate and set filter array
@@ -180,14 +180,14 @@ const logActivityTrackerEvent = (
           const validFilters = filter.filter((f) => validEvents.includes(f));
 
           if (validFilters.length > 0) {
-            adminActions.filter = validFilters;
+            userActions.filter = validFilters;
           }
         }
       }
 
-      // Attach adminActions only if it has content
-      if (Object.keys(adminActions).length > 0) {
-        baseLog.adminActions = adminActions;
+      // Attach userActions only if it has content
+      if (Object.keys(userActions).length > 0) {
+        baseLog.userActions = userActions;
       }
 
       // Save atomically using create()

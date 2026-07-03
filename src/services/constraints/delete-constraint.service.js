@@ -8,6 +8,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Soft-deletes a constraint.
@@ -65,17 +66,17 @@ const deleteConstraintService = async ({
       activityMessage = `Constraint "${deletedConstraint.title}" deleted by ${deletedBy} — Reason: ${deletionReasonDescription}`;
     }
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.DELETE_CONSTRAINT,
-      activityMessage,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.DELETE_CONSTRAINT,
+      description: activityMessage,
+      logOptions: {
         oldData,
-        adminActions: { targetId: deletedConstraint._id?.toString() },
+        adminActions: { targetId: deletedConstraint._id?.toString(), performedOn: DB_COLLECTIONS.CONSTRAINTS },
       }
-    );
+    });
 
     return { success: true };
 

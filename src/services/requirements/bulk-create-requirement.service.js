@@ -1,6 +1,4 @@
-
 const path = require("path");
-const fs = require("fs");
 const XLSX = require("xlsx");
 
 const { createRequirementService } = require("./create-requirement.service");
@@ -23,6 +21,7 @@ const { FieldDefinitions } = require("@configs/field-definitions.config");
 const { getValidationSet } = require("@utils/field-definition.util");
 const { validateLength, isValidRegex } = require("@utils/validators-factory.util");
 const { requiredFields } = require("@configs/required-fields.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 // Pre-built validation map: { fieldName → validationRule } for CREATE_REQUIREMENT
 // Same object that drives the JSON-body middleware — reused here for row validation.
@@ -466,13 +465,13 @@ const bulkCreateRequirementService = async ({
   // ── Fire activity tracker (fire-and-forget) ──────────────────────────────
   const { user, device, requestId } = auditContext || {};
 
-  logActivityTrackerEvent(
+  logActivityTrackerEvent({
     user,
     device,
     requestId,
-    ACTIVITY_TRACKER_EVENTS.REQUIREMENTS_IMPORTED_IN_BULK,
-    `${grandSuccessfulRows} requirement(s) imported in bulk across ${files.length} file(s).`,
-    {
+    eventType: ACTIVITY_TRACKER_EVENTS.REQUIREMENTS_IMPORTED_IN_BULK,
+    description:`${grandSuccessfulRows} requirement(s) imported in bulk across ${files.length} file(s).`,
+    logOptions: {
       oldData: null,
       newData: {
         bulkImportIds,
@@ -483,9 +482,10 @@ const bulkCreateRequirementService = async ({
           failedRows:     grandFailedRows,
           skippedRows:    grandSkippedRows,
         },
-      }
+      },
+      performedOn: DB_COLLECTIONS.REQUIREMENTS
     }
-  );
+});
 
   return {
     success: true,

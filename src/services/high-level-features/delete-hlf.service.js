@@ -8,6 +8,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Soft-deletes a high-level feature.
@@ -64,17 +65,17 @@ const deleteHlfService = async ({
       activityMessage = `High-level feature "${deletedHlf.title}" deleted by ${deletedBy} — Reason: ${deletionReasonDescription}`;
     }
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.DELETE_HLF,
-      activityMessage,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.DELETE_HLF,
+      description: activityMessage,
+      logOptions: {
         oldData,
-        adminActions: { targetId: deletedHlf._id?.toString() },
+        userActions: { targetId: deletedHlf._id?.toString(), performedOn: DB_COLLECTIONS.HIGH_LEVEL_FEATURES },
       }
-    );
+    });
 
     return { success: true };
 

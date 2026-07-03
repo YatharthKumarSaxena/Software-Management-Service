@@ -120,18 +120,19 @@ const deletePhaseService = async ({
 
     if (trackerEvent) {
 
-      logActivityTrackerEvent(
+      logActivityTrackerEvent({
         user,
         device,
         requestId,
-        trackerEvent,
-        `${phaseType} deleted - Reason: ${deletionReasonType}`,
-        {
-          adminActions: {
-            targetId: projectId
+        eventType: trackerEvent,
+        description: `${phaseType} deleted - Reason: ${deletionReasonType}`,
+        logOptions: {
+          userActions: {
+            targetId: latestPhase._id,
+            performedOn: Phases[phaseType]
           }
         }
-      );
+    });
     }
 
     return {

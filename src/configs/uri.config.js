@@ -209,8 +209,8 @@ module.exports = {
         GET_LATEST_PHASE: `/latest/:phaseType/:projectId`, // GET /api/v1/phases/latest/:phaseType/:projectId
     },
     CONVERSION_ROUTES: {
-        CREATE_CONVERSION: `/:projectId`, // POST /api/v1/conversions/:projectId
-        GET_CONVERSION: `/get/:conversionId`, // GET /api/v1/conversions/:conversionId
-        LIST_CONVERSIONS: `/list/:projectId`, // GET /api/v1/conversions/:projectId
+        CREATE_CONVERSION: `/create/:projectId`, // POST /api/v1/conversions/create/:projectId
+        GET_CONVERSION: `/get/:conversionId`, // GET /api/v1/conversions/get/:conversionId
+        LIST_CONVERSIONS: `/list/:projectId`, // GET /api/v1/conversions/list/:projectId
     }
 };

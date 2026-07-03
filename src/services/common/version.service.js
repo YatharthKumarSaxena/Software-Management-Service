@@ -12,6 +12,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { buildActivePhaseQuery } = require("@utils/phase-status.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 const PHASE_MODEL_MAP = {
   [Phases.INCEPTION]: InceptionModel,
@@ -85,20 +86,21 @@ const applyVersionUpdate = async ({
   const { user, device, requestId } = auditContext || {};
   const { oldData, newData } = prepareAuditData(existingDoc, result);
 
-  logActivityTrackerEvent(
+  logActivityTrackerEvent({
     user,
     device,
     requestId,
-    ACTIVITY_TRACKER_EVENTS.PHASE_VERSION_CHANGE,
-    action,
-    {
+    eventType: ACTIVITY_TRACKER_EVENTS.PHASE_VERSION_CHANGE,
+    description: action,
+    logOptions: {
       oldData,
       newData,
-      adminActions: {
+      userActions: {
         targetId: projectId?.toString(),
+        performedOn: currentPhase,
       },
     }
-  );
+  });
 
   return result;
 };

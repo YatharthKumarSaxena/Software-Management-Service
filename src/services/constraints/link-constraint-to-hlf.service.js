@@ -9,6 +9,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases, ApplicabilityTypes } = require("@/configs/enums.config");
 const { FORBIDDEN } = require("@/configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Links a constraint to a high-level feature.
@@ -80,18 +81,18 @@ const linkConstraintToHlfService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldConstraint, linkedConstraint);
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.LINK_CONSTRAINT_TO_HLF,
-      `Constraint "${linkedConstraint.title}" linked to HLF "${hlf.title}" (category set to LOCAL) by ${linkedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.LINK_CONSTRAINT_TO_HLF,
+      description: `Constraint "${linkedConstraint.title}" linked to HLF "${hlf.title}" (category set to LOCAL) by ${linkedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: linkedConstraint._id?.toString() },
+        adminActions: { targetId: linkedConstraint._id?.toString(), performedOn: DB_COLLECTIONS.CONSTRAINTS },
       }
-    );
+    });
 
     logWithTime(`✅ [linkConstraintToHlfService] Constraint ${linkedConstraint._id} successfully linked to HLF ${hlf._id}`);
     return { success: true, message: "Constraint successfully linked to HLF", constraint: linkedConstraint };

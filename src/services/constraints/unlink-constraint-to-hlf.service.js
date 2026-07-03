@@ -8,6 +8,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { ApplicabilityTypes, Phases } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Unlinks a constraint from a high-level feature.
@@ -66,18 +67,18 @@ const unlinkConstraintToHlfService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldConstraint, unlinkedConstraint);
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.UNLINK_CONSTRAINT_TO_HLF,
-      `Constraint "${unlinkedConstraint.title}" unlinked from HLF (category reset to GLOBAL) by ${unlinkedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.UNLINK_CONSTRAINT_TO_HLF,
+      description: `Constraint "${unlinkedConstraint.title}" unlinked from HLF (category reset to GLOBAL) by ${unlinkedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: unlinkedConstraint._id?.toString() },
+        adminActions: { targetId: unlinkedConstraint._id?.toString(), performedOn: DB_COLLECTIONS.CONSTRAINTS },
       }
-    );
+    });
 
     logWithTime(
       `✅ [unlinkConstraintToHlfService] Constraint ${unlinkedConstraint._id} successfully unlinked from HLF`

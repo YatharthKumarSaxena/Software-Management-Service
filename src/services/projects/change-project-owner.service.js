@@ -11,6 +11,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { ProjectRoleTypes } = require("@configs/enums.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { CONFLICT, NOT_FOUND } = require("@configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Changes the owner of a project.
@@ -157,18 +158,18 @@ const changeProjectOwnerService = async (project, params) => {
     const { user, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldProject, updatedProject);
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.CHANGE_PROJECT_OWNER,
-      `Project owner changed to ${userId} by ${changedBy}. Reason: ${changeOwnerReasonType}${ownerChangeReasonDescription ? ` - ${ownerChangeReasonDescription}` : ''}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.CHANGE_PROJECT_OWNER,
+      description: `Project owner changed to ${userId} by ${changedBy}. Reason: ${changeOwnerReasonType}${ownerChangeReasonDescription ? ` - ${ownerChangeReasonDescription}` : ''}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: project._id?.toString() }
+        userActions: { performedOn: DB_COLLECTIONS.PROJECTS, targetId: project._id?.toString() }
       }
-    );
+  });
 
     logWithTime(`✅ [changeProjectOwnerService] Project owner changed successfully from ${project.ownerId} to ${userId}`);
     return { success: true, project: updatedProject };

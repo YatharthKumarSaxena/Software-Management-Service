@@ -10,6 +10,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { isTimeOverlapping } = require("@utils/meeting-validation.util");
 const { MeetingStatuses } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Adds a new participant to a meeting.
@@ -236,14 +237,14 @@ const addParticipantService = async (
         // ── 7. Log activity tracker event ──────────────────────────────────
         const { oldData, newData } = prepareAuditData(oldMeeting, updatedMeeting);
 
-        logActivityTrackerEvent(
+        logActivityTrackerEvent({
             user,
             device,
             requestId,
-            ACTIVITY_TRACKER_EVENTS.ADD_MEETING_MEMBER,
-            `Participant ${userId} added with role: ${role || 'PARTICIPANT'}`,
-            { oldData, newData }
-        );
+            eventType: ACTIVITY_TRACKER_EVENTS.ADD_MEETING_MEMBER,
+            description: `Participant ${userId} added with role: ${role || 'PARTICIPANT'}`,
+            logOptions: { oldData, newData, userActions: { targetId: meeting._id, performedOn: DB_COLLECTIONS.MEETINGS } }
+        });
 
         logWithTime(
             `✅ [addParticipantService] Participant added: ${userId} to meeting ${meeting._id}`

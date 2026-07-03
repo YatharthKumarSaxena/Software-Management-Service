@@ -14,6 +14,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 const {
   getPhaseStatus,
   isPhaseFrozen,
@@ -344,12 +345,12 @@ const createPhaseWithVersionManagement = async ({
 
     // ── Step 5: Log activity tracker ──────────────────────────────────
     const { oldData, newData } = prepareAuditData(null, createdPhase);
-    logActivityTrackerEvent(
-      auditContext?.user, auditContext?.device, auditContext?.requestId,
-      PHASE_EVENT_MAP[targetPhase],
-      `${targetPhase} phase created with majorVersion: ${newMajorVersion}, minorVersion: 0 by ${createdBy}`,
-      { oldData, newData, adminActions: { targetId: projectId } }
-    );
+    logActivityTrackerEvent({
+      user: auditContext?.user, device: auditContext?.device, requestId: auditContext?.requestId,
+      eventType: PHASE_EVENT_MAP[targetPhase],
+      description: `${targetPhase} phase created with majorVersion: ${newMajorVersion}, minorVersion: 0 by ${createdBy}`,
+      logOptions: { oldData, newData, userActions: { targetId: createdPhase._id, performedOn: DB_COLLECTIONS[targetPhase] } }
+    });
 
     return { success: true, message: `${phaseName} phase created successfully`, phase: createdPhase, version: { major: newMajorVersion, minor: 0 } };
 
@@ -464,20 +465,21 @@ const updatePhaseStatus = async ({
         nextStatus
       );
     if (trackerEvent) {
-      logActivityTrackerEvent(
+      logActivityTrackerEvent({
         user,
         device,
         requestId,
-        trackerEvent,
-        `${phaseName} phase status changed from ${currentStatus} to ${nextStatus}`,
-        {
+        eventType: trackerEvent,
+        description: `${phaseName} phase status changed from ${currentStatus} to ${nextStatus}`,
+        logOptions: {
           oldData,
           newData,
-          adminActions: {
-            targetId: phaseDocument.projectId?.toString()
+          userActions: {
+            targetId: updatedDoc?._id?.toString(),
+            performedOn: DB_COLLECTIONS[phase]
           }
         }
-      );
+      });
     }
   }
 
