@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { RequestStatus } = require("@configs/enums.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { OK, BAD_REQUEST, FORBIDDEN, INTERNAL_ERROR, CONFLICT } = require("@configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Updates an existing product request.
@@ -143,14 +144,14 @@ const updateProductRequestService = async (productRequest, params) => {
     const { user, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(productRequest, updatedProductRequest);
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_PRODUCT_REQUEST,
-      `Product request '${updatedProductRequest.title}' (${productRequest._id}) updated by ${updatedBy}`,
-      { oldData, newData, adminActions: { targetId: productRequest._id } }
-    );
+      eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_PRODUCT_REQUEST,
+      description: `Product request '${updatedProductRequest.title}' (${productRequest._id}) updated by ${updatedBy}`,
+      logOptions: { oldData, newData, userActions: { performedOn: DB_COLLECTIONS.PRODUCT_REQUESTS, targetId: productRequest._id } }
+    });
 
     logWithTime(`✅ [updateProductRequestService] Product request updated successfully: ${productRequest._id}`);
     return {

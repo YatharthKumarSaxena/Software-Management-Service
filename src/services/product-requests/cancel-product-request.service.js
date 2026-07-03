@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { RequestStatus } = require("@configs/enums.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { OK, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Rejects a product request.
@@ -54,14 +55,14 @@ const cancelProductRequestService = async (productRequest, params) => {
 
     const { oldData, newData } = prepareAuditData(productRequest, updatedProductRequest);
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.CANCEL_PRODUCT_REQUEST,
-      description,
-      { oldData, newData, adminActions: { targetId: productRequest._id } }
-    );
+      eventType: ACTIVITY_TRACKER_EVENTS.CANCEL_PRODUCT_REQUEST,
+      description: description,
+      logOptions: { oldData, newData, userActions: { performedOn: DB_COLLECTIONS.PRODUCT_REQUESTS, targetId: productRequest._id } }
+    });
 
     logWithTime(`✅ [cancelProductRequestService] Product request cancelled successfully: ${productRequest._id}`);
     return {

@@ -6,6 +6,7 @@ const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { OK, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Soft-deletes a product request (sets isDeleted = true).
@@ -45,14 +46,14 @@ const deleteProductRequestService = async (productRequest, params) => {
 
     const { oldData, newData } = prepareAuditData(productRequest, updatedProductRequest);
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.DELETE_PRODUCT_REQUEST,
-      description,
-      { oldData, newData, adminActions: { targetId: productRequest._id } }
-    );
+      eventType: ACTIVITY_TRACKER_EVENTS.DELETE_PRODUCT_REQUEST,
+      description: description,
+      logOptions: { oldData, newData, userActions: { performedOn: DB_COLLECTIONS.PRODUCT_REQUESTS, targetId: productRequest._id } }
+    });
 
     logWithTime(`✅ [deleteProductRequestService] Product request deleted successfully: ${productRequest._id}`);
     return {

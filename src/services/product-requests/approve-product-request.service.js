@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { RequestStatus } = require("@configs/enums.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { OK, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Approves a product request.
@@ -56,14 +57,14 @@ const approveProductRequestService = async (productRequest, params) => {
 
     const { oldData, newData } = prepareAuditData(productRequest, updatedProductRequest);
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.APPROVE_PRODUCT_REQUEST,
-      description,
-      { oldData, newData, adminActions: { targetId: productRequest._id } }
-    );
+      eventType: ACTIVITY_TRACKER_EVENTS.APPROVE_PRODUCT_REQUEST,
+      description: description,
+      logOptions: { oldData, newData, userActions: { targetId: productRequest._id, performedOn: DB_COLLECTIONS.PRODUCT_REQUESTS } }
+    });
 
     logWithTime(`✅ [approveProductRequestService] Product request approved successfully: ${productRequest._id}`);
     return {
