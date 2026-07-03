@@ -8,6 +8,7 @@ const { INTERNAL_ERROR } = require("@/configs/http-status.config");
 const { getMyEnvAsBool } = require("@/utils/env.util");
 const { uploadBulkImportFilesService } = require("@services/storage/supabase-storage.service");
 const { deleteFileIfExists } = require("@utils/bulk-import-temp.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 const createBulkImportService = async ({
     project,
@@ -221,7 +222,7 @@ const createBulkImportService = async ({
             requestId
         } = auditContext || {};
 
-        logActivityTrackerEvent(
+        logActivityTrackerEvent({
 
             user,
 
@@ -229,20 +230,21 @@ const createBulkImportService = async ({
 
             requestId,
 
-            ACTIVITY_TRACKER_EVENTS.BULK_IMPORT_CREATED,
+            eventType: ACTIVITY_TRACKER_EVENTS.BULK_IMPORT_CREATED,
 
-            `Bulk import created.`,
+            description: `Bulk import created.`,
 
-            {
+            logOptions: {
                 oldData: null,
                 newData: savedBulkImport.toObject(),
 
-                adminActions: {
-                    targetId: savedBulkImport._id.toString()
+                userActions: {
+                    targetId: savedBulkImport._id.toString(),
+                    performedOn: DB_COLLECTIONS.BULK_IMPORTS
                 }
             }
 
-        );
+        });
 
         return {
 
