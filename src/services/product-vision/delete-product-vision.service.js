@@ -8,6 +8,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
 const { InceptionModel } = require("@models/inception.model");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Deletes product vision by clearing it.
@@ -68,18 +69,18 @@ const deleteProductVisionService = async ({
       activityMessage = `Product vision deleted by ${deletedBy} — Reason: ${deletionReasonDescription}`;
     }
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.DELETE_PRODUCT_VISION,
-      activityMessage,
-      {
-        oldData,
-        newData,
-        adminActions: { targetId: inception._id?.toString() },
+      eventType: ACTIVITY_TRACKER_EVENTS.DELETE_PRODUCT_VISION,
+      description: activityMessage,
+      logOptions: {
+        oldData: oldData,
+        newData: newData,
+        adminActions: { performedOn: DB_COLLECTIONS.INCEPTIONS, targetId: inception._id?.toString() }
       }
-    );
+  });
 
     return { success: true };
 

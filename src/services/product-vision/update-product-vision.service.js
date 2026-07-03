@@ -8,6 +8,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Updates product vision with change detection.
@@ -65,18 +66,18 @@ const updateProductVisionService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldInception, updatedInception);
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_PRODUCT_VISION,
-      `Product vision updated for inception ${updatedInception._id?.toString()} by ${updatedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_PRODUCT_VISION,
+      description: `Product vision updated for inception ${updatedInception._id?.toString()} by ${updatedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: updatedInception._id?.toString() },
+        adminActions: { performedOn: DB_COLLECTIONS.INCEPTIONS, targetId: updatedInception._id?.toString() }
       }
-    );
+  });
 
     return { success: true, inception: updatedInception };
 

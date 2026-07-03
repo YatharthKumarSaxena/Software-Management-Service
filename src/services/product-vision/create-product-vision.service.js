@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Creates product vision for an inception document.
@@ -52,18 +53,18 @@ const createProductVisionService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldInception, updatedInception);
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.CREATE_PRODUCT_VISION,
-      `Product vision created for inception ${inception._id?.toString()} by ${createdBy}`,
-      {
-        oldData,
-        newData,
-        adminActions: { targetId: inception._id?.toString() },
+      eventType: ACTIVITY_TRACKER_EVENTS.CREATE_PRODUCT_VISION,
+      description: `Product vision created for inception ${inception._id?.toString()} by ${createdBy}`,
+      logOptions: {
+        oldData: oldData,
+        newData: newData,
+        userActions: { performedOn: DB_COLLECTIONS.INCEPTIONS, targetId: inception._id?.toString() }
       }
-    );
+    });
 
     return { success: true, inception: updatedInception };
 
