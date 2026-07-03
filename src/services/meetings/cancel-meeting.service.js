@@ -119,14 +119,12 @@ const cancelMeetingService = async (
     let reason = cancelReason || "No reason provided";
     if (cancelDescription) reason += ` - ${cancelDescription}`;
 
-    logActivityTrackerEvent(
-      user,
-      device,
-      requestId,
-      ACTIVITY_TRACKER_EVENTS.CANCEL_MEETING,
-      `Meeting cancelled: "${meeting.title}". Reason: ${reason}`,
-      { oldData, newData }
-    );
+    logActivityTrackerEvent({
+      user: user, device: device, requestId: requestId,
+      eventType: ACTIVITY_TRACKER_EVENTS.CANCEL_MEETING,
+      description: `Meeting cancelled: "${meeting.title}". Reason: ${reason}`,
+      logOptions: { oldData, newData, userActions: { targetId: meeting._id?.toString(), performedOn: DB_COLLECTIONS.MEETINGS } }
+    });
 
     logWithTime(
       `✅ [cancelMeetingService] Meeting cancelled: ${meeting._id}`

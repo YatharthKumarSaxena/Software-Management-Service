@@ -2,12 +2,14 @@
 
 const { MeetingModel } = require("@models/meeting.model");
 const { MeetingStatuses } = require("@configs/enums.config");
-const { BAD_REQUEST, INTERNAL_ERROR, CONFLICT, FORBIDDEN } = require("@configs/http-status.config");
+const { BAD_REQUEST, INTERNAL_ERROR, CONFLICT } = require("@configs/http-status.config");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
-const { versionControlService } = require("@services/common/version.service"); const { logWithTime } = require("@utils/time-stamps.util");
+const { versionControlService } = require("@services/common/version.service"); 
+const { logWithTime } = require("@utils/time-stamps.util");
 const { validateMeetingLink, isTimeOverlapping, validatePlatform } = require("@utils/meeting-validation.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Reschedules a meeting (SCHEDULED status only)
@@ -315,14 +317,14 @@ const conflictingMeetings = await MeetingModel.find(
         // ── 11. Log activity tracker event ──────────────────────────────────
         const { oldData, newData } = prepareAuditData(oldMeeting, updatedMeeting);
 
-        logActivityTrackerEvent(
+        logActivityTrackerEvent({
             user,
             device,
             requestId,
-            ACTIVITY_TRACKER_EVENTS.RESCHEDULE_MEETING,
-            `Meeting rescheduled: ${changes.join(", ")}`,
-            { oldData, newData }
-        );
+            eventType: ACTIVITY_TRACKER_EVENTS.RESCHEDULE_MEETING,
+            description: `Meeting rescheduled: ${changes.join(", ")}`,
+            logOptions: { oldData, newData, userActions: { targetId: meeting._id.toString(), performedOn: DB_COLLECTIONS.MEETINGS} }
+    });
 
         return {
             success: true,

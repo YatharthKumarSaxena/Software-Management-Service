@@ -8,6 +8,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { versionControlService } = require("@services/common/version.service");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Freezes a meeting (locks it from further modifications)
@@ -103,14 +104,14 @@ const freezeMeetingService = async (meeting, project, userId, auditContext = {})
     // ── Log activity tracker event ──────────────────────────────────────
     const { oldData, newData } = prepareAuditData(oldMeeting, updatedMeeting);
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.FREEZE_MEETING,
-      `Meeting frozen: prevented from further modifications`,
-      { oldData, newData }
-    );
+      eventType: ACTIVITY_TRACKER_EVENTS.FREEZE_MEETING,
+      description: `Meeting frozen: prevented from further modifications`,
+      logOptions: { oldData, newData, userActions: { targetId: meeting._id.toString(), performedOn: DB_COLLECTIONS.MEETINGS} }
+  });
 
     return {
       success: true,

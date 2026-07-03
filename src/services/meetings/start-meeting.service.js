@@ -8,6 +8,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { versionControlService } = require("@services/common/version.service");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Starts a meeting (transitions from SCHEDULED to ONGOING)
@@ -89,14 +90,14 @@ const startMeetingService = async (meeting, project, userId, auditContext = {}) 
     // ── Log activity tracker event ──────────────────────────────────────
     const { oldData, newData } = prepareAuditData(oldMeeting, updatedMeeting);
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.START_MEETING,
-      `Meeting started: status SCHEDULED → ONGOING at ${now.toISOString()}`,
-      { oldData, newData }
-    );
+      eventType: ACTIVITY_TRACKER_EVENTS.START_MEETING,
+      description: `Meeting started: status SCHEDULED → ONGOING at ${now.toISOString()}`,
+      logOptions: { oldData, newData, userActions: { targetId: updatedMeeting._id?.toString(), performedOn: DB_COLLECTIONS.MEETINGS } }
+    });
 
     return {
       success: true,

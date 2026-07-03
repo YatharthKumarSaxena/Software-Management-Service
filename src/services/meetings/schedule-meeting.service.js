@@ -1,7 +1,7 @@
 // services/meetings/schedule-meeting.service.js
 
 const { MeetingModel } = require("@models/meeting.model");
-const { MeetingStatuses, MeetingPlatformTypes } = require("@configs/enums.config");
+const { MeetingStatuses } = require("@configs/enums.config");
 const { BAD_REQUEST, INTERNAL_ERROR, CONFLICT } = require("@configs/http-status.config");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
@@ -9,6 +9,7 @@ const { versionControlService } = require("@services/common/version.service");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { validateMeetingLink, isTimeOverlapping, validatePlatform } = require("@utils/meeting-validation.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Schedules a meeting (transitions from DRAFT to SCHEDULED status)
@@ -125,30 +126,30 @@ const scheduleMeetingService = async (meeting, project, payload, userId, auditCo
 
         if (activeParticipants.length > 0) {
             // Query for any conflicting meetings
-const lowerBoundTime = new Date(newStart.getTime() - 24 * 60 * 60 * 1000);
+            const lowerBoundTime = new Date(newStart.getTime() - 24 * 60 * 60 * 1000);
 
-const conflictingMeetings = await MeetingModel.find(
-    {
-        _id: { $ne: meeting._id },
-        status: { $in: [MeetingStatuses.SCHEDULED, MeetingStatuses.ONGOING] },
-        scheduledAt: { 
-            $lt: newEnd,
-            $gte: lowerBoundTime // FIX: Prevents Memory/RAM crash from historical data
-        },
-        $or: [
-            { endedAt: { $gt: newStart } },
-            { endedAt: null }, // FIX: MongoDB null trap
-            { endedAt: { $exists: false } }
-        ],
-        "participants": {
-            $elemMatch: {
-                userId: { $in: activeParticipants },
-                isDeleted: { $ne: true } // FIX: Safely checks default boolean missing values
-            }
-        }
-    },
-    { participants: 1, scheduledAt: 1, endedAt: 1, expectedDuration: 1, title: 1 }
-).lean();
+            const conflictingMeetings = await MeetingModel.find(
+                {
+                    _id: { $ne: meeting._id },
+                    status: { $in: [MeetingStatuses.SCHEDULED, MeetingStatuses.ONGOING] },
+                    scheduledAt: {
+                        $lt: newEnd,
+                        $gte: lowerBoundTime // FIX: Prevents Memory/RAM crash from historical data
+                    },
+                    $or: [
+                        { endedAt: { $gt: newStart } },
+                        { endedAt: null }, // FIX: MongoDB null trap
+                        { endedAt: { $exists: false } }
+                    ],
+                    "participants": {
+                        $elemMatch: {
+                            userId: { $in: activeParticipants },
+                            isDeleted: { $ne: true } // FIX: Safely checks default boolean missing values
+                        }
+                    }
+                },
+                { participants: 1, scheduledAt: 1, endedAt: 1, expectedDuration: 1, title: 1 }
+            ).lean();
 
             logWithTime(
                 `[scheduleMeetingService] Found ${conflictingMeetings.length} potentially conflicting meetings`
@@ -228,14 +229,14 @@ const conflictingMeetings = await MeetingModel.find(
         // ── 10. Log activity tracker event ──────────────────────────────────
         const { oldData, newData } = prepareAuditData(oldMeeting, updatedMeeting);
 
-        logActivityTrackerEvent(
+        logActivityTrackerEvent({
             user,
             device,
             requestId,
-            ACTIVITY_TRACKER_EVENTS.SCHEDULE_MEETING,
-            `Meeting scheduled: status DRAFT → SCHEDULED, scheduled for ${finalScheduledAt.toISOString()}`,
-            { oldData, newData }
-        );
+            eventType: ACTIVITY_TRACKER_EVENTS.SCHEDULE_MEETING,
+            description: `Meeting scheduled: status DRAFT → SCHEDULED, scheduled for ${finalScheduledAt.toISOString()}`,
+            logOptions: { oldData, newData, userActions: { targetId: updatedMeeting._id?.toString(), performedOn: DB_COLLECTIONS.MEETINGS } }
+        });
 
         return {
             success: true,
