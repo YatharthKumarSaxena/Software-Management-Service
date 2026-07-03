@@ -8,6 +8,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Soft-deletes a scope.
@@ -65,17 +66,17 @@ const deleteScopeService = async ({
       activityMessage = `Scope "${deletedScope.title}" deleted by ${deletedBy} — Reason: ${deletionReasonDescription}`;
     }
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.DELETE_SCOPE,
-      activityMessage,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.DELETE_SCOPE,
+      description: activityMessage,
+      logOptions: {
         oldData,
-        adminActions: { targetId: deletedScope._id?.toString() },
+        userActions: { performedOn: DB_COLLECTIONS.SCOPES, targetId: deletedScope._id?.toString() },
       }
-    );
+    });
 
     return { success: true };
 

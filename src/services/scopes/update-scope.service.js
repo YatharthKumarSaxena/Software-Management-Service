@@ -8,6 +8,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Updates an existing scope with change detection.
@@ -118,18 +119,18 @@ const updateScopeService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldScope, updatedScope);
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_SCOPE,
-      `Scope "${updatedScope.title}" updated with category ${updatedScope.category} by ${updatedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_SCOPE,
+      description: `Scope "${updatedScope.title}" updated with category ${updatedScope.category} by ${updatedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: updatedScope._id?.toString() },
+        userActions: { performedOn: DB_COLLECTIONS.SCOPES, targetId: updatedScope._id?.toString() },
       }
-    );
+  });
 
     return { success: true, scope: updatedScope };
 

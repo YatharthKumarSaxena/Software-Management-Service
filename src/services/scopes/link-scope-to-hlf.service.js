@@ -9,6 +9,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases, ApplicabilityTypes } = require("@/configs/enums.config");
 const { FORBIDDEN } = require("@/configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Links a scope to a high-level feature.
@@ -73,18 +74,18 @@ const linkScopeToHlfService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldScope, linkedScope);
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.LINK_SCOPE_TO_HLF,
-      `Scope "${linkedScope.title}" linked to HLF "${hlf.title}" with category ${linkedScope.category} by ${linkedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.LINK_SCOPE_TO_HLF,
+      description: `Scope "${linkedScope.title}" linked to HLF "${hlf.title}" with category ${linkedScope.category} by ${linkedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: linkedScope._id?.toString() },
+        userActions: { performedOn: DB_COLLECTIONS.SCOPES, targetId: linkedScope._id?.toString() },
       }
-    );
+    });
 
     logWithTime(`✅ [linkScopeToHlfService] Scope ${linkedScope._id} successfully linked to HLF ${hlf._id}`);
     return { success: true, message: "Scope successfully linked to HLF", scope: linkedScope };
