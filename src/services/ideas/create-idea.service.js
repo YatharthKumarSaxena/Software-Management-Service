@@ -9,6 +9,7 @@ const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { INTERNAL_ERROR, CONFLICT, BAD_REQUEST } = require("@configs/http-status.config");
 const { counterServices } = require("@services/common/counter.service");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Creates a new idea document in the database.
@@ -79,11 +80,11 @@ const createIdeaService = async ({
 
     // ── Step 4: Log activity tracker event ────────────────────────────
     const { user, device, requestId } = auditContext || {};
-    logActivityTrackerEvent(
-      user, device, requestId, ACTIVITY_TRACKER_EVENTS.CREATE_IDEA,
-      `Idea "${normalizedTitle}" created for project`,
-      { newData: prepareAuditData(null, savedIdea).newData, adminActions: { targetId: projectId } }
-    );
+    logActivityTrackerEvent({
+      user: user, device, requestId, eventType: ACTIVITY_TRACKER_EVENTS.CREATE_IDEA,
+      description: `Idea "${normalizedTitle}" created for project`,
+      logOptions: { newData: prepareAuditData(null, savedIdea).newData, userActions: { targetId: savedIdea._id?.toString(), performedOn: DB_COLLECTIONS.IDEAS } }
+  });
 
     logWithTime(`✅ [createIdeaService] Idea created with ID: ${savedIdea._id}`);
     

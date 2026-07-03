@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { BAD_REQUEST, CONFLICT } = require("@configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Revokes an idea (changes status from ACCEPTED to REVOKED).
@@ -85,11 +86,11 @@ const revokeIdeaService = async (
     // ── Step 4: Log activity tracker event ────────────────────────────
     const { user, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldIdeaData, updatedIdea);
-    logActivityTrackerEvent(
-      user, device, requestId, ACTIVITY_TRACKER_EVENTS.REVOKE_IDEA,
-      `Idea revoked with reason: ${revokeReasonType}`,
-      { oldData, newData, adminActions: { targetId: idea._id } }
-    );
+    logActivityTrackerEvent({
+      user: user, device: device, requestId: requestId, eventType: ACTIVITY_TRACKER_EVENTS.REVOKE_IDEA,
+      description: `Idea revoked with reason: ${revokeReasonType}`,
+      logOptions: { oldData, newData, userActions: { targetId: idea._id?.toString(), performedOn: DB_COLLECTIONS.IDEAS } }
+    });
 
     logWithTime(`✅ [revokeIdeaService] Idea revoked successfully: ${idea._id}`);
     

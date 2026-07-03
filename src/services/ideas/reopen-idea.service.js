@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { BAD_REQUEST, CONFLICT } = require("@configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Reopens an idea (changes status from REJECTED/DEFERRED back to PENDING).
@@ -66,11 +67,11 @@ const reopenIdeaService = async (
     // ── Step 3: Log activity tracker event ────────────────────────────
     const { user, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldIdeaData, updatedIdea);
-    logActivityTrackerEvent(
-      user, device, requestId, ACTIVITY_TRACKER_EVENTS.REOPEN_IDEA,
-      `Idea reopened from ${idea.status} status`,
-      { oldData, newData, adminActions: { targetId: idea._id } }
-    );
+    logActivityTrackerEvent({
+      user: user, device: device, requestId: requestId, eventType: ACTIVITY_TRACKER_EVENTS.REOPEN_IDEA,
+      description: `Idea reopened from ${idea.status} status`,
+      logOptions: { oldData, newData, userActions: { targetId: idea._id?.toString(), performedOn: DB_COLLECTIONS.IDEAS } }
+    });
 
     logWithTime(`✅ [reopenIdeaService] Idea reopened successfully: ${idea._id}`);
     
