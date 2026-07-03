@@ -8,6 +8,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { counterServices } = require("@services/common/counter.service");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Creates an org project request for a client
@@ -139,20 +140,21 @@ const createOrgProjectRequestService = async ({
     /* ── Log activity tracker event ────────────────────────────────── */
     try {
       const { user, device, requestId: auditRequestId } = auditContext || {};
-      logActivityTrackerEvent(
+      logActivityTrackerEvent({
         user,
         device,
         auditRequestId,
-        ACTIVITY_TRACKER_EVENTS.CREATE_ORG_PROJECT_REQUEST,
-        `Organization project join request created. Project: ${project._id}, Organization: ${organizationId}`,
-        {
-          adminActions: {
+        eventType: ACTIVITY_TRACKER_EVENTS.CREATE_ORG_PROJECT_REQUEST,
+        description: `Organization project join request created. Project: ${project._id}, Organization: ${organizationId}`,
+        logOptions: {
+          userActions: {
             targetId: orgProjectRequest._id.toString(),
             clientId: client._id.toString(),
-            projectId: project._id.toString()
+            projectId: project._id.toString(),
+            performedOn: DB_COLLECTIONS.ORG_PROJECT_REQUESTS
           }
         }
-      );
+    });
     } catch (trackerError) {
       logWithTime(`⚠️  [createOrgProjectRequestService] Activity tracker logging failed: ${trackerError.message}`);
       // Continue - tracking failure doesn't fail the operation

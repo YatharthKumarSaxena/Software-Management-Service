@@ -1,8 +1,7 @@
 // services/org-project-requests/withdraw-org-project-request.service.js
 
-const { OrgProjectRequest } = require("@models/org-project-request.model");
 const { RequestStatus } = require("@configs/enums.config");
-const { NOT_FOUND, BAD_REQUEST, INTERNAL_ERROR, FORBIDDEN } = require("@configs/http-status.config");
+const { BAD_REQUEST, INTERNAL_ERROR, FORBIDDEN } = require("@configs/http-status.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
@@ -52,14 +51,14 @@ const withdrawOrgProjectRequestService = async ({
       const { user, device, requestId: auditRequestId } = auditContext || {};
       const { oldData: auditOldData, newData: auditNewData } = prepareAuditData(oldData, updatedRequest);
 
-      logActivityTrackerEvent(
+      logActivityTrackerEvent({
         user,
         device,
         auditRequestId,
-        ACTIVITY_TRACKER_EVENTS.WITHDRAW_ORG_PROJECT_REQUEST,
-        "Organization project request withdrawn by client",
-        { oldData: auditOldData, newData: auditNewData, adminActions: { targetId: request._id } }
-      );
+        eventType: ACTIVITY_TRACKER_EVENTS.WITHDRAW_ORG_PROJECT_REQUEST,
+        description: "Organization project request withdrawn by client",
+        logOptions: { oldData: auditOldData, newData: auditNewData, userActions: { targetId: request._id, performedOn: DB_COLLECTIONS.ORG_PROJECT_REQUESTS } }
+    });
     } catch (trackerError) {
       logWithTime(`⚠️  [withdrawOrgProjectRequestService] Activity tracker logging failed: ${trackerError.message}`);
       // Continue - tracking failure doesn't fail the operation

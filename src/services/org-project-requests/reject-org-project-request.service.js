@@ -1,12 +1,12 @@
 // services/org-project-requests/reject-org-project-request.service.js
 
-const { OrgProjectRequest } = require("@models/org-project-request.model");
 const { RequestStatus } = require("@configs/enums.config");
-const { NOT_FOUND, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
+const { BAD_REQUEST, INTERNAL_ERROR } = require("@configs/http-status.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { prepareAuditData } = require("@utils/audit-data.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Rejects an org project request (project owner/manager only)
@@ -53,14 +53,14 @@ const rejectOrgProjectRequestService = async ({
       const { user, device, requestId: auditRequestId } = auditContext || {};
       const { oldData: auditOldData, newData: auditNewData } = prepareAuditData(oldData, updatedRequest);
 
-      logActivityTrackerEvent(
+      logActivityTrackerEvent({
         user,
         device,
         auditRequestId,
-        ACTIVITY_TRACKER_EVENTS.REJECT_ORG_PROJECT_REQUEST,
-        `Organization project request rejected. Reason: ${rejectReasonType}${rejectReasonDescription ? ` - ${rejectReasonDescription}` : ''}`,
-        { oldData: auditOldData, newData: auditNewData, adminActions: { targetId: request._id } }
-      );
+        eventType: ACTIVITY_TRACKER_EVENTS.REJECT_ORG_PROJECT_REQUEST,
+        description: `Organization project request rejected. Reason: ${rejectReasonType}${rejectReasonDescription ? ` - ${rejectReasonDescription}` : ''}`,
+        logOptions: { oldData: auditOldData, newData: auditNewData, userActions: { targetId: request._id, performedOn: DB_COLLECTIONS.ORG_PROJECT_REQUESTS } }
+      });
     } catch (trackerError) {
       logWithTime(`⚠️  [rejectOrgProjectRequestService] Activity tracker logging failed: ${trackerError.message}`);
       // Continue - tracking failure doesn't fail the operation
