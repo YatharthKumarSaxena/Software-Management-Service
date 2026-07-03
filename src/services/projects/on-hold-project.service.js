@@ -5,6 +5,7 @@ const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.se
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { ProjectStatus } = require("@configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Puts an ACTIVE project on hold.
@@ -59,14 +60,14 @@ const onHoldProjectService = async (project, params) => {
         const { user, device, requestId } = params.auditContext || {};
         const { oldData, newData } = prepareAuditData(project, updatedProject);
 
-        logActivityTrackerEvent(
+        logActivityTrackerEvent({
             user,
             device,
             requestId,
-            ACTIVITY_TRACKER_EVENTS.ON_HOLD_PROJECT,
-            `Project '${updatedProject.name}' (${project._id}) put on hold by ${params.onHoldBy}. Reason: ${params.onHoldReasonType}`,
-            { oldData, newData, adminActions: { targetId: project._id } }
-        );
+            eventType: ACTIVITY_TRACKER_EVENTS.ON_HOLD_PROJECT,
+            description: `Project '${updatedProject.name}' (${project._id}) put on hold by ${params.onHoldBy}. Reason: ${params.onHoldReasonType}`,
+            logOptions: { oldData, newData, userActions: { performedOn: DB_COLLECTIONS.PROJECTS, targetId: project._id } }
+        });
 
         return { success: true, project: updatedProject };
     } catch (error) {
@@ -130,14 +131,14 @@ const convertOnHoldToActiveProjectService = async (project, params) => {
 
         const versionString = `v${updatedProject.version.major}.${updatedProject.version.minor}`;
 
-        logActivityTrackerEvent(
+        logActivityTrackerEvent({
             user,
             device,
             requestId,
-            ACTIVITY_TRACKER_EVENTS.CONVERT_ON_HOLD_TO_ACTIVE,
-            `Project '${updatedProject.name}' (${project._id}) auto-converted from ON_HOLD to ACTIVE of ${versionString} by ${params.convertedBy}`,
-            { oldData, newData, adminActions: { targetId: project._id } }
-        );
+            eventType: ACTIVITY_TRACKER_EVENTS.CONVERT_ON_HOLD_TO_ACTIVE,
+            description: `Project '${updatedProject.name}' (${project._id}) auto-converted from ON_HOLD to ACTIVE of ${versionString} by ${params.convertedBy}`,
+            logOptions: { oldData, newData, userActions: { performedOn: DB_COLLECTIONS.PROJECTS, targetId: project._id } }
+        });
 
         return { success: true, project: updatedProject };
     } catch (error) {

@@ -5,6 +5,7 @@ const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.se
 const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { ProjectStatus } = require("@configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Resumes a project that was previously put ON_HOLD or ABORTED.
@@ -63,14 +64,14 @@ const resumeProjectService = async (project, params) => {
     const { user, device, requestId } = params.auditContext || {};
     const { oldData, newData } = prepareAuditData(project, updatedProject);
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.RESUME_PROJECT,
-      `Project '${updatedProject.name}' (${project._id}) resumed by ${params.resumedBy}. Reason: ${params.resumeReasonType}`,
-      { oldData, newData, adminActions: { targetId: project._id } }
-    );
+      eventType: ACTIVITY_TRACKER_EVENTS.RESUME_PROJECT,
+      description: `Project '${updatedProject.name}' (${project._id}) resumed by ${params.resumedBy}. Reason: ${params.resumeReasonType}`,
+      logOptions: { oldData, newData, userActions: { performedOn: DB_COLLECTIONS.PROJECTS, targetId: project._id } }
+    });
 
     return { success: true, project: updatedProject };
   } catch (error) {

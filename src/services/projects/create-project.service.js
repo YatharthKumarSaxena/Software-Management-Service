@@ -12,6 +12,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { getMyEnvAsBool } = require("@/utils/env.util");
 const { counterServices } = require("@services/common/counter.service");
 const { INTERNAL_ERROR } = require("@configs/http-status.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Creates a new project document in the database.
@@ -191,14 +192,14 @@ const createProjectService = async ({
       ...(workflowMode !== undefined && { workflowMode })
     });
 
-    logActivityTrackerEvent(
+    logActivityTrackerEvent({
       user,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.CREATE_PROJECT,
-      `Project '${project.name}' (${project._id}) created by ${createdBy}`,
-      { newData: project }
-    );
+      eventType: ACTIVITY_TRACKER_EVENTS.CREATE_PROJECT,
+      description: `Project '${project.name}' (${project._id}) created by ${createdBy}`,
+      logOptions: { newData: project, userActions: { performedOn: DB_COLLECTIONS.PROJECTS, targetId: project._id } }
+  });
 
     // Auto-create Inception Phase using phase management service
     logWithTime(`[createProjectService] Creating Inception phase for project ${projectId}`);
