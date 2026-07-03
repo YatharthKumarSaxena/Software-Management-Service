@@ -9,6 +9,7 @@ const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
 const { Phases, ApplicabilityTypes } = require("@/configs/enums.config");
 const { counterServices } = require("@services/common/counter.service");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Creates a new constraint for a project's current inception phase.
@@ -85,17 +86,17 @@ const createConstraintService = async ({
 
     // ── Activity tracker ──────────────────────────────────────────────────────
     const { user: auditUser, device, requestId } = auditContext || {};
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.CREATE_CONSTRAINT,
-      `Constraint "${normalizedTitle}" created for inception ${inceptionId} with type ${type} by ${createdBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.CREATE_CONSTRAINT,
+      description: `Constraint "${normalizedTitle}" created for inception ${inceptionId} with type ${type} by ${createdBy}`,
+      logOptions: {
         newData: prepareAuditData(null, constraint).newData,
-        adminActions: { targetId: constraint._id?.toString() },
+        adminActions: { targetId: constraint._id?.toString(), performedOn: DB_COLLECTIONS.CONSTRAINTS },
       }
-    );
+    });
 
     return { success: true, constraint };
 

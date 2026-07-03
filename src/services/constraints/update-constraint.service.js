@@ -7,7 +7,8 @@ const { prepareAuditData } = require("@utils/audit-data.util");
 const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { errorMessage } = require("@utils/log-error.util");
-const { Phases, ApplicabilityTypes } = require("@/configs/enums.config");
+const { Phases } = require("@/configs/enums.config");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Updates an existing constraint with change detection.
@@ -104,18 +105,18 @@ const updateConstraintService = async ({
     const { user: auditUser, device, requestId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldConstraint, updatedConstraint);
 
-    logActivityTrackerEvent(
-      auditUser,
+    logActivityTrackerEvent({
+      user: auditUser,
       device,
       requestId,
-      ACTIVITY_TRACKER_EVENTS.UPDATE_CONSTRAINT,
-      `Constraint "${updatedConstraint.title}" updated by ${updatedBy}`,
-      {
+      eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_CONSTRAINT,
+      description: `Constraint "${updatedConstraint.title}" updated by ${updatedBy}`,
+      logOptions: {
         oldData,
         newData,
-        adminActions: { targetId: updatedConstraint._id?.toString() },
+        adminActions: { targetId: updatedConstraint._id?.toString(), performedOn: DB_COLLECTIONS.CONSTRAINTS },
       }
-    );
+    });
 
     return { success: true, constraint: updatedConstraint };
 
