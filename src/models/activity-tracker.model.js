@@ -57,7 +57,7 @@ const activityTrackerSchema = new mongoose.Schema({
     default: null
   },
 
-  adminActions: {
+  userActions: {
     type: new mongoose.Schema(
       {
         targetId: {
