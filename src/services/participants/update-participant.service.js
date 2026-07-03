@@ -7,6 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@configs/tracker.config");
 const { versionControlService } = require("@services/common/version.service");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Updates a participant's editable fields (role and/or roleDescription).
@@ -147,14 +148,14 @@ const updateParticipantService = async (
         // ── 8. Log activity tracker event ──────────────────────────────────
         const { oldData, newData } = prepareAuditData(oldMeeting, updatedMeeting);
 
-        logActivityTrackerEvent(
+        logActivityTrackerEvent({
             user,
             device,
             requestId,
-            ACTIVITY_TRACKER_EVENTS.UPDATE_MEETING_MEMBER,
-            `Participant ${userId} updated: ${changes.join(', ')}`,
-            { oldData, newData }
-        );
+            eventType: ACTIVITY_TRACKER_EVENTS.UPDATE_MEETING_MEMBER,
+            description: `Participant ${userId} updated: ${changes.join(', ')}`,
+            logOptions: { oldData, newData, userActions: { targetId: meeting._id, performedOn: DB_COLLECTIONS.MEETINGS } }
+        });
 
         logWithTime(
             `✅ [updateParticipantService] Participant updated: ${userId} in meeting ${meeting._id}`
