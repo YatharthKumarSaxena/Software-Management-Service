@@ -8,6 +8,7 @@ const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 const { isConversionAllowed, getEventsForCollection } = require("@configs/conversion-matrix.config");
 const { compareDirectConversion } = require("../../utils/direct-comparison.util");
 const { ConversionTypes } = require("@/configs/enums.config");
+const mongoose = require("mongoose");
 
 /**
  * Creates a conversion record after validating the workflow.
@@ -55,9 +56,23 @@ const createConversionService = async ({
       return { success: true, conversion: existingWorkflowConversion, message: "Conversion already completed (Idempotent)" };
     }
 
+    const sourceEvents = getEventsForCollection(sourceCollection);
+    const targetEvents = getEventsForCollection(targetCollection);
+
+    if (!sourceEvents || !targetEvents) {
+      return {
+        success: false,
+        message: "Unsupported collections for conversion events"
+      };
+    }
+
+    // 5. Exact Activity Matching
+    const deleteEvent = sourceEvents.DELETE;
+    const createEvent = targetEvents.CREATE;
+
     // 4. Fetch Activities for the workflow and user
     const activities = await ActivityTrackerModel
-      .find({ workflowId, userId, deviceUUID })
+      .find({ workflowId, userId, deviceUUID, eventType: { $in: [createEvent, deleteEvent] } })
       .sort({ createdAt: 1 })
       .lean();
 
@@ -68,34 +83,23 @@ const createConversionService = async ({
       };
     }
 
-    // 5. Exact Activity Matching
-    const eventsConfig = getEventsForCollection(sourceCollection);
-    const targetEventsConfig = getEventsForCollection(targetCollection);
-
-    if (!eventsConfig || !targetEventsConfig) {
-      return { success: false, message: "Unsupported collections for conversion events" };
-    }
-
-    const expectedDeleteEvent = eventsConfig.DELETE;
-    const expectedCreateEvent = targetEventsConfig.CREATE;
-
     const createActivity = activities.find(a =>
-      a.eventType === expectedCreateEvent &&
-      a.adminActions?.performedOn === targetCollection &&
-      String(a.adminActions?.targetId) === String(targetEntityId)
+      a.eventType === createEvent &&
+      a.userActions?.performedOn === targetCollection &&
+      String(a.userActions?.targetId) === String(targetEntityId)
     );
 
     const deleteActivity = activities.find(a =>
-      a.eventType === expectedDeleteEvent &&
-      a.adminActions?.performedOn === sourceCollection &&
-      String(a.adminActions?.targetId) === String(sourceEntityId)
+      a.eventType === deleteEvent &&
+      a.userActions?.performedOn === sourceCollection &&
+      String(a.userActions?.targetId) === String(sourceEntityId)
     );
 
     if (!createActivity) {
-      return { success: false, message: `Exact Create activity (${expectedCreateEvent}) for target entity not found in workflow` };
+      return { success: false, message: `Exact Create activity (${createEvent}) for target entity not found in workflow` };
     }
     if (!deleteActivity) {
-      return { success: false, message: `Exact Delete activity (${expectedDeleteEvent}) for source entity not found in workflow` };
+      return { success: false, message: `Exact Delete activity (${deleteEvent}) for source entity not found in workflow` };
     }
 
     // 6. Activity sequence (Create must occur before Delete)
@@ -112,9 +116,22 @@ const createConversionService = async ({
       return { success: false, message: "Workflow activities do not belong to the specified project" };
     }
 
+    const SourceModel = mongoose.model(sourceCollection);
+    const TargetModel = mongoose.model(targetCollection);
+
+    const sourceEntity = await SourceModel.findById(sourceEntityId).lean();
+    const targetEntity = await TargetModel.findById(targetEntityId).lean();
+
+    if (!sourceEntity || !targetEntity) {
+      return {
+        success: false,
+        message: "Source or target entity not found."
+      };
+    }
+
     let conversionType = ConversionTypes.DIRECT;
     // 8. DIRECT Conversion Validation
-    const comparison = compareDirectConversion(deleteActivity.oldData, createActivity.newData);
+    const comparison = compareDirectConversion(sourceEntity, targetEntity);
     if (!comparison.valid) {
       conversionType = ConversionTypes.INDIRECT;
     }
@@ -146,7 +163,7 @@ const createConversionService = async ({
       logOptions: {
         oldData: { sourceEntityId, sourceCollection, projectId },
         newData: { targetEntityId, targetCollection, conversionId: conversion._id, projectId },
-        adminActions: { targetId: conversion._id, performedOn: DB_COLLECTIONS.CONVERSIONS }
+        userActions: { targetId: conversion._id, performedOn: DB_COLLECTIONS.CONVERSIONS }
       }
     });
 
