@@ -9,6 +9,7 @@ const { projectMiddlewares } = require("@/middlewares/projects");
 
 const baseMiddlewares = [
     commonMiddlewares.requestIdMiddleware,
+    commonMiddlewares.workflowIdMiddleware,
     commonMiddlewares.verifyDeviceField,
     commonMiddlewares.isDeviceBlocked
 ];
