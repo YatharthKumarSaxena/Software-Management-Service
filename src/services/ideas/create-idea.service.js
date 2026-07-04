@@ -79,9 +79,9 @@ const createIdeaService = async ({
     }
 
     // ── Step 4: Log activity tracker event ────────────────────────────
-    const { user, device, requestId } = auditContext || {};
+    const { user, device, requestId, workflowId } = auditContext || {};
     logActivityTrackerEvent({
-      user: user, device, requestId, eventType: ACTIVITY_TRACKER_EVENTS.CREATE_IDEA,
+      user: user, device, requestId, workflowId, eventType: ACTIVITY_TRACKER_EVENTS.CREATE_IDEA,
       description: `Idea "${normalizedTitle}" created for project`,
       logOptions: { newData: prepareAuditData(null, savedIdea).newData, userActions: { targetId: savedIdea._id?.toString(), performedOn: DB_COLLECTIONS.IDEAS } }
   });

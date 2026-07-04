@@ -58,7 +58,7 @@ const deleteConstraintService = async ({
     });
 
     // ── Activity tracker ───────────────────────────────────────────────────────
-    const { user: auditUser, device, requestId } = auditContext || {};
+    const { user: auditUser, device, requestId, workflowId } = auditContext || {};
     const { oldData } = prepareAuditData(oldConstraint, null);
 
     let activityMessage = `Constraint "${deletedConstraint.title}" deleted by ${deletedBy}`;
@@ -70,6 +70,7 @@ const deleteConstraintService = async ({
       user: auditUser,
       device,
       requestId,
+      workflowId,
       eventType: ACTIVITY_TRACKER_EVENTS.DELETE_CONSTRAINT,
       description: activityMessage,
       logOptions: {

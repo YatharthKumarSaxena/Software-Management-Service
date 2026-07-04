@@ -71,13 +71,13 @@ const logActivityTrackerEvent = ({
 
   requestId,
 
+  workflowId = null,
+
   eventType,
 
   description,
 
-  logOptions = {},
-
-  workflowId = null
+  logOptions = {}
 }) => {
   (async () => {
     try {
