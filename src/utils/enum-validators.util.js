@@ -1,6 +1,7 @@
 // Enum Helpers using Factory Design Pattern
 const { isValidEnumValue, getEnumKeyByValue } = require("./validators-factory.util.js");
 const { logWithTime } = require("./time-stamps.util");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 const {
   Phases,
@@ -141,6 +142,7 @@ const UnlinkReasonTypesHelper = createEnumHelper(UnlinkReasonTypes, "UnlinkReaso
 const AllowedPhaseTypesHelper = createEnumHelper(AllowedPhaseTypes, "AllowedPhaseTypes");
 const ConstraintTypesHelper = createEnumHelper(ConstraintTypes, "ConstraintTypes");
 const ApplicabilityTypesHelper = createEnumHelper(ApplicabilityTypes, "ApplicabilityTypes");
+const DBCollectionsHelper = createEnumHelper(DB_COLLECTIONS, "DBCollections");
 
 module.exports = {
   DeviceTypeHelper,
@@ -195,5 +197,6 @@ module.exports = {
   UnlinkReasonTypesHelper,
   AllowedPhaseTypesHelper,
   ConstraintTypesHelper,
-  ApplicabilityTypesHelper
+  ApplicabilityTypesHelper,
+  DBCollectionsHelper
 };
