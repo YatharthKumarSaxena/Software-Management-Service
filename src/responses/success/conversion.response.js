@@ -14,4 +14,35 @@ const sendConversionCreatedSuccess = (res, conversion) => {
   });
 };
 
-module.exports = { sendConversionCreatedSuccess };
+const sendConversionsListFetchedSuccess = (res, conversions, totalCount, currentPage, totalPages) => {
+  logWithTime(`✅ [sendConversionsListFetchedSuccess] Fetched ${conversions.length} conversions`);
+  return res.status(OK).json({
+    success: true,
+    message: "Conversions fetched successfully",
+    data: {
+      conversions,
+      pagination: {
+        totalCount,
+        currentPage,
+        totalPages
+      }
+    }
+  });
+};
+
+const sendConversionFetchedSuccess = (res, conversion) => {
+  logWithTime(`✅ [sendConversionFetchedSuccess] Fetched Conversion ID: ${conversion._id}`);
+  return res.status(OK).json({
+    success: true,
+    message: "Conversion fetched successfully",
+    data: {
+      conversion
+    }
+  });
+};
+
+module.exports = {
+    sendConversionCreatedSuccess,
+    sendConversionsListFetchedSuccess,
+    sendConversionFetchedSuccess
+};
