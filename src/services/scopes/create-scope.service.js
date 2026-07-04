@@ -95,7 +95,7 @@ const createScopeService = async ({
       description: `Scope "${normalizedTitle}" created for inception ${inceptionId} with category GLOBAL by ${createdBy}`,
       logOptions: {
         newData: prepareAuditData(null, scope).newData,
-        adminActions: { targetId: scope._id?.toString(), performedOn: DB_COLLECTIONS.SCOPES },
+        userActions: { targetId: scope._id?.toString(), performedOn: DB_COLLECTIONS.SCOPES },
       }
   });
 

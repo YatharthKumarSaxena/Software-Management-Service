@@ -14,6 +14,16 @@ const sendConversionCreatedSuccess = (res, conversion) => {
   });
 };
 
+const sendConversionAlreadyExistsSuccess = (res, conversion) => {
+  logWithTime(`✅ [sendConversionAlreadyExistsSuccess] Conversion already completed ID: ${conversion._id}`);
+  return res.status(OK).json({
+    success: true,
+    message: "Conversion already completed (Idempotent)",
+    data: {
+      conversion
+    }
+  });
+};
 const sendConversionsListFetchedSuccess = (res, conversions, totalCount, currentPage, totalPages) => {
   logWithTime(`✅ [sendConversionsListFetchedSuccess] Fetched ${conversions.length} conversions`);
   return res.status(OK).json({
@@ -43,6 +53,7 @@ const sendConversionFetchedSuccess = (res, conversion) => {
 
 module.exports = {
     sendConversionCreatedSuccess,
+    sendConversionAlreadyExistsSuccess,
     sendConversionsListFetchedSuccess,
     sendConversionFetchedSuccess
 };

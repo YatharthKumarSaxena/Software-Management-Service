@@ -16,9 +16,9 @@ const conversionSchema = new mongoose.Schema({
     match: customIdRegex
   },
   projectId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
-    match: customIdRegex
+    ref: DB_COLLECTIONS.PROJECTS
   },
   sourceCollection: {
     type: String,

@@ -1,7 +1,7 @@
 // controllers/conversions/create-conversion.controller.js
 
 const { createConversionService } = require("@services/conversions/create-conversion.service");
-const { sendConversionCreatedSuccess } = require("@/responses/success/conversion.response");
+const { sendConversionCreatedSuccess, sendConversionAlreadyExistsSuccess } = require("@/responses/success/conversion.response");
 
 const {
   throwBadRequestError,
@@ -29,7 +29,7 @@ const createConversionController = async (req, res) => {
     // ── Call service ──────────────────────────────────────
     const result = await createConversionService({
       workflowId,
-      projectId: project._id.toString(),
+      projectId: project._id,
       sourceEntityId,
       sourceCollection,
       targetEntityId,
@@ -37,7 +37,7 @@ const createConversionController = async (req, res) => {
       auditContext: {
         user: req.admin || req.client,
         device: req.device,
-        requestId: req.requestId,
+        requestId: req.requestId
       },
     });
 
@@ -57,6 +57,11 @@ const createConversionController = async (req, res) => {
       // All other validation failures (including unsupported collections) are Bad Requests
       logWithTime(`❌ [createConversionController] Validation error: ${result.message} | ${getLogIdentifiers(req)}`);
       return throwBadRequestError(res, result.message, result.error);
+    }
+
+    if (result.message === "Conversion already completed (Idempotent)") {
+      logWithTime(`✅ [createConversionController] Conversion already completed (Idempotent) | ${getLogIdentifiers(req)}`);
+      return sendConversionAlreadyExistsSuccess(res, result.conversion);
     }
 
     logWithTime(`✅ [createConversionController] Conversion created successfully | ${getLogIdentifiers(req)}`);
