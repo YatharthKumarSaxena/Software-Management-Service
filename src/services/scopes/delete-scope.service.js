@@ -58,7 +58,7 @@ const deleteScopeService = async ({
     });
 
     // ── Activity tracker ─────────────────────────────────────────────────────
-    const { user: auditUser, device, requestId } = auditContext || {};
+    const { user: auditUser, device, requestId, workflowId } = auditContext || {};
     const { oldData } = prepareAuditData(oldScope, null);
 
     let activityMessage = `Scope "${deletedScope.title}" deleted by ${deletedBy}`;
@@ -70,6 +70,7 @@ const deleteScopeService = async ({
       user: auditUser,
       device,
       requestId,
+      workflowId,
       eventType: ACTIVITY_TRACKER_EVENTS.DELETE_SCOPE,
       description: activityMessage,
       logOptions: {

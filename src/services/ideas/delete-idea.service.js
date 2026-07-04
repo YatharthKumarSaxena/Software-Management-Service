@@ -74,10 +74,10 @@ const deleteIdeaService = async (
     }
 
     // ── Step 4: Log activity tracker event ────────────────────────────
-    const { user, device, requestId } = auditContext || {};
+    const { user, device, requestId, workflowId } = auditContext || {};
     const { oldData, newData } = prepareAuditData(oldIdeaData, deletedIdea);
     logActivityTrackerEvent({
-      user: user, device: device, requestId: requestId, eventType: ACTIVITY_TRACKER_EVENTS.DELETE_IDEA,
+      user: user, device: device, requestId: requestId, workflowId, eventType: ACTIVITY_TRACKER_EVENTS.DELETE_IDEA,
       description: `Idea deleted`,
       logOptions: { oldData, newData, userActions: { targetId: idea._id?.toString(), performedOn: DB_COLLECTIONS.IDEAS } }
     });

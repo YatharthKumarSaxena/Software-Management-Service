@@ -115,7 +115,10 @@ const requiredFields = {
     // ── Constraint ──────────────────────────────────────────────────────
     createConstraintField: getRequiredFields(FieldDefinitions.CREATE_CONSTRAINT),
     updateConstraintField: getRequiredFields(FieldDefinitions.UPDATE_CONSTRAINT),
-    deleteConstraintField: getRequiredFields(FieldDefinitions.DELETE_CONSTRAINT)
+    deleteConstraintField: getRequiredFields(FieldDefinitions.DELETE_CONSTRAINT),
+
+    // ── Conversion ──────────────────────────────────────────────────────
+    createConversionField: getRequiredFields(FieldDefinitions.CREATE_CONVERSION)
 }
 
 module.exports = {

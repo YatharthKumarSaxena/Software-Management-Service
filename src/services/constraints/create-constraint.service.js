@@ -85,11 +85,12 @@ const createConstraintService = async ({
     });
 
     // ── Activity tracker ──────────────────────────────────────────────────────
-    const { user: auditUser, device, requestId } = auditContext || {};
+    const { user: auditUser, device, requestId, workflowId } = auditContext || {};
     logActivityTrackerEvent({
       user: auditUser,
       device,
       requestId,
+      workflowId,
       eventType: ACTIVITY_TRACKER_EVENTS.CREATE_CONSTRAINT,
       description: `Constraint "${normalizedTitle}" created for inception ${inceptionId} with type ${type} by ${createdBy}`,
       logOptions: {

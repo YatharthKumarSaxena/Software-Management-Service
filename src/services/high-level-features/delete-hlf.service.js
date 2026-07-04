@@ -57,7 +57,7 @@ const deleteHlfService = async ({
     });
 
     // ── Activity tracker ─────────────────────────────────────────────────────
-    const { user: auditUser, device, requestId } = auditContext || {};
+    const { user: auditUser, device, requestId, workflowId } = auditContext || {};
     const { oldData } = prepareAuditData(oldHlf, null);
 
     let activityMessage = `High-level feature "${deletedHlf.title}" deleted by ${deletedBy}`;
@@ -69,6 +69,7 @@ const deleteHlfService = async ({
       user: auditUser,
       device,
       requestId,
+      workflowId,
       eventType: ACTIVITY_TRACKER_EVENTS.DELETE_HLF,
       description: activityMessage,
       logOptions: {

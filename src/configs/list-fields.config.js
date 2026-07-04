@@ -227,6 +227,20 @@ const ACTIVITY_TRACKER_CLIENT_LIST_FIELDS = {
     searchableFields: ["description"]
 };
 
+const CONVERSION_ADMIN_LIST_FIELDS = {
+    hiddenFields: ["__v"],
+    filterableFields: ["workflowId", "projectId", "sourceCollection", "targetCollection", "isDeleted"],
+    sortableFields: ["createdAt", "updatedAt"],
+    searchableFields: []
+};
+
+const CONVERSION_CLIENT_LIST_FIELDS = {
+    hiddenFields: ["__v", "createdBy", "updatedBy", "isDeleted", "deletedAt", "deletedBy", "deviceUUID", "createActivityId", "deleteActivityId"],
+    filterableFields: ["workflowId", "projectId", "sourceCollection", "targetCollection", "isDeleted"],
+    sortableFields: ["createdAt"],
+    searchableFields: []
+};
+
 module.exports = {
     REQUIREMENT_ADMIN_LIST_FIELDS,
     REQUIREMENT_CLIENT_LIST_FIELDS,
@@ -251,5 +265,7 @@ module.exports = {
     STAKEHOLDER_ADMIN_LIST_FIELDS,
     STAKEHOLDER_CLIENT_LIST_FIELDS,
     ACTIVITY_TRACKER_ADMIN_LIST_FIELDS,
-    ACTIVITY_TRACKER_CLIENT_LIST_FIELDS
+    ACTIVITY_TRACKER_CLIENT_LIST_FIELDS,
+    CONVERSION_ADMIN_LIST_FIELDS,
+    CONVERSION_CLIENT_LIST_FIELDS
 };

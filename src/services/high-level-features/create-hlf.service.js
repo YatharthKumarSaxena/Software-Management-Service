@@ -98,11 +98,12 @@ const createHlfService = async ({
     });
 
     // ── Activity tracker ──────────────────────────────────────────────────────
-    const { user: auditUser, device, requestId } = auditContext || {};
+    const { user: auditUser, device, requestId, workflowId } = auditContext || {};
     logActivityTrackerEvent({
       user: auditUser,
       device,
       requestId,
+      workflowId,
       eventType: ACTIVITY_TRACKER_EVENTS.CREATE_HLF,
       description: `High-level feature "${title}" created for inception ${inceptionId} by ${createdBy}`,
       logOptions: {

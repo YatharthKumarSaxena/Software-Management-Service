@@ -50,7 +50,8 @@ const createRequirementController = async (req, res) => {
       auditContext: {
         user,
         device: req.device,
-        requestId: req.requestId
+        requestId: req.requestId,
+        workflowId: req.workflowId
       }
     });
 

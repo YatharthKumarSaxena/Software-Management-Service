@@ -18,7 +18,6 @@ const { ConversionTypes } = require("@/configs/enums.config");
  * @param {String} params.sourceCollection
  * @param {String} params.targetEntityId
  * @param {String} params.targetCollection
- * @param {String} params.conversionType
  * @param {Object} params.auditContext
  * @returns {Object} { success, message, conversion, error }
  */
@@ -29,7 +28,6 @@ const createConversionService = async ({
   sourceCollection,
   targetEntityId,
   targetCollection,
-  conversionType,
   auditContext,
 }) => {
   try {
@@ -114,15 +112,11 @@ const createConversionService = async ({
       return { success: false, message: "Workflow activities do not belong to the specified project" };
     }
 
+    let conversionType = ConversionTypes.DIRECT;
     // 8. DIRECT Conversion Validation
-    if (conversionType === ConversionTypes.DIRECT) {
-      const comparison = compareDirectConversion(deleteActivity.oldData, createActivity.newData);
-      if (!comparison.valid) {
-        return {
-          success: false,
-          message: `DIRECT conversion validation failed: field '${comparison.field}' ${comparison.reason}. Please use INDIRECT conversion.`
-        };
-      }
+    const comparison = compareDirectConversion(deleteActivity.oldData, createActivity.newData);
+    if (!comparison.valid) {
+      conversionType = ConversionTypes.INDIRECT;
     }
 
     // 9. Persist Conversion Mapping
@@ -154,7 +148,7 @@ const createConversionService = async ({
         newData: { targetEntityId, targetCollection, conversionId: conversion._id, projectId },
         adminActions: { targetId: conversion._id, performedOn: DB_COLLECTIONS.CONVERSIONS }
       }
-  });
+    });
 
     return { success: true, conversion };
   } catch (error) {

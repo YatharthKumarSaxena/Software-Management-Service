@@ -35,6 +35,7 @@ const createHlfController = async (req, res) => {
         user: req.admin,
         device: req.device,
         requestId: req.requestId,
+        workflowId: req.workflowId
       },
     });
 

@@ -206,9 +206,9 @@ const createRequirementService = async ({
 
     if (!usedInBulkImport) {
       // Log activity tracker event (fire-and-forget)
-      const { user, device, requestId } = auditContext || {};
+      const { user, device, requestId, workflowId } = auditContext || {};
       logActivityTrackerEvent({
-        user, device, requestId, eventType: ACTIVITY_TRACKER_EVENTS.REQUIREMENT_CREATED,
+        user, device, requestId, workflowId, eventType: ACTIVITY_TRACKER_EVENTS.REQUIREMENT_CREATED,
         description: `Requirement created: "${title}"`,
         logOptions: { newData: savedRequirement.toObject(), userActions: { performedOn: DB_COLLECTIONS.REQUIREMENTS, targetId: savedRequirement._id.toString() } }
     });

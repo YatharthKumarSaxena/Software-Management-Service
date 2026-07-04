@@ -85,11 +85,12 @@ const createScopeService = async ({
     });
 
     // ── Activity tracker ──────────────────────────────────────────────────────
-    const { user: auditUser, device, requestId } = auditContext || {};
+    const { user: auditUser, device, requestId, workflowId } = auditContext || {};
     logActivityTrackerEvent({
       user: auditUser,
       device,
       requestId,
+      workflowId,
       eventType: ACTIVITY_TRACKER_EVENTS.CREATE_SCOPE,
       description: `Scope "${normalizedTitle}" created for inception ${inceptionId} with category GLOBAL by ${createdBy}`,
       logOptions: {

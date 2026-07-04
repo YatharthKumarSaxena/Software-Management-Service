@@ -53,10 +53,11 @@ const {
   UnlinkReasonTypesHelper,
   AllowedPhaseTypesHelper,
   ConstraintTypesHelper,
-  ApplicabilityTypesHelper
+  ApplicabilityTypesHelper,
+  DBCollectionsHelper
 } = require("@utils/enum-validators.util");
 
-const { customIdRegex, mongoIdRegex, budgetRegex, timelineRegex, isoDateRegex } = require("./regex.config");
+const { customIdRegex, mongoIdRegex, budgetRegex, timelineRegex, isoDateRegex, UUID_V4_REGEX } = require("./regex.config");
 
 /**
  * Validation rules – single source of truth for field-level constraints.
@@ -322,6 +323,14 @@ const validationRules = {
   },
   applicabilityType: {
     enum: ApplicabilityTypesHelper
+  },
+
+  // ── Conversion fields ──────────────────────────────────────────────────
+  uuidV4: {
+    regex: UUID_V4_REGEX
+  },
+  dbCollection: {
+    enum: DBCollectionsHelper
   }
 };
 
