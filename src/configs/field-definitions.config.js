@@ -1538,6 +1538,40 @@ const FieldDefinitions = {
     }
   },
 
+  // ── CREATE CONVERSION ────────────────────────────────────────────────
+  CREATE_CONVERSION: {
+    WORKFLOW_ID: {
+      field: "workflowId",
+      required: true,
+      validation: validationRules.uuidV4,
+      description: "UUID v4 string for the workflow"
+    },
+    SOURCE_ENTITY_ID: {
+      field: "sourceEntityId",
+      required: true,
+      validation: validationRules.mongoId,
+      description: "MongoDB ObjectId of the source entity"
+    },
+    SOURCE_COLLECTION: {
+      field: "sourceCollection",
+      required: true,
+      validation: validationRules.dbCollection,
+      description: "Enum for source collection"
+    },
+    TARGET_ENTITY_ID: {
+      field: "targetEntityId",
+      required: true,
+      validation: validationRules.mongoId,
+      description: "MongoDB ObjectId of the target entity"
+    },
+    TARGET_COLLECTION: {
+      field: "targetCollection",
+      required: true,
+      validation: validationRules.dbCollection,
+      description: "Enum for target collection"
+    }
+  }
+
 };
 
 module.exports = { FieldDefinitions };

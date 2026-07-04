@@ -85,7 +85,10 @@ const validationSets = {
     // ── Constraint Operations ──────────────────────────────────────────
     createConstraintValidationSet: getValidationSet(FieldDefinitions.CREATE_CONSTRAINT),
     updateConstraintValidationSet: getValidationSet(FieldDefinitions.UPDATE_CONSTRAINT),
-    deleteConstraintValidationSet: getValidationSet(FieldDefinitions.DELETE_CONSTRAINT)
+    deleteConstraintValidationSet: getValidationSet(FieldDefinitions.DELETE_CONSTRAINT),
+
+    // ── Conversion Operations ──────────────────────────────────────────
+    createConversionValidationSet: getValidationSet(FieldDefinitions.CREATE_CONVERSION)
 };
 
 module.exports = { validationSets };
