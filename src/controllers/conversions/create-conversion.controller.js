@@ -21,8 +21,7 @@ const createConversionController = async (req, res) => {
       sourceEntityId,
       sourceCollection,
       targetEntityId,
-      targetCollection,
-      conversionType
+      targetCollection
     } = req.body;
 
     const project = req.project;
@@ -35,7 +34,6 @@ const createConversionController = async (req, res) => {
       sourceCollection,
       targetEntityId,
       targetCollection,
-      conversionType,
       auditContext: {
         user: req.admin || req.client,
         device: req.device,
@@ -51,12 +49,12 @@ const createConversionController = async (req, res) => {
       }
 
       // Internal errors
-      if (result.message === "Internal server error" || result.message.includes("Unsupported collections")) {
-        logWithTime(`❌ [createConversionController] ${result.message} | ${getLogIdentifiers(req)}`);
-        return throwSpecificInternalServerError(res, result.message);
+      if (result.message === "Internal server error") {
+        logWithTime(`❌ [createConversionController] ${result.message}: ${result.error || "Unknown Error"} | ${getLogIdentifiers(req)}`);
+        return throwSpecificInternalServerError(res, "An internal server error occurred during conversion.");
       }
 
-      // All other validation failures are Bad Requests
+      // All other validation failures (including unsupported collections) are Bad Requests
       logWithTime(`❌ [createConversionController] Validation error: ${result.message} | ${getLogIdentifiers(req)}`);
       return throwBadRequestError(res, result.message, result.error);
     }

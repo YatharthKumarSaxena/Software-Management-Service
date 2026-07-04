@@ -31,7 +31,8 @@ const deleteIdeaController = async (req, res) => {
         auditContext: {
           user: req?.admin || req?.client,
           device: req?.device,
-          requestId: req?.requestId
+          requestId: req?.requestId,
+          workflowId: req.workflowId
         }
       }
     );
