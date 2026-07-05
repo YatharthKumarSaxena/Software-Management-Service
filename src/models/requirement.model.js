@@ -23,44 +23,6 @@ const RequirementSchema = new mongoose.Schema({
     deletedAt: { type: Date, default: null },
     deletedBy: { type: String, match: customIdRegex, default: null },
     isAdminModified: { type: Boolean, default: false },
-    reviewNotes: {
-        type: [{
-            description: {
-                type: String,
-                minlength: descriptionLength.min,
-                maxlength: descriptionLength.max,
-                required: true
-            },
-            createdBy: {
-                type: String,
-                match: customIdRegex,
-                required: true
-            },
-            createdAt: {
-                type: Date,
-                default: Date.now
-            },
-            updatedAt: {
-                type: Date,
-                default: null
-            },
-            deletedAt: {
-                type: Date,
-                default: null
-            },
-            isDeleted: {
-                type: Boolean,
-                default: false
-            },
-            deletedBy: {
-                type: String,
-                match: customIdRegex,
-                default: null
-            }
-        }
-        ],
-        default: []
-    },
     priority: {
         type: String,
         enum: Object.values(PriorityLevels),

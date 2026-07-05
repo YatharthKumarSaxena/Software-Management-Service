@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 const { BulkImportModel } = require("@models/bulk-import.model");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@/configs/tracker.config");
-const { BulkImportStatuses, BulkImportCategories, BulkImportFileTypes } = require("@/configs/enums.config");
+const { BulkImportStatuses, BulkImportCategories } = require("@/configs/enums.config");
 const { logWithTime } = require("@/utils/time-stamps.util");
 const { INTERNAL_ERROR } = require("@/configs/http-status.config");
-const { getMyEnvAsBool } = require("@/utils/env.util");
-const { uploadBulkImportFilesService } = require("@services/storage/supabase-storage.service");
-const { deleteFileIfExists } = require("@utils/bulk-import-temp.util");
 const { DB_COLLECTIONS } = require("@configs/db-collections.config");
+const {
+    uploadBulkImportInBackgroundService
+} = require("@services/bulk-import/bulk-import-upload.service");
 
 const createBulkImportService = async ({
     project,
@@ -163,57 +163,17 @@ const createBulkImportService = async ({
             `✅ [createBulkImportService] Bulk Import created: ${savedBulkImport._id}`
         );
 
-        // ── Decide which files to upload (business logic lives here) ─────────
-        const projectId = project._id.toString();
-        const bulkImportId = savedBulkImport._id.toString();
-
-        const filesToUpload = [];
-        const shouldUploadOriginal =
-            preserveSourceFile === null
-                ? getMyEnvAsBool("BULK_IMPORT_UPLOAD_ORIGINAL", false)
-                : preserveSourceFile;
-
-        const shouldUploadProcessed =
-            preserveProcessedFile === null
-                ? getMyEnvAsBool("BULK_IMPORT_UPLOAD_PROCESSED", true)
-                : preserveProcessedFile;
-
-        if (originalFilePath && shouldUploadOriginal) {
-            filesToUpload.push({
-                type: BulkImportFileTypes.ORIGINAL,
-                path: originalFilePath,
+        setImmediate(() => {
+            void uploadBulkImportInBackgroundService({
+                bulkImport: savedBulkImport,
+                project,
+                originalFilePath,
+                processedFilePath,
+                preserveSourceFile,
+                preserveProcessedFile,
+                auditContext
             });
-        }
-
-        if (processedFilePath && shouldUploadProcessed) {
-            filesToUpload.push({
-                type: BulkImportFileTypes.PROCESSED,
-                path: processedFilePath,
-            });
-        }
-
-        // ── Upload pre-decided files to Supabase Storage ──────────────────────
-        const { originalFileUrl, processedFileUrl } =
-            await uploadBulkImportFilesService({
-                projectId,
-                bulkImportId,
-                files: filesToUpload,
-            });
-
-        // Persist blob URLs if at least one upload succeeded
-        if (originalFileUrl || processedFileUrl) {
-            savedBulkImport.originalFileUrl = originalFileUrl;
-            savedBulkImport.processedFileUrl = processedFileUrl;
-            await savedBulkImport.save();
-
-            logWithTime(
-                `📎 [createBulkImportService] File URLs stored for import ${bulkImportId}`
-            );
-        }
-
-        // ── Delete temporary local files ──────────────────────────────────────
-        deleteFileIfExists(originalFilePath);
-        deleteFileIfExists(processedFilePath);
+        });
 
         // Fire & Forget
         const {
