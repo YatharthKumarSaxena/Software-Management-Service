@@ -20,6 +20,19 @@ const sendRequirementCreatedSuccess = (res, requirement) => {
   });
 };
 
+const sendRequirementCreatedWithMappingErrorSuccess = (res, requirement, mappingError) => {
+  logWithTime(`✅ [sendRequirementCreatedWithMappingErrorSuccess] Requirement created ID: ${requirement._id} but mapping failed: ${mappingError}`);
+  return res.status(CREATED).json({
+    success: true,
+    message: "Requirement created successfully, but there was an error while mapping to the High-Level Feature",
+    data: {
+      requirement,
+      mappingFailed: true,
+      mappingError
+    }
+  });
+};
+
 // ── UPDATE ─────────────────────────────────────────────────────────
 const sendRequirementUpdatedSuccess = (res, requirement) => {
   logWithTime(`✅ [sendRequirementUpdatedSuccess] Requirement updated ID: ${requirement._id}`);
@@ -214,6 +227,7 @@ module.exports = {
   sendRequirementFeatureUnmappedSuccess,
   sendRequirementLinkedSuccess,
   sendRequirementAssignedSuccess,
-  sendRequirementUnassignedSuccess
+  sendRequirementUnassignedSuccess,
+  sendRequirementCreatedWithMappingErrorSuccess
 };
 
