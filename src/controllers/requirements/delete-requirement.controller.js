@@ -6,11 +6,12 @@ const {
   throwAccessDeniedError,
   getLogIdentifiers,
   throwSpecificInternalServerError,
-  throwConflictError
+  throwConflictError,
+  throwDBResourceNotFoundError
 } = require("@/responses/common/error-handler.response");
 const { sendRequirementDeletedSuccess } = require("@/responses/success/requirement.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CONFLICT, FORBIDDEN } = require("@configs/http-status.config");
+const { CONFLICT, FORBIDDEN, NOT_FOUND } = require("@configs/http-status.config");
 const { TotalTypes } = require("@/configs/enums.config");
 
 /**
@@ -45,7 +46,8 @@ const deleteRequirementController = async (req, res) => {
       auditContext: {
         user: user,
         device: req.device,
-        requestId: req.requestId
+        requestId: req.requestId,
+        workflowId: req.workflowId
       }
     });
 
@@ -62,6 +64,12 @@ const deleteRequirementController = async (req, res) => {
           `❌ [deleteRequirementController] Access denied: ${result.message} | ${getLogIdentifiers(req)}`
         );
         return throwAccessDeniedError(res, result.message);
+      }
+      if(result.errorCode === NOT_FOUND){
+        logWithTime(
+          `❌ [deleteRequirementController] Not found: ${result.message} | ${getLogIdentifiers(req)}`
+        );
+        return throwDBResourceNotFoundError(res, result.message);
       }
       logWithTime(`❌ [deleteRequirementController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);

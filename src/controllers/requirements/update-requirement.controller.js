@@ -7,10 +7,11 @@ const {
   throwAccessDeniedError,
   getLogIdentifiers,
   throwSpecificInternalServerError,
+  throwDBResourceNotFoundError,
 } = require("@/responses/common/error-handler.response");
 const { sendRequirementUpdatedSuccess } = require("@/responses/success/requirement.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { CONFLICT, FORBIDDEN } = require("@configs/http-status.config");
+const { CONFLICT, FORBIDDEN, NOT_FOUND } = require("@configs/http-status.config");
 const { TotalTypes } = require("@/configs/enums.config");
 /**
  * PUT /projects/:projectId/elicitations/:elicitationId/requirements/:requirementId
@@ -61,6 +62,12 @@ const updateRequirementController = async (req, res) => {
           `❌ [updateRequirementController] Access denied: ${result.message} | ${getLogIdentifiers(req)}`
         );
         return throwAccessDeniedError(res, result.message);
+      }
+      if (result.errorCode === NOT_FOUND) {
+        logWithTime(
+          `❌ [updateRequirementController] Not found: ${result.message} | ${getLogIdentifiers(req)}`
+        );
+        return throwDBResourceNotFoundError(res, result.message);
       }
       logWithTime(`❌ [updateRequirementController] ${result.message} | ${getLogIdentifiers(req)}`);
       return throwSpecificInternalServerError(res, result.message);

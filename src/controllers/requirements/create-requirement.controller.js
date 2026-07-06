@@ -8,9 +8,9 @@ const {
   throwSpecificInternalServerError,
   getLogIdentifiers,
 } = require("@/responses/common/error-handler.response");
-const { sendRequirementCreatedSuccess } = require("@/responses/success/requirement.response");
+const { sendRequirementCreatedSuccess, sendRequirementCreatedWithMappingErrorSuccess } = require("@/responses/success/requirement.response");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { RequirementSources, RequirementTypes } = require("@configs/enums.config");
+const { RequirementSources, RequirementTypes, TotalTypes } = require("@configs/enums.config");
 const { BAD_REQUEST, NOT_FOUND, CONFLICT } = require("@configs/http-status.config");
 
 /**
@@ -28,6 +28,7 @@ const createRequirementController = async (req, res) => {
 
     const user = req?.admin || req?.client;
     const createdBy = user?.adminId || user?.clientId;
+    const userType = req.admin ? TotalTypes.ADMIN : TotalTypes.CLIENT;
 
     const Type = type || RequirementTypes.FUNCTIONAL;
 
@@ -47,6 +48,7 @@ const createRequirementController = async (req, res) => {
       parentHlfId,
       relationType,
       relationshipNotes,
+      userType,
       auditContext: {
         user,
         device: req.device,
@@ -77,6 +79,11 @@ const createRequirementController = async (req, res) => {
     }
 
     // ── Return success response ───────────────────────────────────────
+    if (result.mappingFailed) {
+      logWithTime(`⚠️ [createRequirementController] Requirement created but mapping failed | ${getLogIdentifiers(req)}`);
+      return sendRequirementCreatedWithMappingErrorSuccess(res, result.requirement, result.mappingError);
+    }
+
     logWithTime(`✅ [createRequirementController] Requirement created successfully | ${getLogIdentifiers(req)}`);
     return sendRequirementCreatedSuccess(res, result.requirement);
 
