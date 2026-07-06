@@ -2,11 +2,12 @@ const { createCheckLatestPhaseNotFrozenMiddleware, createCheckLatestPhaseOpenMid
 const { Phases } = require("@/configs/enums.config");
 
 const allowedPhaseMiddlewares = {
-    createRequirementPhaseCheckMiddleware: createCheckLatestPhaseOpenMiddleware([Phases.ELICITATION,Phases.ELABORATION]),
-    updateRequirementPhaseCheckMiddleware: createCheckLatestPhaseNotFrozenMiddleware([Phases.ELICITATION,Phases.ELABORATION,Phases.NEGOTIATION]),
-    refineRequirementPhaseCheckMiddleware: createCheckLatestPhaseNotFrozenMiddleware([Phases.ELICITATION,Phases.ELABORATION])
+  createRequirementPhaseCheckMiddleware: createCheckLatestPhaseOpenMiddleware([Phases.ELICITATION, Phases.ELABORATION]),
+  updateRequirementPhaseCheckMiddleware: createCheckLatestPhaseNotFrozenMiddleware([Phases.ELICITATION, Phases.ELABORATION, Phases.NEGOTIATION]),
+  refineRequirementPhaseCheckMiddleware: createCheckLatestPhaseNotFrozenMiddleware([Phases.ELICITATION, Phases.ELABORATION]),
+  deleteRequirementPhaseCheckMiddleware: createCheckLatestPhaseNotFrozenMiddleware([Phases.ELICITATION, Phases.ELABORATION])
 };
 
-module.exports = { 
+module.exports = {
   allowedPhaseMiddlewares
 };
