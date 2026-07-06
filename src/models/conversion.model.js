@@ -4,6 +4,17 @@ const { UUID_V4_REGEX, customIdRegex } = require("@configs/regex.config");
 const { ConversionTypes } = require("@/configs/enums.config");
 
 const conversionSchema = new mongoose.Schema({
+  sequence: {
+    type: Number,
+    required: true,
+    min: 1
+  },
+
+  id: {
+    type: String,
+    required: true,
+    trim: true
+  },
   workflowId: {
     type: String,
     required: true,
@@ -65,6 +76,16 @@ const conversionSchema = new mongoose.Schema({
   timestamps: true,
   versionKey: false
 });
+
+conversionSchema.index(
+  { projectId: 1, sequence: 1 },
+  { unique: true }
+);
+
+conversionSchema.index(
+  { projectId: 1, id: 1 },
+  { unique: true }
+);
 
 module.exports = {
   ConversionModel: mongoose.model(DB_COLLECTIONS.CONVERSIONS, conversionSchema)

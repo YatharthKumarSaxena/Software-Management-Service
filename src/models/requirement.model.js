@@ -13,7 +13,6 @@ const RequirementSchema = new mongoose.Schema({
     title: { type: String, trim: true, minlength: titleLength.min, maxlength: titleLength.max, required: true },
     description: { type: String, trim: true, default: null, minlength: descriptionLength.min, maxlength: descriptionLength.max },
     type: { type: String, enum: Object.values(RequirementTypes), default: RequirementTypes.FUNCTIONAL },
-    parentFeatureId: { type: mongoose.Schema.Types.ObjectId, ref: DB_COLLECTIONS.HIGH_LEVEL_FEATURES, default: null },
     aiSuggestedType: { type: String, enum: Object.values(RequirementTypes), default: null },
     status: { type: String, enum: Object.values(RequirementStatuses), default: RequirementStatuses.DRAFT },
     source: { type: String, enum: Object.values(RequirementSources), default: RequirementSources.MANUAL },
@@ -32,46 +31,6 @@ const RequirementSchema = new mongoose.Schema({
         type: String,
         enum: Object.values(WorkflowModes),
         default: WorkflowModes.OPEN
-    },
-    linkedRequirements: {
-        type: [{
-            requirementId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: DB_COLLECTIONS.REQUIREMENTS,
-                required: true
-            },
-            relationType: {
-                type: String,
-                enum: Object.values(RelationTypes),
-                required: true // e.g. DEPENDS_ON, DUPLICATE_OF, BLOCKS
-            },
-            relationshipNotes: {
-                type: String,
-                trim: true,
-                default: null,
-                minlength: descriptionLength.min,
-                maxlength: descriptionLength.max
-            },
-            createdBy: {
-                type: String,
-                match: customIdRegex,
-                required: true
-            },
-            createdAt: {
-                type: Date,
-                default: Date.now
-            },
-            updatedAt: {
-                type: Date,
-                default: null
-            },
-            updatedBy: {
-                type: String,
-                match: customIdRegex,
-                default: null
-            },
-        }],
-        default: []
     },
     decision: {
 
@@ -225,7 +184,6 @@ RequirementSchema.index(
     }
 );
 RequirementSchema.index({ entityId: 1, isDeleted: 1 });
-RequirementSchema.index({ entityId: 1, parentFeatureId: 1, isDeleted: 1 });
 RequirementSchema.index({ entityId: 1, status: 1, isDeleted: 1 });
 RequirementSchema.index({ entityId: 1, createdAt: -1, isDeleted: 1 });
 RequirementSchema.index({ tags: 1 });
