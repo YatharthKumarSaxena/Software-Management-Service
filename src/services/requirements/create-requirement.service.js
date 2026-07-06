@@ -7,7 +7,7 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@/configs/tracker.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { INTERNAL_ERROR, BAD_REQUEST, CONFLICT } = require("@configs/http-status.config");
-const { RequirementStatuses, RequirementTypes, RequirementSources, MinBufferTime, ContributionTypes, PriorityLevels, RelationTypes, Phases, WorkflowModes } = require("@configs/enums.config");
+const { RequirementStatuses, RequirementTypes, RequirementSources, MinBufferTime, ContributionTypes, PriorityLevels, RelationTypes, Phases, TotalTypes } = require("@configs/enums.config");
 const { linkRequirementToHlfService } = require("../hlf-requirement/link-requirement-to-hlf.service");
 const { manualVersionControlService } = require("../common/version.service");
 const { counterServices } = require("@services/common/counter.service");
@@ -29,6 +29,7 @@ const createRequirementService = async ({
   parentHlfId,
   relationType,
   relationshipNotes,
+  userType,
   usedInBulkImport = false,
   auditContext
 }) => {
@@ -171,8 +172,7 @@ const createRequirementService = async ({
       sequence: counterResult.sequence,
       id: counterResult.generatedId,
       createdBy,
-      isDeleted: false,
-      parentFeatureId: null
+      isDeleted: false
     });
 
     const savedRequirement = await newRequirement.save();
@@ -180,7 +180,9 @@ const createRequirementService = async ({
     logWithTime(`✅ [createRequirementService] Requirement created: ${savedRequirement._id}`);
 
     // Auto-create HLF mapping if parentHlfId provided
-    if (parentHlfId) {
+    let mappingResult = { mappingFailed: false };
+
+    if (parentHlfId && userType !== TotalTypes.CLIENT) {
       if (!relationType) {
         relationType = RelationTypes.DERIVED_FROM;
       }
@@ -197,10 +199,17 @@ const createRequirementService = async ({
 
         if (!linkResult.success) {
           logWithTime(`⚠️ [createRequirementService] Error linking to HLF: ${linkResult.message}`);
-          // Note: Requirement is created but linking failed - logging only, requirement still returned as success
+          mappingResult = {
+            mappingFailed: true,
+            mappingError: linkResult.message
+          };
         }
       } catch (linkError) {
         logWithTime(`⚠️ [createRequirementService] Error linking to HLF: ${linkError.message}`);
+        mappingResult = {
+          mappingFailed: true,
+          mappingError: linkError.message
+        };
       }
     }
 
@@ -211,7 +220,7 @@ const createRequirementService = async ({
         user, device, requestId, workflowId, eventType: ACTIVITY_TRACKER_EVENTS.REQUIREMENT_CREATED,
         description: `Requirement created: "${title}"`,
         logOptions: { newData: savedRequirement.toObject(), userActions: { performedOn: DB_COLLECTIONS.REQUIREMENTS, targetId: savedRequirement._id.toString() } }
-    });
+      });
 
 
       await manualVersionControlService({
@@ -222,7 +231,11 @@ const createRequirementService = async ({
         auditContext
       });
     }
-    return { success: true, requirement: savedRequirement };
+    return {
+      success: true,
+      requirement: savedRequirement,
+      ...mappingResult
+    };
 
   } catch (error) {
     logWithTime(`❌ [createRequirementService] Error: ${error.message}`);

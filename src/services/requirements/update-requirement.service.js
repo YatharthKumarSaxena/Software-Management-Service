@@ -8,8 +8,8 @@ const { ACTIVITY_TRACKER_EVENTS } = require("@/configs/tracker.config");
 const { DB_COLLECTIONS } = require("@/configs/db-collections.config");
 const { logWithTime } = require("@utils/time-stamps.util");
 const { prepareAuditData } = require("@utils/audit-data.util");
-const { CONFLICT, INTERNAL_ERROR, FORBIDDEN, BAD_REQUEST } = require("@configs/http-status.config");
-const { RequirementStatuses, UserTypes, ContributionTypes, RelationTypes, WorkflowModes, Phases, MinBufferTime, PriorityLevels } = require("@configs/enums.config");
+const { CONFLICT, INTERNAL_ERROR, FORBIDDEN, BAD_REQUEST, NOT_FOUND } = require("@configs/http-status.config");
+const { RequirementStatuses, TotalTypes, ContributionTypes, RelationTypes, MappingStatuses, Phases, MinBufferTime, PriorityLevels } = require("@configs/enums.config");
 const { linkRequirementToHlfService } = require("../hlf-requirement/link-requirement-to-hlf.service");
 const { unlinkRequirementToHlfService } = require("../hlf-requirement/unlink-requirement-to-hlf.service");
 const { manualVersionControlService } = require("../common/version.service");
@@ -49,8 +49,16 @@ const updateRequirementService = async ({
     // Fetch current requirement
     const currentRequirement = await RequirementModel.findById(requirementId);
 
+    if (!currentRequirement) {
+      return {
+        success: false,
+        message: "Requirement not found",
+        errorCode: NOT_FOUND
+      };
+    }
+
     // Check if client trying to update admin-modified requirement
-    if (userType === UserTypes.CLIENT && currentRequirement.isAdminModified) {
+    if (userType === TotalTypes.CLIENT && currentRequirement.isAdminModified) {
       logWithTime(`❌ [updateRequirementService] Access denied. Client ${updatedBy} cannot edit requirement that was modified by admin`);
       return { success: false, message: "This requirement has been modified by an admin and can no longer be edited by clients", errorCode: FORBIDDEN };
     }
@@ -101,7 +109,7 @@ const updateRequirementService = async ({
 
     // ── Access control checks ──────────────────────────────────────────────
     // Client access check: Only createdBy can update their own requirement
-    if (userType === UserTypes.CLIENT && currentRequirement.createdBy !== updatedBy) {
+    if (userType === TotalTypes.CLIENT && currentRequirement.createdBy !== updatedBy) {
       logWithTime(`❌ [updateRequirementService] Access denied. Client ${updatedBy} cannot update requirement created by ${currentRequirement.createdBy}`);
       return { success: false, message: "You do not have permission to perform this action on this requirement", errorCode: FORBIDDEN };
     }
@@ -156,12 +164,65 @@ const updateRequirementService = async ({
       }
     }
 
-    // Prepare update payload - only allow certain fields
-    const allowedFields = ['title', 'description', 'priority', 'type', 'proposedDate', 'parentHlfId'];
+    // ── Check if any business fields actually changed ───────────────────────
+    let hasBusinessChanges = false;
+
+    if (updateData.title !== undefined && updateData.title !== currentRequirement.title) {
+      const normalizedTitle = updateData.title.trim().replace(/\s+/g, " ");
+      
+      const existingRequirement = await RequirementModel.findOne({
+        projectId: project._id,
+        title: normalizedTitle,
+        isDeleted: false,
+        _id: { $ne: requirementId }
+      }).collation({
+        locale: "en",
+        strength: 2
+      });
+
+      if (existingRequirement) {
+        return {
+          success: false,
+          message: "Requirement with same title already exists",
+          errorCode: CONFLICT
+        };
+      }
+      hasBusinessChanges = true;
+    }
+    if (updateData.description !== undefined && updateData.description !== currentRequirement.description) {
+      hasBusinessChanges = true;
+    }
+    if (updateData.priority !== undefined && updateData.priority !== currentRequirement.priority) {
+      hasBusinessChanges = true;
+    }
+    if (updateData.type !== undefined && updateData.type !== currentRequirement.type) {
+      hasBusinessChanges = true;
+    }
+
+    if (updateData.proposedDate !== undefined) {
+      const currentProposedDate = currentRequirement.timeline?.proposedDate;
+      const currentProposedTime = currentProposedDate ? new Date(currentProposedDate).getTime() : null;
+      const newProposedTime = new Date(updateData.proposedDate).getTime();
+      if (currentProposedTime !== newProposedTime) {
+        hasBusinessChanges = true;
+      }
+    }
+
+    if (!hasBusinessChanges) {
+      logWithTime(`ℹ️ [updateRequirementService] No actual changes detected for requirement: ${requirementId}`);
+      return {
+        success: true,
+        requirement: currentRequirement,
+        message: "No changes detected"
+      };
+    }
+
+    // ── Prepare update payload ──────────────────────────────────────────────
+    const allowedFields = ['title', 'description', 'priority', 'type', 'proposedDate'];
     const updatePayload = { updatedBy, updatedAt: new Date() };
 
     // If admin is updating, set isAdminModified flag to true
-    if (userType === UserTypes.ADMIN) {
+    if (userType === TotalTypes.ADMIN) {
       updatePayload.isAdminModified = true;
     }
 
@@ -176,29 +237,39 @@ const updateRequirementService = async ({
       }
     });
 
-  
-    // Handle parentHlfId change - if HLF ID changed, unlink old then link new
-    const { parentHlfId, relationType, relationshipNotes } = updateData;
-    const oldHlfId = currentRequirement.parentFeatureId ? String(currentRequirement.parentFeatureId) : null;
-
-    if (parentHlfId !== undefined && oldHlfId !== parentHlfId) {
-      // If there's an old mapping, unlink it first
-      if (oldHlfId) {
-        const oldMapping = await FeatureRequirementMappingModel.findOne({
-          featureId: new mongoose.Types.ObjectId(oldHlfId),
+    // ── Handle PRIMARY HLF mapping change ──────────────────────────────────────
+    const { parentHlfId } = updateData;
+    let oldHlfId = null;
+    if (
+      userType !== TotalTypes.CLIENT &&
+      parentHlfId !== undefined &&
+      parentHlfId !== null
+    ) {
+      const existingPrimaryMapping =
+        await FeatureRequirementMappingModel.findOne({
           requirementId: new mongoose.Types.ObjectId(requirementId),
-          isDeleted: false
+          contributionType: ContributionTypes.PRIMARY,
+          status: MappingStatuses.LINKED
         });
 
-        if (oldMapping) {
+      oldHlfId = existingPrimaryMapping
+        ? existingPrimaryMapping.featureId.toString()
+        : null;
+      // Proceed only if mapping actually changed
+      if (oldHlfId !== parentHlfId) {
+        // Remove old primary mapping
+        if (existingPrimaryMapping) {
           const unlinkResult = await unlinkRequirementToHlfService({
-            mappingId: oldMapping._id.toString(),
+            mappingId: existingPrimaryMapping._id.toString(),
             unlinkedBy: updatedBy,
             auditContext
           });
 
           if (!unlinkResult.success) {
-            logWithTime(`❌ [updateRequirementService] Failed to unlink old HLF mapping: ${unlinkResult.message}`);
+            logWithTime(
+              `❌ [updateRequirementService] Failed to unlink old HLF mapping: ${unlinkResult.message}`
+            );
+
             return {
               success: false,
               message: `Failed to unlink old HLF mapping: ${unlinkResult.message}`,
@@ -206,10 +277,9 @@ const updateRequirementService = async ({
             };
           }
         }
-      }
 
-      // If new HLF ID is provided, link to it
-      if (parentHlfId) {
+        // Create new primary mapping
+
         const linkResult = await linkRequirementToHlfService({
           requirementId,
           highLevelFeatureId: parentHlfId,
@@ -221,17 +291,18 @@ const updateRequirementService = async ({
         });
 
         if (!linkResult.success) {
-          logWithTime(`❌ [updateRequirementService] Failed to link new HLF: ${linkResult.message}`);
+          logWithTime(
+            `❌ [updateRequirementService] Failed to link new HLF: ${linkResult.message}`
+          );
+
           return {
             success: false,
             message: `Failed to link new HLF: ${linkResult.message}`,
             errorCode: INTERNAL_ERROR
           };
+
         }
       }
-
-      // Update parentFeatureId in requirement
-      updatePayload.parentFeatureId = parentHlfId ? new mongoose.Types.ObjectId(parentHlfId) : null;
     }
 
     // Update requirement
@@ -241,31 +312,21 @@ const updateRequirementService = async ({
       { new: true }
     );
 
-    // Check if any changes were actually made using audit data utility
+    // Generate audit data
     const auditData = prepareAuditData(currentRequirement, updatedRequirement);
-    const hasChanges = Object.keys(auditData.newData || {}).length > 0;
-
-    if (!hasChanges) {
-      logWithTime(`ℹ️ [updateRequirementService] No actual changes detected for requirement: ${requirementId}`);
-      return {
-        success: true,
-        requirement: updatedRequirement,
-        message: "Your requirement was updated but no changes were detected"
-      };
-    }
 
     logWithTime(`✅ [updateRequirementService] Requirement updated: ${requirementId}`);
 
     // Log activity tracker event only if changes were made
     const { user, device, requestId } = auditContext;
-    logActivityTrackerEvent(
-      user, device, requestId, ACTIVITY_TRACKER_EVENTS.REQUIREMENT_UPDATED,
-      `Requirement updated: "${updatedRequirement.title}"`,
-      {
+    logActivityTrackerEvent({
+      user, device, requestId, eventType: ACTIVITY_TRACKER_EVENTS.REQUIREMENT_UPDATED,
+      description: `Requirement updated: "${updatedRequirement.title}"`,
+      logOptions: {
         ...auditData,
-        adminActions: { targetId: requirementId }
+        userActions: { targetId: requirementId, performedOn: DB_COLLECTIONS.REQUIREMENTS }
       }
-    );
+    });
 
     await manualVersionControlService({
       projectId: project._id,

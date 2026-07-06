@@ -4,11 +4,13 @@ const { RequirementModel } = require("@models/requirement.model");
 const { logActivityTrackerEvent } = require("@services/audit/activity-tracker.service");
 const { ACTIVITY_TRACKER_EVENTS } = require("@/configs/tracker.config");
 const { logWithTime } = require("@utils/time-stamps.util");
-const { INTERNAL_ERROR, FORBIDDEN, CONFLICT } = require("@configs/http-status.config");
-const { UserTypes, WorkflowModes, RequirementStatuses, Phases } = require("@configs/enums.config");
+const { INTERNAL_ERROR, FORBIDDEN, CONFLICT, NOT_FOUND } = require("@configs/http-status.config");
+const { UserTypes, RequirementStatuses, Phases } = require("@configs/enums.config");
 const { ActivityTrackerModel } = require("@/models");
 const { manualVersionControlService } = require("../common/version.service");
-const { isPhaseFrozen } = require("@utils/phase-status.util");
+const { validatePhaseContext } = require("@services/common/phase-context.service");
+const { resolveActivePhase } = require("@services/common/phase-resolution.service");
+const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 
 /**
  * Soft-deletes a requirement (only allowed in Elicitation and Elaboration phases).
@@ -42,7 +44,16 @@ const deleteRequirementService = async ({
 }) => {
   try {
     // Fetch current requirement
+
     const currentRequirement = await RequirementModel.findOne({ _id: requirementId, isDeleted: false });
+
+    if (!currentRequirement) {
+      return {
+        success: false,
+        message: "Requirement not found",
+        errorCode: NOT_FOUND
+      };
+    }
 
     // Check if client trying to delete admin-modified requirement
     if (userType === UserTypes.CLIENT && currentRequirement.isAdminModified) {
@@ -50,30 +61,20 @@ const deleteRequirementService = async ({
       return { success: false, message: "This requirement has been modified by an admin and can no longer be deleted by clients", errorCode: FORBIDDEN };
     }
 
-    // Determine active phase - same logic as create and update services
-    const activePhases = project.currentPhase;
-    let assignedPhase = null;
+    const phaseResult = resolveActivePhase({
+      activePhases: project.currentPhase,
+      supportedPhases: [
+        Phases.ELICITATION,
+        Phases.ELABORATION
+      ],
+      selectedPhase: phase
+    });
 
-    if (activePhases.length === 0) {
-      return { success: false, message: "Project has no active phases", errorCode: CONFLICT };
-    } else if (activePhases.length === 1) {
-      assignedPhase = activePhases[0];
-    } else {
-      // Multiple phases - require explicit specification
-      if (!phase) {
-        return { success: false, message: "Multiple phases are active. Please specify which phase.", errorCode: CONFLICT };
-      }
-      if (!activePhases.includes(phase)) {
-        return { success: false, message: "Specified phase is not currently active for this project", errorCode: CONFLICT };
-      }
-      assignedPhase = phase;
+    if (!phaseResult.success) {
+      return phaseResult;
     }
 
-    // Check if delete is allowed only in Elicitation and Elaboration phases
-    if (assignedPhase !== Phases.ELICITATION && assignedPhase !== Phases.ELABORATION) {
-      logWithTime(`❌ [deleteRequirementService] Delete not allowed in ${assignedPhase} phase`);
-      return { success: false, message: `Requirements can only be deleted in Elicitation and Elaboration phases, not in ${assignedPhase}`, errorCode: FORBIDDEN };
-    }
+    const assignedPhase = phaseResult.phase;
 
     // Check if requirement is in DRAFT status - cannot delete non-draft requirements
     if (currentRequirement.status !== RequirementStatuses.DRAFT) {
@@ -82,31 +83,30 @@ const deleteRequirementService = async ({
     }
 
     // Get the active phase context object
-    let activePhaseContext = null;
-    if (assignedPhase === Phases.ELICITATION) {
-      activePhaseContext = elicitation;
-    } else if (assignedPhase === Phases.ELABORATION) {
-      activePhaseContext = elaboration;
-    }
+    const phaseConfigMap = {
+      [Phases.ELICITATION]: {
+        context: elicitation
+      },
 
-    if (!activePhaseContext) {
-      return { success: false, message: `No active ${assignedPhase} context provided`, errorCode: CONFLICT };
-    }
+      [Phases.ELABORATION]: {
+        context: elaboration
+      }
+    };
 
-    if (isPhaseFrozen(activePhaseContext)) {
-      return { success: false, message: `Cannot delete requirement in a frozen ${assignedPhase} phase`, errorCode: CONFLICT };
+    const phaseValidation = validatePhaseContext({
+      phase: assignedPhase,
+      phaseContext: phaseConfigMap[assignedPhase]?.context,
+      userId: deletedBy
+    });
+
+    if (!phaseValidation.success) {
+      return phaseValidation;
     }
 
     // Client access check: Only createdBy can delete their own requirement
     if (userType === UserTypes.CLIENT && currentRequirement.createdBy !== deletedBy) {
       logWithTime(`❌ [deleteRequirementService] Access denied. Client ${deletedBy} cannot delete requirement created by ${currentRequirement.createdBy}`);
       return { success: false, message: "You do not have permission to perform this action on this requirement", errorCode: FORBIDDEN };
-    } else { 
-      // Check Provided Admin has access to delete Requirement
-      if (currentRequirement.createdInMode === WorkflowModes.MODERATION && !activePhaseContext.contributors.includes(deletedBy)) {
-        logWithTime(`❌ [deleteRequirementService] Access denied. Admin ${deletedBy} is not a contributor on ${assignedPhase} ${activePhaseContext._id}`);
-        return { success: false, message: "You do not have permission to perform this action on this requirement", errorCode: FORBIDDEN };
-      }
     }
 
     // Final check: Verify activity tracker doesn't have REQUIREMENT_ISSUED event for this requirement
@@ -137,12 +137,16 @@ const deleteRequirementService = async ({
     logWithTime(`✅ [deleteRequirementService] Requirement soft-deleted: ${requirementId}`);
 
     // Log activity tracker event
-    const { user, device, requestId } = auditContext || {};
-    logActivityTrackerEvent(
-      user, device, requestId, ACTIVITY_TRACKER_EVENTS.REQUIREMENT_DELETED,
-      `Requirement deleted: "${deletedRequirement.title}"`,
-      { deletedData: deletedRequirement.toObject(), reason: deletionReasonType, reasonDescription: deletionReasonDescription }
-    );
+    const { user, device, requestId, workflowId } = auditContext || {};
+    logActivityTrackerEvent({
+      user: user,
+      device: device,
+      requestId,
+      workflowId: workflowId,
+      eventType: ACTIVITY_TRACKER_EVENTS.REQUIREMENT_DELETED,
+      description: `Requirement deleted: "${deletedRequirement.title}"`,
+      logOptions: { oldData: currentRequirement.toObject(), newData: deletedRequirement.toObject(), userActions: { reason: deletionReasonType, reasonDescription: deletionReasonDescription, targetId: requirementId, performedOn: DB_COLLECTIONS.REQUIREMENTS } }
+    });
 
     await manualVersionControlService({
       projectId: project._id,
