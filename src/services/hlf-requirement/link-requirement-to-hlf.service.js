@@ -154,42 +154,7 @@ const linkRequirementToHlfService = async ({
       return { success: true, mapping: relinkedMapping, requirement };
     }
 
-    // ── 5. If PRIMARY, update requirement.parentFeatureId AFTER all validation checks ───────────────
-    if (isPrimary) {
-      // Clone original requirement for audit
-      const originalRequirement = JSON.parse(JSON.stringify(requirement));
-
-      const updatedRequirement = await RequirementModel.findByIdAndUpdate(
-        requirementId,
-        {
-          $set: {
-            parentFeatureId: new mongoose.Types.ObjectId(highLevelFeatureId),
-            updatedBy: linkedBy
-          }
-        },
-        { new: true }
-      );
-
-      logWithTime(`✅ [linkRequirementToHlfService] Requirement linked to HLF with PRIMARY contribution and parentFeatureId updated`);
-
-      // ── 6. Log activity tracker event ──────────────────────────────────
-      const { user, device, requestId } = auditContext || {};
-      const auditData = prepareAuditData(originalRequirement, updatedRequirement);
-
-      logActivityTrackerEvent(
-        user,
-        device,
-        requestId,
-        ACTIVITY_TRACKER_EVENTS.REQUIREMENT_UPDATED,
-        `Requirement linked to HLF with PRIMARY contribution: "${requirement.title}" → "${hlf.title || highLevelFeatureId}"`,
-        {
-          ...auditData,
-          adminActions: { targetId: requirementId }
-        }
-      );
-    }
-
-    // ── 6. Call create service to create new mapping ───────────────────
+    // ── 5. Call create service to create new mapping ───────────────────
     logWithTime(`📍 [linkRequirementToHlfService] Calling createRequirementToHlfService to create new mapping`);
     
     const createResult = await createRequirementToHlfService({
