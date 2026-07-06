@@ -8,19 +8,21 @@ const { baseAuthClientOrAdminMiddlewares } = require("./middleware.gateway.route
 
 const { requirementControllers } = require("@controllers/requirements");
 const { requirementMiddlewares } = require("@/middlewares/requirements");
-const { createRequirementRateLimiter, getRequirementRateLimiter, listRequirementsRateLimiter, createRequirementInBulkRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
+const { createRequirementRateLimiter, getRequirementRateLimiter, listRequirementsRateLimiter, createRequirementInBulkRateLimiter, deleteRequirementRateLimiter, updateRequirementRateLimiter } = require("@/rate-limiters/general-api.rate-limiter");
 const { projectMiddlewares } = require("@/middlewares/projects");
 const { commonMiddlewares } = require("@/middlewares/common");
 const { getDataMiddleware, listDataMiddleware } = require("@middlewares/common/fetch-data.middleware");
 const { bulkImportMiddlewares } = require("@middlewares/bulk-import");
 const { elicitationMiddlewares } = require("@/middlewares/elicitations");
-const { checkRequirementFileUploadConfiguration, parseSpreadsheetFileMiddleware, createRequirementInBulkHeaderValidationMiddleware } = bulkImportMiddlewares; 
+const { checkRequirementFileUploadConfiguration, parseSpreadsheetFileMiddleware, createRequirementInBulkHeaderValidationMiddleware } = bulkImportMiddlewares;
 
 const {
   CREATE_REQUIREMENT,
   GET_REQUIREMENT,
   LIST_REQUIREMENTS,
-  CREATE_REQUIREMENT_IN_BULK
+  CREATE_REQUIREMENT_IN_BULK,
+  DELETE_REQUIREMENT,
+  UPDATE_REQUIREMENT
 } = REQUIREMENT_ROUTES;
 
 // Create Requirement
@@ -92,6 +94,38 @@ requirementRouter.post(
   ],
   requirementControllers.bulkCreateRequirementController
 );
+
+requirementRouter.delete(
+  DELETE_REQUIREMENT,
+  [
+    ...baseAuthClientOrAdminMiddlewares,
+    deleteRequirementRateLimiter,
+    requirementMiddlewares.fetchRequirementMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
+    commonMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    requirementMiddlewares.deleteRequirementPhaseCheckMiddleware,
+    requirementMiddlewares.deleteRequirementPresenceMiddleware,
+    requirementMiddlewares.deleteRequirementValidationMiddleware
+  ],
+  requirementControllers.deleteRequirementController
+)
+
+requirementRouter.patch(
+  UPDATE_REQUIREMENT,
+  [
+    ...baseAuthClientOrAdminMiddlewares,
+    updateRequirementRateLimiter,
+    requirementMiddlewares.fetchRequirementMiddleware,
+    projectMiddlewares.fetchProjectMiddleware,
+    commonMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+    requirementMiddlewares.updateRequirementPhaseCheckMiddleware,
+    requirementMiddlewares.updateRequirementPresenceMiddleware,
+    requirementMiddlewares.updateRequirementValidationMiddleware
+  ],
+  requirementControllers.updateRequirementController
+)
 
 module.exports = {
   requirementRouter

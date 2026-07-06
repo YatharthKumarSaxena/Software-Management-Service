@@ -417,6 +417,14 @@ const RequirementStatuses = Object.freeze({
   REVOKED: "REVOKED"
 });
 
+const RequirementDeletionReason = Object.freeze({
+  DUPLICATE: "duplicate_requirement",
+  ADMIN_ERROR: "created_by_admin_mistake",
+  TEST_REQUIREMENT: "test_or_demo_requirement_cleanup",
+  OUT_OF_SCOPE: "out_of_scope",
+  OTHER: "other"
+});
+
 
 const RequirementSources = Object.freeze({
   MANUAL: "MANUAL",
@@ -723,6 +731,7 @@ module.exports = {
   RejectOrgProjectRequestReasonType,
   ScopeTypes,
   RequirementTypes,
+  RequirementDeletionReason,
   CommentEntityTypes,
   CommentOtherEntityTypes,
   RequirementStatuses,

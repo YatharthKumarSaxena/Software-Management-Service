@@ -8,6 +8,7 @@ const { DB_COLLECTIONS } = require("@configs/db-collections.config");
 const { isConversionAllowed, getEventsForCollection } = require("@configs/conversion-matrix.config");
 const { compareDirectConversion } = require("../../utils/direct-comparison.util");
 const { ConversionTypes } = require("@/configs/enums.config");
+const { counterServices } = require("@services/common/counter.service");
 const mongoose = require("mongoose");
 
 /**
@@ -136,11 +137,20 @@ const createConversionService = async ({
       conversionType = ConversionTypes.INDIRECT;
     }
 
+    // ── Call counter service to get sequence and id ──────────────────────────
+    const counterResult = await counterServices.conversionCounterService(projectId);
+    if (!counterResult.success) {
+      logWithTime(`❌ [createConversionService] Error generating Conversion sequence for project: ${projectId}`);
+      return { success: false, message: "Failed to generate Conversion sequence", errorCode: INTERNAL_ERROR };
+    }
+
     // 9. Persist Conversion Mapping
     const conversion = new ConversionModel({
       workflowId,
       userId,
       projectId,
+      sequence: counterResult.sequence,
+      id: counterResult.generatedId,
       sourceEntityId,
       sourceCollection,
       targetEntityId,
