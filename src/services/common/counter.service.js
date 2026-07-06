@@ -9,7 +9,8 @@ const counterServices = {
     productRequestCounterService: createCounterService(DB_COLLECTIONS.PRODUCT_REQUESTS),
     orgProjectRequestCounterService: createCounterService(DB_COLLECTIONS.ORG_PROJECT_REQUESTS),
     constraintCounterService: createCounterService(DB_COLLECTIONS.CONSTRAINTS),
-    ideaCounterService: createCounterService(DB_COLLECTIONS.IDEAS)
+    ideaCounterService: createCounterService(DB_COLLECTIONS.IDEAS),
+    conversionCounterService: createCounterService(DB_COLLECTIONS.CONVERSIONS)
 }
 
 module.exports = {
