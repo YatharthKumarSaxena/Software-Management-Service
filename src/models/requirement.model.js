@@ -1,6 +1,6 @@
 
 const { DB_COLLECTIONS } = require('@/configs/db-collections.config');
-const { RequirementTypes, RequirementSources, RequirementStatuses, PriorityLevels, WorkflowModes, RelationTypes } = require('@/configs/enums.config');
+const { RequirementTypes, RequirementSources, RequirementStatuses, PriorityLevels, WorkflowModes, KanoCategories } = require('@/configs/enums.config');
 const { descriptionLength, titleLength, acceptanceCriteriaLength, tagLength } = require('@/configs/fields-length.config');
 const { customIdRegex, tagRegex, acceptanceCriteriaRegex } = require('@/configs/regex.config');
 const { IssuedReasonTypes, RejectedReasonTypes, DeferredReasonTypes, RevokeReasonTypes } = require("@configs/reasons.config");
@@ -13,6 +13,8 @@ const RequirementSchema = new mongoose.Schema({
     title: { type: String, trim: true, minlength: titleLength.min, maxlength: titleLength.max, required: true },
     description: { type: String, trim: true, default: null, minlength: descriptionLength.min, maxlength: descriptionLength.max },
     type: { type: String, enum: Object.values(RequirementTypes), default: RequirementTypes.FUNCTIONAL },
+    kanoCategory: { type: String, enum: Object.values(KanoCategories), default: null },
+    aiSuggestedKanoCategory: { type: String, enum: Object.values(KanoCategories), default: null},
     aiSuggestedType: { type: String, enum: Object.values(RequirementTypes), default: null },
     status: { type: String, enum: Object.values(RequirementStatuses), default: RequirementStatuses.DRAFT },
     source: { type: String, enum: Object.values(RequirementSources), default: RequirementSources.MANUAL },
