@@ -78,8 +78,46 @@ const sendMeetingsListSuccess = (res, meetings, pagination) => {
   });
 };
 
+/**
+ * Sends a 201 response after a meeting is automatically created with provider link.
+ *
+ * @param {Object} res - Express response object
+ * @param {Object} meeting - Newly created meeting document
+ * @param {Object} [meta] - Additional metadata (e.g. passwordNote)
+ */
+const sendMeetingAutoCreatedSuccess = (res, meeting, meta = {}) => {
+  return res.status(CREATED).json({
+    success: true,
+    message: "Meeting automatically created successfully.",
+    data: {
+      meeting,
+      ...meta
+    },
+  });
+};
+
+/**
+ * Sends a 200 response after a meeting link is successfully regenerated.
+ *
+ * @param {Object} res - Express response object
+ * @param {Object} meeting - Updated meeting document
+ * @param {Object} [meta] - Additional metadata (e.g. passwordNote)
+ */
+const sendMeetingLinkRegeneratedSuccess = (res, meeting, meta = {}) => {
+  return res.status(OK).json({
+    success: true,
+    message: "Meeting link regenerated successfully.",
+    data: {
+      meeting,
+      ...meta
+    },
+  });
+};
+
 module.exports = {
   sendMeetingCreatedSuccess,
+  sendMeetingAutoCreatedSuccess,
+  sendMeetingLinkRegeneratedSuccess,
   sendMeetingUpdatedSuccess,
   sendMeetingCancelledSuccess,
   sendMeetingFetchedSuccess,
