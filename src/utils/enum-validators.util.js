@@ -52,7 +52,8 @@ const {
   RevokeRequirementTypes,
   AllowedPhaseTypes,
   ConstraintTypes,
-  ApplicabilityTypes
+  ApplicabilityTypes,
+  KanoCategories
 } = require("@configs/enums.config");
 
 const {
@@ -103,6 +104,7 @@ const ProjectStatusHelper        = createEnumHelper(ProjectStatus,        "Proje
 const ProjectDeletionReasonHelper = createEnumHelper(ProjectDeletionReason, "ProjectDeletionReason");
 const PhaseStatusHelper = createEnumHelper(PhaseStatus, "PhaseStatus");
 const InceptionDeletionReasonHelper = createEnumHelper(InceptionDeletionReason, "InceptionDeletionReason");
+const KanoCategoriesHelper = createEnumHelper(KanoCategories, "KanoCategories");
 
 const AdminRoleTypesHelper = createEnumHelper(AdminRoleTypes, "AdminRoleTypes");
 const ClientRoleTypesHelper = createEnumHelper(ClientRoleTypes, "ClientRoleTypes");
@@ -198,5 +200,6 @@ module.exports = {
   AllowedPhaseTypesHelper,
   ConstraintTypesHelper,
   ApplicabilityTypesHelper,
-  DBCollectionsHelper
+  DBCollectionsHelper,
+  KanoCategoriesHelper
 };

@@ -606,6 +606,20 @@ module.exports = {
       reason: "Create meeting endpoint abuse",
       message: "Too many requests to create meeting endpoint. Please try again later."
     },
+    createAutoMeeting: {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+      prefix: "create_auto_meeting",
+      reason: "Create auto meeting endpoint abuse",
+      message: "Too many requests to create auto meeting endpoint. Please try again later."
+    },
+    regenerateMeetingLink: {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+      prefix: "regenerate_meeting_link",
+      reason: "Regenerate meeting link endpoint abuse",
+      message: "Too many requests to regenerate meeting link endpoint. Please try again later."
+    },
     updateMeeting: {
       maxRequests: 20,
       windowMs: 60 * 1000,

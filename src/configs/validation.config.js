@@ -8,6 +8,7 @@ const {
 } = require("./fields-length.config");
 
 const {
+  KanoCategoriesHelper,
   ProjectCreationReasonHelper,
   ProjectUpdationReasonHelper,
   ProjectOnHoldReasonHelper,
@@ -331,6 +332,10 @@ const validationRules = {
   },
   dbCollection: {
     enum: DBCollectionsHelper
+  },
+
+  kanoCategory: {
+    enum: KanoCategoriesHelper
   }
 };
 

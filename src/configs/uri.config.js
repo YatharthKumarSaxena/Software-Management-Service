@@ -180,7 +180,9 @@ module.exports = {
         RESHEDULE_MEETING: `/reschedule/:entityType/:meetingId`,      // PATCH /api/v1/meetings/reschedule/:entityType/:meetingId
         START_MEETING: `/start/:entityType/:meetingId`,                // POST /api/v1/meetings/start/:entityType/:meetingId
         END_MEETING: `/end/:entityType/:meetingId`,                    // POST /api/v1/meetings/end/:entityType/:meetingId
-        FREEZE_MEETING: `/freeze/:entityType/:meetingId`               // POST /api/v1/meetings/freeze/:entityType/:meetingId
+        FREEZE_MEETING: `/freeze/:entityType/:meetingId`,              // POST /api/v1/meetings/freeze/:entityType/:meetingId
+        CREATE_AUTO_MEETING: `/create-auto/:entityType/:projectId`,    // POST /api/v1/meetings/create-auto/:entityType/:projectId
+        REGENERATE_MEETING_LINK: `/regenerate-link/:entityType/:meetingId` // PATCH/POST /api/v1/meetings/regenerate-link/:entityType/:meetingId
     },
     PARTICIPANT_ROUTES: {
         ADD_PARTICIPANT: `/add/:entityType/:meetingId`, // PATCH /api/v1/participants/add/:meetingId

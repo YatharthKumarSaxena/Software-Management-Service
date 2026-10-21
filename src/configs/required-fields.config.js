@@ -72,6 +72,8 @@ const requiredFields = {
     revokeIdeaField: getRequiredFields(FieldDefinitions.REVOKE_IDEA),
 
     createMeetingField: getRequiredFields(FieldDefinitions.CREATE_MEETING),
+    createAutoMeetingField: getRequiredFields(FieldDefinitions.CREATE_AUTO_MEETING),
+    regenerateMeetingLinkField: getRequiredFields(FieldDefinitions.REGENERATE_MEETING_LINK),
     updateMeetingField: getRequiredFields(FieldDefinitions.UPDATE_MEETING),
     cancelMeetingField: getRequiredFields(FieldDefinitions.CANCEL_MEETING),
     scheduleMeetingField: getRequiredFields(FieldDefinitions.SCHEDULE_MEETING),

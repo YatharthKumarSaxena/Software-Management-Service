@@ -807,6 +807,57 @@ const FieldDefinitions = {
     }
   },
 
+  // ── CREATE AUTO MEETING ──────────────────────────────────────────────
+  CREATE_AUTO_MEETING: {
+    TITLE: {
+      field: "title",
+      required: true,
+      validation: validationRules.meetingTitle,
+      description: "Meeting title (required)"
+    },
+    DESCRIPTION: {
+      field: "description",
+      required: false,
+      validation: validationRules.meetingDescription,
+      description: "Meeting description / agenda (optional)"
+    },
+    AGENDA: {
+      field: "agenda",
+      required: false,
+      validation: validationRules.meetingDescription,
+      description: "Meeting agenda alias for description (optional)"
+    },
+    FACILITATOR_ID: {
+      field: "facilitatorId",
+      required: false,
+      validation: validationRules.userId,
+      description: "Facilitator ID (optional, will default to createdBy)"
+    },
+    MEETING_GROUP: {
+      field: "meetingGroup",
+      required: false,
+      validation: validationRules.meetingGroup,
+      description: "Meeting functional group (optional, enum)"
+    },
+    PLATFORM: {
+      field: "platform",
+      required: false,
+      validation: validationRules.meetingPlatform,
+      description: "Meeting platform type (optional, enum)"
+    },
+    SCHEDULED_AT: {
+      field: "scheduledAt",
+      required: false,
+      validation: validationRules.isoDate,
+      description: "Scheduled start time (optional, ISO date)"
+    }
+  },
+
+  // ── REGENERATE MEETING LINK ──────────────────────────────────────────
+  REGENERATE_MEETING_LINK: {
+    // No required fields: existing meeting context is loaded from DB
+  },
+
   // ── UPDATE MEETING ───────────────────────────────────────────────────
   UPDATE_MEETING: {
     TITLE: {
@@ -1066,6 +1117,12 @@ const FieldDefinitions = {
       required: false,
       validation: validationRules.requirementType,
       description: "Requirement type (FUNCTIONAL, NON_FUNCTIONAL, CONSTRAINT)"
+    },
+    KANO_CATEGORY: {
+      field: "kanoCategory",
+      required: false,
+      validation: validationRules.kanoCategory,
+      description: "Kano category (MUST_HAVE, PERFORMANCE, EXCITED, INDIFFERENT, QUESTIONABLE, REVERSE)"
     },
     PROPOSED_DATE: {
       field: "proposedDate",

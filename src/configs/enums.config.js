@@ -381,8 +381,17 @@ const ScopeTypes = Object.freeze({
 
 const RequirementTypes = Object.freeze({
   FUNCTIONAL: "FUNCTIONAL",
-  NON_FUNCTIONAL: "NON_FUNCTIONAL",
-  EXCITED: "EXCITED"
+  NON_FUNCTIONAL: "NON_FUNCTIONAL"
+});
+
+// rowId,projectTitle,projectDescription,problemStatement,projectGoal,projectType,productVision,Title,Description,HLF -> Primary, [Array of Supporting HLFs (Title, Desc)], Requirements Linked Array (Title, Desc), acceptanceCriteria array form, tags array 
+const KanoCategories = Object.freeze({
+    MUST_BE: 'MUST_BE',
+    PERFORMANCE: 'PERFORMANCE',
+    EXCITED: 'EXCITED',
+    INDIFFERENT: 'INDIFFERENT',
+    QUESTIONABLE: 'QUESTIONABLE',
+    REVERSE: 'REVERSE'
 });
 
 const CommentOtherEntityTypes = Object.freeze({
@@ -768,5 +777,6 @@ module.exports = {
   BulkImportFileTypes,
   ImportColumns,
   ConstraintTypes,
-  ConversionTypes
+  ConversionTypes,
+  KanoCategories
 };

@@ -44,6 +44,8 @@ const validationSets = {
     updateCommentValidationSet: getValidationSet(FieldDefinitions.UPDATE_COMMENT),
     deleteCommentValidationSet: getValidationSet(FieldDefinitions.DELETE_COMMENT),
     createMeetingValidationSet: getValidationSet(FieldDefinitions.CREATE_MEETING),
+    createAutoMeetingValidationSet: getValidationSet(FieldDefinitions.CREATE_AUTO_MEETING),
+    regenerateMeetingLinkValidationSet: getValidationSet(FieldDefinitions.REGENERATE_MEETING_LINK),
     updateMeetingValidationSet: getValidationSet(FieldDefinitions.UPDATE_MEETING),
     cancelMeetingValidationSet: getValidationSet(FieldDefinitions.CANCEL_MEETING),
     scheduleMeetingValidationSet: getValidationSet(FieldDefinitions.SCHEDULE_MEETING),
