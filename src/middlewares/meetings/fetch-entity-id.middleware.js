@@ -4,12 +4,12 @@ const { throwValidationError } = require("@/responses/common/error-handler.respo
 const { createCheckLatestPhaseNotFrozenMiddleware, createCheckLatestPhaseAnyStatusMiddleware } = require("../factory/check-latest-phase.middleware-factory");
 
 const PHASE_MAPPING = {
-    inceptions: Phases.INCEPTIONS,
-    elicitations: Phases.ELICITATIONS,
-    elaborations: Phases.ELABORATIONS,
-    negotiations: Phases.NEGOTIATIONS,
-    specifications: Phases.SPECIFICATIONS,
-    validations: Phases.VALIDATIONS
+    inceptions: Phases.INCEPTION,
+    elicitations: Phases.ELICITATION,
+    elaborations: Phases.ELABORATION,
+    negotiations: Phases.NEGOTIATION,
+    specifications: Phases.SPECIFICATION,
+    validations: Phases.VALIDATION
 };
 
 const createFetchEntityMiddleware = (checkNotFrozen = true) => {
@@ -41,7 +41,10 @@ const createFetchEntityMiddleware = (checkNotFrozen = true) => {
             );
         }
 
-        return middleware(req, res, next);
+        return middleware(req, res, () => {
+            req.parentEntity = req.latestPhases?.[phaseEnum] || req[phaseEnum.slice(0, -1)];
+            return next();
+        });
     };
 };
 

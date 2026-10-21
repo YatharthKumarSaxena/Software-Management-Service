@@ -16,6 +16,8 @@ const { validateBody } = require("@/middlewares/factory/field-validation.middlew
 
 const validationMiddlewares = {
   createMeetingValidationMiddleware: validateBody("createMeeting", validationSets.createMeetingValidationSet),
+  createAutoMeetingValidationMiddleware: validateBody("createAutoMeeting", validationSets.createAutoMeetingValidationSet),
+  regenerateMeetingLinkValidationMiddleware: validateBody("regenerateMeetingLink", validationSets.regenerateMeetingLinkValidationSet),
   updateMeetingValidationMiddleware: validateBody("updateMeeting", validationSets.updateMeetingValidationSet),
   cancelMeetingValidationMiddleware: validateBody("cancelMeeting", validationSets.cancelMeetingValidationSet),
   scheduleMeetingValidationMiddleware: validateBody("scheduleMeeting", validationSets.scheduleMeetingValidationSet),

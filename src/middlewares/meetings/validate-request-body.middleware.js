@@ -3,6 +3,8 @@ const { checkBodyPresence } = require("../factory/validate-request-body.middlewa
 
 const presenceMiddlewares = { 
   createMeetingPresenceMiddleware: checkBodyPresence("createMeetingPresence", requiredFields.createMeetingField),
+  createAutoMeetingPresenceMiddleware: checkBodyPresence("createAutoMeetingPresence", requiredFields.createAutoMeetingField),
+  regenerateMeetingLinkPresenceMiddleware: checkBodyPresence("regenerateMeetingLinkPresence", requiredFields.regenerateMeetingLinkField),
   updateMeetingPresenceMiddleware: checkBodyPresence("updateMeetingPresence", requiredFields.updateMeetingField),
   cancelMeetingPresenceMiddleware: checkBodyPresence("cancelMeetingPresence", requiredFields.cancelMeetingField),
   scheduleMeetingPresenceMiddleware: checkBodyPresence("scheduleMeetingPresence", requiredFields.scheduleMeetingField),
