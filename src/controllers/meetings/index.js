@@ -1,4 +1,6 @@
 const { createMeetingController } = require("./create-meeting.controller");
+const { createAutoMeetingController } = require("./create-auto-meeting.controller");
+const { regenerateMeetingLinkController } = require("./regenerate-meeting-link.controller");
 const { getMeetingController } = require("./get-meeting.controller");
 const { listMeetingsController } = require("./list-meetings.controller");
 const { updateMeetingController } = require("./update-meeting.controller");
@@ -11,6 +13,8 @@ const { freezeMeetingController } = require("./freeze-meeting.controller");
 
 const meetingControllers = {
   createMeetingController,
+  createAutoMeetingController,
+  regenerateMeetingLinkController,
   getMeetingController,
   listMeetingsController,
   updateMeetingController,
