@@ -23,10 +23,14 @@ const {
   rescheduleMeetingRateLimiter,
   startMeetingRateLimiter,
   endMeetingRateLimiter,
-  freezeMeetingRateLimiter
+  freezeMeetingRateLimiter,
+  createAutoMeetingRateLimiter,
+  regenerateMeetingLinkRateLimiter
 } = require("@rate-limiters/general-api.rate-limiter");
 const {
   CREATE_MEETING,
+  CREATE_AUTO_MEETING,
+  REGENERATE_MEETING_LINK,
   UPDATE_MEETING,
   CANCEL_MEETING,
   GET_MEETING,
@@ -61,6 +65,104 @@ meetingRouter.post(
     meetingMiddlewares.createMeetingValidationMiddleware
   ],
   meetingControllers.createMeetingController
+)
+
+meetingRouter.post(
+  CREATE_AUTO_MEETING, [
+    ...baseAuthAdminMiddlewares,
+    createAutoMeetingRateLimiter,
+
+    // Project (derived from entity or meeting)
+    projectMiddlewares.fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+
+    // Stakeholder
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    stakeholderRoleAccessMiddlewares.createMeetingStakeholderRoleAccessMiddleware,
+
+    // Entity (from entityType)
+    meetingMiddlewares.fetchEntityIdMiddleware,
+
+    // Request validation
+    meetingMiddlewares.createAutoMeetingPresenceMiddleware,
+    meetingMiddlewares.createAutoMeetingValidationMiddleware
+  ],
+  meetingControllers.createAutoMeetingController
+)
+
+// Alias for automatic meeting creation
+meetingRouter.post(
+  "/auto-create/:entityType/:projectId", [
+    ...baseAuthAdminMiddlewares,
+    createAutoMeetingRateLimiter,
+
+    projectMiddlewares.fetchProjectMiddleware,
+    projectMiddlewares.activeProjectGuardMiddleware,
+
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    stakeholderRoleAccessMiddlewares.createMeetingStakeholderRoleAccessMiddleware,
+
+    meetingMiddlewares.fetchEntityIdMiddleware,
+
+    meetingMiddlewares.createAutoMeetingPresenceMiddleware,
+    meetingMiddlewares.createAutoMeetingValidationMiddleware
+  ],
+  meetingControllers.createAutoMeetingController
+)
+
+// Regenerate Meeting Link (PATCH and POST supported)
+meetingRouter.patch(
+  REGENERATE_MEETING_LINK, [
+    ...baseAuthAdminMiddlewares,
+    regenerateMeetingLinkRateLimiter,
+
+    // Meeting (from meetingId + entity)
+    meetingMiddlewares.fetchMeetingMiddleware,
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
+
+    // Project (derived from entity or meeting)
+    projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+
+    // Entity (from entityType)
+    meetingMiddlewares.fetchEntityIdMiddleware,
+
+    // Meeting validations
+    meetingMiddlewares.validateUserIsParticipantMiddleware,
+
+    // Request validation
+    meetingMiddlewares.regenerateMeetingLinkPresenceMiddleware,
+    meetingMiddlewares.regenerateMeetingLinkValidationMiddleware
+  ],
+  meetingControllers.regenerateMeetingLinkController
+)
+
+meetingRouter.post(
+  REGENERATE_MEETING_LINK, [
+    ...baseAuthAdminMiddlewares,
+    regenerateMeetingLinkRateLimiter,
+
+    // Meeting (from meetingId + entity)
+    meetingMiddlewares.fetchMeetingMiddleware,
+    meetingMiddlewares.meetingFinalizedGuardMiddleware,
+
+    // Project (derived from entity or meeting)
+    projectMiddlewares.fetchProjectMiddleware,
+    stakeholderMiddlewares.checkUserIsStakeholder,
+    projectMiddlewares.activeProjectGuardMiddleware,
+
+    // Entity (from entityType)
+    meetingMiddlewares.fetchEntityIdMiddleware,
+
+    // Meeting validations
+    meetingMiddlewares.validateUserIsParticipantMiddleware,
+
+    // Request validation
+    meetingMiddlewares.regenerateMeetingLinkPresenceMiddleware,
+    meetingMiddlewares.regenerateMeetingLinkValidationMiddleware
+  ],
+  meetingControllers.regenerateMeetingLinkController
 )
 
 meetingRouter.patch(
