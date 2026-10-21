@@ -98,6 +98,8 @@ const listParticipantsRateLimiter = createRateLimiter(perUserAndDevice.listParti
 
 // ── Meeting rate limiters ────────────────────────────────────────────────────
 const createMeetingRateLimiter = createRateLimiter(perUserAndDevice.createMeeting);
+const createAutoMeetingRateLimiter = createRateLimiter(perUserAndDevice.createAutoMeeting);
+const regenerateMeetingLinkRateLimiter = createRateLimiter(perUserAndDevice.regenerateMeetingLink);
 const updateMeetingRateLimiter = createRateLimiter(perUserAndDevice.updateMeeting);
 const cancelMeetingRateLimiter = createRateLimiter(perUserAndDevice.cancelMeeting);
 const getMeetingRateLimiter = createRateLimiter(perUserAndDevice.getMeeting);
@@ -219,6 +221,8 @@ module.exports = {
     getParticipantRateLimiter,
     listParticipantsRateLimiter,
     createMeetingRateLimiter,
+    createAutoMeetingRateLimiter,
+    regenerateMeetingLinkRateLimiter,
     updateMeetingRateLimiter,
     cancelMeetingRateLimiter,
     getMeetingRateLimiter,
