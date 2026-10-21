@@ -1,4 +1,6 @@
 const { createMeetingService } = require("./create-meeting.service");
+const { createAutoMeetingService } = require("./create-auto-meeting.service");
+const { regenerateMeetingLinkService } = require("./regenerate-meeting-link.service");
 const { updateMeetingService } = require("./update-meeting.service");
 const { cancelMeetingService } = require("./cancel-meeting.service");
 const { getMeetingService } = require("./get-meeting.service");
@@ -11,6 +13,8 @@ const { freezeMeetingService } = require("./freeze-meeting.service");
 
 module.exports = {
   createMeetingService,
+  createAutoMeetingService,
+  regenerateMeetingLinkService,
   updateMeetingService,
   cancelMeetingService,
   getMeetingService,
