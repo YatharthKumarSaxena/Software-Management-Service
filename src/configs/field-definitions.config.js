@@ -597,13 +597,13 @@ const FieldDefinitions = {
   // ── CREATE IDEA ────────────────────────────────────────────────────────────────────────
   CREATE_IDEA: {
     TITLE: {
-      field: "title",
+      field: "rawTitle",
       required: true,
       validation: validationRules.title,
       description: "Idea title (required)"
     },
     DESCRIPTION: {
-      field: "description",
+      field: "rawDescription",
       required: true,
       validation: validationRules.description,
       description: "Detailed idea description (required)"
@@ -613,13 +613,13 @@ const FieldDefinitions = {
   // ── UPDATE IDEA ────────────────────────────────────────────────────────────────────────
   UPDATE_IDEA: {
     TITLE: {
-      field: "title",
+      field: "rawTitle",
       required: false,
       validation: validationRules.title,
       description: "Updated idea title (optional)"
     },
     DESCRIPTION: {
-      field: "description",
+      field: "rawDescription",
       required: false,
       validation: validationRules.description,
       description: "Updated idea description (optional)"

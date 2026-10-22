@@ -75,16 +75,16 @@ const REQUIREMENT_CLIENT_LIST_FIELDS = {
 
 const IDEA_ADMIN_LIST_FIELDS = {
     hiddenFields: ["__v"],
-    filterableFields: ["title", "status", "projectId", "isDeleted"],
-    sortableFields: ["title", "status", "createdAt", "updatedAt"],
-    searchableFields: ["title", "description"]
+    filterableFields: ["title", "status", "projectId", "isDeleted", "rawTitle", "aiPredictedClass"],
+    sortableFields: ["title", "status", "createdAt", "updatedAt", "rawTitle", "aiPredictedClass"],
+    searchableFields: ["title", "description", "rawTitle", "rawDescription", "aiPredictedClass"]
 };
 
 const IDEA_CLIENT_LIST_FIELDS = {
     hiddenFields: ["__v", "deletedBy", "deletedAt", "createdBy", "updatedBy", "isDeleted", "decidedBy", "revokedBy"],
-    filterableFields: ["title", "status", "projectId", "isDeleted"],
-    sortableFields: ["title", "status", "createdAt"],
-    searchableFields: ["title", "description"]
+    filterableFields: ["title", "status", "projectId", "isDeleted", "rawTitle", "aiPredictedClass"],
+    sortableFields: ["title", "status", "createdAt", "rawTitle", "aiPredictedClass"],
+    searchableFields: ["title", "description", "rawTitle", "rawDescription", "aiPredictedClass"]
 };
 
 const HLF_ADMIN_LIST_FIELDS = {

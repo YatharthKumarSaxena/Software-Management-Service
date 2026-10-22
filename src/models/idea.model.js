@@ -7,6 +7,22 @@ const { IdeaStatuses, RejectedIdeaReasonTypes, DeferredIdeaReasonTypes, RevokeId
 
 const ideaSchema = new mongoose.Schema({
 
+    rawTitle: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: titleLength.min,
+        maxlength: titleLength.max
+    },
+
+    rawDescription: {
+        type: String,
+        required: false,
+        trim: true,
+        minlength: descriptionLength.min,
+        maxlength: descriptionLength.max
+    },
+
     title: {
         type: String,
         required: true,
@@ -17,10 +33,22 @@ const ideaSchema = new mongoose.Schema({
 
     description: {
         type: String,
-        required: true,
+        required: false,
         trim: true,
+        default: null,
         minlength: descriptionLength.min,
         maxlength: descriptionLength.max
+    },
+
+    aiPredictedClass: {
+        type: String,
+        trim: true,
+        default: null
+    },
+
+    aiPredictionSummary: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null
     },
 
     projectId: {
@@ -150,6 +178,11 @@ ideaSchema.index(
 ideaSchema.index(
     { projectId: 1, id: 1 },
     { unique: true }
+);
+
+// Index for filtering ideas by predicted class
+ideaSchema.index(
+    { projectId: 1, aiPredictedClass: 1 }
 );
 
 /* ---------------- Validations ---------------- */

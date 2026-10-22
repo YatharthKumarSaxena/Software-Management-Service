@@ -19,7 +19,7 @@ const { CONFLICT, UNAUTHORIZED, BAD_REQUEST, OK } = require("@configs/http-statu
  */
 const updateIdeaController = async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const { rawTitle, rawDescription } = req.body;
     const { idea } = req;
 
     logWithTime(
@@ -30,13 +30,14 @@ const updateIdeaController = async (req, res) => {
     const result = await ideaServices.updateIdeaService(
       idea,
       {
-        title,
-        description,
+        rawTitle: rawTitle,
+        rawDescription: rawDescription,
         updatedBy: req?.admin?.adminId || req?.client?.clientId,
         auditContext: {
           user: req?.admin || req?.client,
           device: req?.device,
-          requestId: req?.requestId
+          requestId: req?.requestId,
+          workflowId: req?.workflowId
         }
       }
     );

@@ -19,7 +19,7 @@ const { CONFLICT, NOT_FOUND, BAD_REQUEST, INTERNAL_ERROR } = require("@configs/h
 const createIdeaController = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { title, description } = req.body;
+    const { rawTitle, rawDescription } = req.body;
 
     logWithTime(
       `📍 [createIdeaController] Creating idea for project: ${projectId} | ${getLogIdentifiers(req)}`
@@ -28,8 +28,8 @@ const createIdeaController = async (req, res) => {
     // ── Call service ──────────────────────────────────────────────────
     const result = await ideaServices.createIdeaService({
       projectId,
-      title,
-      description,
+      rawTitle: rawTitle,
+      rawDescription: rawDescription,
       createdBy: req.admin?.adminId || req.client?.clientId,
       auditContext: {
         user: req.admin || req.client,
